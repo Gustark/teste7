@@ -177,7 +177,6 @@
             padding: 14px 16px;
             border-bottom: 1px solid #ecf3f8;
         }
-        /* Coluna Quantidade mais estreita */
         .inventory-table th:nth-child(5),
         .inventory-table td:nth-child(5) {
             text-align: center;
@@ -410,7 +409,7 @@
 
 <script>
     // ============================================================
-    // URL DO SEU WEB APP
+    // ✅ URL ATUALIZADA DO SEU WEB APP
     // ============================================================
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzYsyFNdG3Lfujd1w8_bk-ZlR_11NxMkH65otf6P51VxyXb0RmcYDIaJgoAUAQtynwWIQ/exec";
     // ============================================================
@@ -452,7 +451,6 @@
             else if (tipo === 'success') { statusDiv.classList.add('success'); statusText.innerText = texto; }
             else { statusText.innerText = texto; }
         }
-        console.log("Status:", tipo, "-", texto);
     }
 
     function escapeHtml(str) {
@@ -467,7 +465,6 @@
         try {
             const resposta = await fetch(`${URL_WEB_APP}?t=${Date.now()}`);
             const dados = await resposta.json();
-            console.log("Dados recebidos:", dados);
             if (dados.status === "sucesso" && dados.dados) {
                 equipamentos = dados.dados;
                 renderizar();
@@ -516,7 +513,7 @@
         }
 
         const agora = new Date();
-        const dataHora = agora.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const dataHora = agora.toLocaleString('pt-BR');
 
         mostrarMensagem('Salvando...', 'syncing');
         try {
@@ -583,7 +580,7 @@
         document.getElementById("equipLocation").value = equip.localizacao || "";
         document.getElementById("equipQtd").value = equip.quantidade || 1;
         document.getElementById("equipStatus").value = equip.status;
-        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar (salvar criará novo)";
+        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar";
         document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
     }
 
@@ -615,13 +612,13 @@
                 <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
                 <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
                 <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:12px;">${escapeHtml(eq.serial)}<\/code><\/td>
-                <td><i class="fas fa-location-dot" style="color:#4f7ea0;"><\/i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
+                <td><i class="fas fa-location-dot"></i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
                 <td style="text-align: center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
                 <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
                 <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}<\/td>
                 <td class="row-actions">
-                    <i class="fas fa-edit" title="Editar" onclick="editEquipamento(${eq.id})"><\/i>
-                    <i class="fas fa-trash-alt" title="Excluir" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
+                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"><\/i>
+                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
                 <\/td>
             <\/tr>`;
         });
