@@ -163,7 +163,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            min-width: 1050px;
+            min-width: 1000px;
         }
         .inventory-table th {
             text-align: left;
@@ -176,6 +176,12 @@
         .inventory-table td {
             padding: 14px 16px;
             border-bottom: 1px solid #ecf3f8;
+        }
+        /* Coluna Quantidade mais estreita */
+        .inventory-table th:nth-child(5),
+        .inventory-table td:nth-child(5) {
+            text-align: center;
+            width: 80px;
         }
         .status-badge {
             display: inline-block;
@@ -273,6 +279,12 @@
             font-weight: 500;
             color: #2c7da0;
         }
+        .quantidade-numero {
+            font-weight: 700;
+            text-align: center;
+            display: inline-block;
+            min-width: 40px;
+        }
         @media (max-width: 680px) {
             body { padding: 20px 16px; }
             .form-card { padding: 20px; }
@@ -320,7 +332,7 @@
             </div>
             <div class="input-group">
                 <label><i class="fas fa-boxes"></i> Quantidade</label>
-                <input type="number" id="equipQtd" value="1" min="1" step="1">
+                <input type="number" id="equipQtd" value="1" min="1" step="1" style="width: 100px;">
             </div>
             <div class="input-group">
                 <label><i class="fas fa-chart-line"></i> Status</label>
@@ -362,7 +374,7 @@
                     <th>Marca / Modelo</th>
                     <th>Nº Série</th>
                     <th>Localização</th>
-                    <th>Quantidade</th>
+                    <th style="text-align: center;">Qtd</th>
                     <th>Status</th>
                     <th>Data de Registro</th>
                     <th style="width: 100px;">Ações</th>
@@ -398,7 +410,7 @@
 
 <script>
     // ============================================================
-    // ✅ URL DO SEU WEB APP (ATUALIZADA)
+    // URL DO SEU WEB APP
     // ============================================================
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbz-6rLTAb1IGIslG2OMBWVwdzFMN7j8d7f_RswQLhozwOYbwZ6Q06Km7E7S5cmQWo2GfQ/exec";
     // ============================================================
@@ -473,6 +485,19 @@
         carregando = false;
     }
 
+    async function excluirDaPlanilha(id) {
+        try {
+            const params = new URLSearchParams({ acao: 'excluir', id: id });
+            const urlCompleta = `${URL_WEB_APP}?${params.toString()}`;
+            const resposta = await fetch(urlCompleta);
+            const resultado = await resposta.json();
+            return resultado.status === "sucesso";
+        } catch (erro) {
+            console.error('Erro na exclusão:', erro);
+            return false;
+        }
+    }
+
     async function salvarEquipamento() {
         const nome = document.getElementById("equipName").value.trim();
         const marca = document.getElementById("equipMarca").value.trim();
@@ -521,6 +546,22 @@
         }
     }
 
+    async function excluirEquipamento(id) {
+        const equip = equipamentos.find(eq => eq.id === id);
+        if (!equip) return;
+        
+        if (confirm(`Tem certeza que deseja excluir o equipamento "${equip.nome}" - ${equip.marca}?\n\nEsta ação não poderá ser desfeita.`)) {
+            mostrarMensagem('Excluindo...', 'syncing');
+            const excluido = await excluirDaPlanilha(id);
+            if (excluido) {
+                mostrarMensagem('🗑️ Equipamento excluído!', 'success');
+                setTimeout(() => carregarDaPlanilha(), 500);
+            } else {
+                mostrarMensagem('❌ Erro ao excluir', 'error');
+            }
+        }
+    }
+
     function resetForm() {
         document.getElementById("equipName").value = "";
         document.getElementById("equipMarca").value = "";
@@ -544,11 +585,6 @@
         document.getElementById("equipStatus").value = equip.status;
         document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar (salvar criará novo)";
         document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
-    }
-
-    function excluirEquipamento(id) {
-        const equip = equipamentos.find(eq => eq.id === id);
-        if (equip) alert(`Para excluir "${equip.nome}" - ${equip.marca}, remova a linha na planilha do Google e clique em "Atualizar".`);
     }
 
     function renderizar() {
@@ -580,12 +616,12 @@
                 <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
                 <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:12px;">${escapeHtml(eq.serial)}<\/code><\/td>
                 <td><i class="fas fa-location-dot" style="color:#4f7ea0;"><\/i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
-                <td><span style="font-weight:600;">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
+                <td style="text-align: center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
                 <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
                 <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}<\/td>
                 <td class="row-actions">
-                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"><\/i>
-                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
+                    <i class="fas fa-edit" title="Editar" onclick="editEquipamento(${eq.id})"><\/i>
+                    <i class="fas fa-trash-alt" title="Excluir" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
                 <\/td>
             <\/tr>`;
         });
