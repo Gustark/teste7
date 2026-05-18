@@ -163,7 +163,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            min-width: 900px;
+            min-width: 1050px;
         }
         .inventory-table th {
             text-align: left;
@@ -269,6 +269,10 @@
             color: #64748b;
             white-space: nowrap;
         }
+        .marca-modelo {
+            font-weight: 500;
+            color: #2c7da0;
+        }
         @media (max-width: 680px) {
             body { padding: 20px 16px; }
             .form-card { padding: 20px; }
@@ -282,7 +286,7 @@
     <div class="header">
         <div class="title-section">
             <h1><i class="fas fa-microchip"></i> Inventário de Equipamentos EGESP</h1>
-            <p>Sempre verifique o status de sincronização</p>
+            <p>Dados sincronizados com planilha do Google</p>
         </div>
         <div style="display: flex; gap: 12px;">
             <div class="sync-status" id="syncStatus">
@@ -300,7 +304,11 @@
         <div class="form-grid">
             <div class="input-group">
                 <label><i class="fas fa-tag"></i> Nome / Tipo *</label>
-                <input type="text" id="equipName" placeholder="Ex: Notebook Daten" autocomplete="off">
+                <input type="text" id="equipName" placeholder="Ex: Notebook" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-industry"></i> Marca / Modelo *</label>
+                <input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron 15" autocomplete="off">
             </div>
             <div class="input-group">
                 <label><i class="fas fa-barcode"></i> Nº de Série/SF *</label>
@@ -332,7 +340,7 @@
     <div class="filter-bar">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Buscar por nome, SF ou local...">
+            <input type="text" id="searchInput" placeholder="Buscar por nome, marca, série ou local...">
         </div>
         <div class="filter-status">
             <select id="filterStatusSelect">
@@ -349,10 +357,19 @@
     <div class="table-wrapper">
         <table class="inventory-table">
             <thead>
-                <tr><th>Nome / Tipo</th><th>Nº Série</th><th>Localização</th><th>Quantidade</th><th>Status</th><th>Data de Registro</th><th style="width: 100px;">Ações</th></tr>
+                <tr>
+                    <th>Nome / Tipo</th>
+                    <th>Marca / Modelo</th>
+                    <th>Nº Série</th>
+                    <th>Localização</th>
+                    <th>Quantidade</th>
+                    <th>Status</th>
+                    <th>Data de Registro</th>
+                    <th style="width: 100px;">Ações</th>
+                </tr>
             </thead>
             <tbody id="tableBody">
-                <tr class="empty-row"><td colspan="7">Carregando equipamentos da planilha...<\/td><\/tr>
+                <tr class="empty-row"><td colspan="8">Carregando equipamentos da planilha...<\/td><\/tr>
             <\/tbody>
          <\/table>
     <\/div>
@@ -381,9 +398,9 @@
 
 <script>
     // ============================================================
-    // ✅ URL ATUALIZADA DO SEU WEB APP
+    // ✅ URL DO SEU WEB APP (ATUALIZADA)
     // ============================================================
-    const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbwUv0HIJHip5yHf0sp5cGBNWY5wnPAmuJH-56KFYQlM0kySav8fdsBi0OSAw4duEhzklA/exec";
+    const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbz-6rLTAb1IGIslG2OMBWVwdzFMN7j8d7f_RswQLhozwOYbwZ6Q06Km7E7S5cmQWo2GfQ/exec";
     // ============================================================
     
     let equipamentos = [];
@@ -458,13 +475,16 @@
 
     async function salvarEquipamento() {
         const nome = document.getElementById("equipName").value.trim();
+        const marca = document.getElementById("equipMarca").value.trim();
         const serial = document.getElementById("equipSerial").value.trim();
         const localizacao = document.getElementById("equipLocation").value.trim() || "Não informado";
         const quantidade = document.getElementById("equipQtd").value || "1";
         const status = document.getElementById("equipStatus").value;
 
-        if (!nome) { alert("Informe o Nome/Tipo."); return false; }
-        if (!serial) { alert("Informe o Número de Série."); return false; }
+        if (!nome) { alert("Informe o Nome/Tipo do equipamento."); return false; }
+        if (!marca) { alert("Informe a Marca/Modelo do equipamento."); return false; }
+        if (!serial) { alert("Informe o Número de Série/SF."); return false; }
+        
         if (equipamentos.some(eq => eq.serial === serial)) {
             alert("Já existe um equipamento com este número de série.");
             return false;
@@ -475,7 +495,16 @@
 
         mostrarMensagem('Salvando...', 'syncing');
         try {
-            const params = new URLSearchParams({ acao: 'salvar', nome, serial, localizacao, quantidade, status, registro: dataHora });
+            const params = new URLSearchParams({ 
+                acao: 'salvar', 
+                nome, 
+                marca,
+                serial, 
+                localizacao, 
+                quantidade, 
+                status, 
+                registro: dataHora 
+            });
             const urlCompleta = `${URL_WEB_APP}?${params.toString()}`;
             const resposta = await fetch(urlCompleta);
             const resultado = await resposta.json();
@@ -494,6 +523,7 @@
 
     function resetForm() {
         document.getElementById("equipName").value = "";
+        document.getElementById("equipMarca").value = "";
         document.getElementById("equipSerial").value = "";
         document.getElementById("equipLocation").value = "";
         document.getElementById("equipQtd").value = "1";
@@ -507,6 +537,7 @@
         if (!equip) return;
         editingId = equip.id;
         document.getElementById("equipName").value = equip.nome;
+        document.getElementById("equipMarca").value = equip.marca || "";
         document.getElementById("equipSerial").value = equip.serial;
         document.getElementById("equipLocation").value = equip.localizacao || "";
         document.getElementById("equipQtd").value = equip.quantidade || 1;
@@ -517,28 +548,36 @@
 
     function excluirEquipamento(id) {
         const equip = equipamentos.find(eq => eq.id === id);
-        if (equip) alert(`Para excluir "${equip.nome}", remova a linha na planilha do Google e clique em "Atualizar".`);
+        if (equip) alert(`Para excluir "${equip.nome}" - ${equip.marca}, remova a linha na planilha do Google e clique em "Atualizar".`);
     }
 
     function renderizar() {
         const busca = document.getElementById("searchInput").value.toLowerCase();
         const filtroStatus = document.getElementById("filterStatusSelect").value;
+        
         let filtrados = equipamentos.filter(eq => {
-            const matchBusca = busca === "" || String(eq.nome || "").toLowerCase().includes(busca) || String(eq.serial || "").toLowerCase().includes(busca);
+            const matchBusca = busca === "" || 
+                String(eq.nome || "").toLowerCase().includes(busca) || 
+                String(eq.marca || "").toLowerCase().includes(busca) ||
+                String(eq.serial || "").toLowerCase().includes(busca) ||
+                String(eq.localizacao || "").toLowerCase().includes(busca);
             const matchStatus = filtroStatus === "todos" || eq.status === filtroStatus;
             return matchBusca && matchStatus;
         });
+        
         const tbody = document.getElementById("tableBody");
         if (!tbody) return;
         if (filtrados.length === 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
             return;
         }
+        
         let html = "";
         filtrados.forEach(eq => {
             let statusClass = eq.status === "Operacional" ? "status-operacional" : (eq.status === "Manutenção" ? "status-manutencao" : "status-inativo");
             html += `<tr>
                 <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
+                <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
                 <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:12px;">${escapeHtml(eq.serial)}<\/code><\/td>
                 <td><i class="fas fa-location-dot" style="color:#4f7ea0;"><\/i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
                 <td><span style="font-weight:600;">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
@@ -557,8 +596,17 @@
 
     function exportarCSV() {
         if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
-        const headers = ["ID", "Nome", "Série", "Localização", "Quantidade", "Status", "Data de Registro"];
-        const linhas = equipamentos.map(eq => [ eq.id, `"${String(eq.nome || '').replace(/"/g, '""')}"`, `"${String(eq.serial || '').replace(/"/g, '""')}"`, `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, eq.quantidade || '1', eq.status, eq.registro || '' ]);
+        const headers = ["ID", "Nome/Tipo", "Marca/Modelo", "Nº Série", "Localização", "Quantidade", "Status", "Data de Registro"];
+        const linhas = equipamentos.map(eq => [ 
+            eq.id, 
+            `"${String(eq.nome || '').replace(/"/g, '""')}"`, 
+            `"${String(eq.marca || '').replace(/"/g, '""')}"`,
+            `"${String(eq.serial || '').replace(/"/g, '""')}"`, 
+            `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, 
+            eq.quantidade || '1', 
+            eq.status, 
+            eq.registro || '' 
+        ]);
         let csv = headers.join(",") + "\n" + linhas.map(l => l.join(",")).join("\n");
         const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
