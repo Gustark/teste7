@@ -805,4 +805,44 @@
         document.getElementById("equipLocation").value = equip.localizacao || "";
         document.getElementById("equipQtd").value = equip.quantidade || 1;
         document.getElementById("equipStatus").value = equip.status;
-        document.getElementById("formTitle").innerHTML = "<i class
+        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar Equipamento";
+        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+        verificarDuplicidade();
+    }
+
+    function exportarCSV() {
+        if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
+        const headers = ["ID", "Nome/Tipo", "Marca/Modelo", "Nº Série", "Localização", "Quantidade", "Status", "Data de Registro"];
+        const linhas = equipamentos.map(eq => [ 
+            eq.id, 
+            `"${String(eq.nome || '').replace(/"/g, '""')}"`, 
+            `"${String(eq.marca || '').replace(/"/g, '""')}"`,
+            `"${String(eq.serial || '').replace(/"/g, '""')}"`, 
+            `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, 
+            eq.quantidade || '1', 
+            eq.status, 
+            eq.registro || '' 
+        ]);
+        let csv = headers.join(",") + "\n" + linhas.map(l => l.join(",")).join("\n");
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `inventario_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        mostrarMensagem('📄 CSV exportado!', 'success');
+    }
+
+    document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
+    document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
+    document.getElementById("searchInput").oninput = () => aplicarFiltros();
+    document.getElementById("filterStatusSelect").onchange = () => aplicarFiltros();
+    document.getElementById("exportBtn").onclick = () => exportarCSV();
+    document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
+    document.getElementById("equipSerial").oninput = () => verificarDuplicidade();
+    document.getElementById("equipSerial").onblur = () => verificarDuplicidade();
+
+    carregarDaPlanilha();
+</script>
+</body>
+</html>
