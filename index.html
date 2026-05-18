@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventário EGESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            color: #1e293b;
+            padding: 32px 24px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            gap: 16px;
+        }
+        .title-section h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f2b3d, #1e4a6e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .title-section p { color: #475569; font-size: 0.9rem; margin-top: 6px; }
+        .stats-badge {
+            background: white;
+            border-radius: 60px;
+            padding: 8px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+        .sync-status {
+            background: #e6f7e6;
+            border-radius: 60px;
+            padding: 8px 16px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sync-status.syncing { background: #fff3cd; color: #856404; }
+        .sync-status.error { background: #f8d7da; color: #721c24; }
+        .sync-status.success { background: #d4edda; color: #155724; }
+        .form-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 36px;
+            border: 1px solid #e9eef3;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #4b6b86;
+        }
+        .input-group input, .input-group select {
+            padding: 12px 14px;
+            border-radius: 16px;
+            border: 1.5px solid #e2e8f0;
+            font-family: 'Inter', monospace;
+            font-size: 0.95rem;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+        }
+        .btn-primary {
+            background: #1e4a6e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary:hover { background: #0f3b58; transform: scale(0.98); }
+        .btn-secondary {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            padding: 8px 16px;
+            border-radius: 32px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { background: #e6edf4; }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .search-box {
+            background: white;
+            border-radius: 48px;
+            padding: 6px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .search-box i { color: #7e8b9c; }
+        .search-box input {
+            border: none;
+            padding: 12px 0;
+            width: 220px;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+        .search-box input:focus { outline: none; }
+        .filter-status select {
+            border-radius: 40px;
+            padding: 8px 18px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-weight: 500;
+        }
+        .table-wrapper {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            border: 1px solid #eef2f6;
+        }
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 900px;
+        }
+        .inventory-table th {
+            text-align: left;
+            padding: 18px 16px;
+            background-color: #f8fafc;
+            font-weight: 700;
+            color: #1f4662;
+            border-bottom: 1px solid #e2edf2;
+        }
+        .inventory-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #ecf3f8;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status-operacional { background: #dcfce7; color: #15803d; }
+        .status-manutencao { background: #fff3e3; color: #b45309; }
+        .status-inativo { background: #ffe4e2; color: #b91c1c; }
+        .row-actions i {
+            font-size: 1.2rem;
+            margin: 0 6px;
+            cursor: pointer;
+            color: #5b6e8c;
+        }
+        .row-actions i:hover { color: #0f2b3d; transform: scale(1.1); }
+        .empty-row td { text-align: center; padding: 48px; color: #6c7a91; font-style: italic; }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 30px 20px 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .footer-content { max-width: 600px; margin: 0 auto; }
+        .footer-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #1e4a6e, #2c7da0);
+            margin: 0 auto 20px;
+            border-radius: 3px;
+        }
+        .footer-text {
+            color: #64748b;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .footer-text i { color: #2c7da0; margin: 0 4px; }
+        .footer-name {
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e4a6e, #2c7da0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .footer-heart {
+            color: #e74c3c;
+            animation: pulse 1.5s ease infinite;
+            display: inline-block;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .social-links {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .social-links a {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .social-links a:hover {
+            color: #1e4a6e;
+            transform: translateY(-2px);
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e4a6e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; }
+        .registro-data {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        @media (max-width: 680px) {
+            body { padding: 20px 16px; }
+            .form-card { padding: 20px; }
+            .btn-primary { width: 100%; justify-content: center; }
+            .footer { margin-top: 30px; padding: 20px 15px 15px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="title-section">
+            <h1><i class="fas fa-microchip"></i> Inventário de Equipamentos EGESP</h1>
+            <p>Dados sincronizados com planilha do Google</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <div class="sync-status" id="syncStatus">
+                <i class="fas fa-cloud"></i> <span id="syncText">Carregando...</span>
+            </div>
+            <div class="stats-badge" id="statsBadge">
+                <i class="fas fa-laptop-code"></i>
+                <span id="totalCount">0</span> equipamentos
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card" id="formCard">
+        <h3 style="margin-bottom: 16px; font-weight: 600;"><i class="fas fa-plus-circle"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
+        <div class="form-grid">
+            <div class="input-group">
+                <label><i class="fas fa-tag"></i> Nome / Tipo *</label>
+                <input type="text" id="equipName" placeholder="Ex: Notebook Daten" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-barcode"></i> Nº de Série/SF *</label>
+                <input type="text" id="equipSerial" placeholder="SF0000" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-map-marker-alt"></i> Localização</label>
+                <input type="text" id="equipLocation" placeholder="Ex: PLENÁRIO, SALA 171">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-boxes"></i> Quantidade</label>
+                <input type="number" id="equipQtd" value="1" min="1" step="1">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-chart-line"></i> Status</label>
+                <select id="equipStatus">
+                    <option value="Operacional">🟢 Operacional</option>
+                    <option value="Manutenção">🟡 Manutenção</option>
+                    <option value="Inativo">🔴 Inativo</option>
+                </select>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancelar</button>
+            <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Salvar Equipamento</button>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Buscar por nome, SF ou local...">
+        </div>
+        <div class="filter-status">
+            <select id="filterStatusSelect">
+                <option value="todos">📋 Todos os status</option>
+                <option value="Operacional">✅ Operacional</option>
+                <option value="Manutenção">⚠️ Manutenção</option>
+                <option value="Inativo">❌ Inativo</option>
+            </select>
+        </div>
+        <button class="btn-secondary" id="exportBtn"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+        <button class="btn-secondary" id="refreshBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="inventory-table">
+            <thead>
+                <tr><th>Nome / Tipo</th><th>Nº Série</th><th>Localização</th><th>Quantidade</th><th>Status</th><th>Data de Registro</th><th style="width: 100px;">Ações</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr class="empty-row"><td colspan="7">Carregando equipamentos da planilha...<\/td><\/tr>
+            <\/tbody>
+         <\/table>
+    <\/div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-divider"></div>
+            <div class="footer-text">
+                <i class="fas fa-code"></i> Desenvolvido por 
+                <span class="footer-name">Gustavo Hugo</span>
+                <i class="fas fa-heart footer-heart"></i>
+            </div>
+            <div class="footer-text" style="font-size: 0.7rem; margin-top: 8px;">
+                <i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas
+            </div>
+            <div class="social-links">
+                <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+<\/div>
+
+<div id="toast" class="toast"><\/div>
+
+<script>
+    // ============================================================
+    // ✅ URL ATUALIZADA DO SEU WEB APP
+    // ============================================================
+    const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbwUv0HIJHip5yHf0sp5cGBNWY5wnPAmuJH-56KFYQlM0kySav8fdsBi0OSAw4duEhzklA/exec";
+    // ============================================================
+    
+    let equipamentos = [];
+    let editingId = null;
+    let carregando = false;
+
+    function formatarData(dataString) {
+        if (!dataString || dataString === "Não registrado") return "Não registrado";
+        try {
+            const data = new Date(dataString);
+            if (isNaN(data.getTime())) return dataString;
+            return data.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return dataString;
+        }
+    }
+
+    function mostrarMensagem(texto, tipo = 'normal') {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = texto;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        const statusText = document.getElementById('syncText');
+        const statusDiv = document.getElementById('syncStatus');
+        if (statusText && statusDiv) {
+            statusDiv.className = 'sync-status';
+            if (tipo === 'error') { statusDiv.classList.add('error'); statusText.innerText = 'Erro'; }
+            else if (tipo === 'syncing') { statusDiv.classList.add('syncing'); statusText.innerText = texto; }
+            else if (tipo === 'success') { statusDiv.classList.add('success'); statusText.innerText = texto; }
+            else { statusText.innerText = texto; }
+        }
+        console.log("Status:", tipo, "-", texto);
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+    }
+
+    async function carregarDaPlanilha() {
+        if (carregando) return;
+        carregando = true;
+        mostrarMensagem('Carregando...', 'syncing');
+        try {
+            const resposta = await fetch(`${URL_WEB_APP}?t=${Date.now()}`);
+            const dados = await resposta.json();
+            console.log("Dados recebidos:", dados);
+            if (dados.status === "sucesso" && dados.dados) {
+                equipamentos = dados.dados;
+                renderizar();
+                atualizarContador();
+                mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
+            } else if (dados.status === "vazio") {
+                equipamentos = []; renderizar(); atualizarContador();
+                mostrarMensagem('Planilha vazia', 'error');
+            } else { throw new Error(dados.mensagem || 'Erro desconhecido'); }
+        } catch (erro) {
+            console.error('Erro:', erro);
+            mostrarMensagem('Erro ao carregar', 'error');
+            equipamentos = []; renderizar(); atualizarContador();
+        }
+        carregando = false;
+    }
+
+    async function salvarEquipamento() {
+        const nome = document.getElementById("equipName").value.trim();
+        const serial = document.getElementById("equipSerial").value.trim();
+        const localizacao = document.getElementById("equipLocation").value.trim() || "Não informado";
+        const quantidade = document.getElementById("equipQtd").value || "1";
+        const status = document.getElementById("equipStatus").value;
+
+        if (!nome) { alert("Informe o Nome/Tipo."); return false; }
+        if (!serial) { alert("Informe o Número de Série."); return false; }
+        if (equipamentos.some(eq => eq.serial === serial)) {
+            alert("Já existe um equipamento com este número de série.");
+            return false;
+        }
+
+        const agora = new Date();
+        const dataHora = agora.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        mostrarMensagem('Salvando...', 'syncing');
+        try {
+            const params = new URLSearchParams({ acao: 'salvar', nome, serial, localizacao, quantidade, status, registro: dataHora });
+            const urlCompleta = `${URL_WEB_APP}?${params.toString()}`;
+            const resposta = await fetch(urlCompleta);
+            const resultado = await resposta.json();
+            if (resultado.status === "sucesso") {
+                mostrarMensagem('✅ Salvo com sucesso!', 'success');
+                resetForm();
+                setTimeout(() => carregarDaPlanilha(), 1000);
+                return true;
+            } else { throw new Error(resultado.mensagem || 'Erro desconhecido'); }
+        } catch (erro) {
+            console.error('Erro no salvamento:', erro);
+            mostrarMensagem('❌ Erro ao salvar', 'error');
+            return false;
+        }
+    }
+
+    function resetForm() {
+        document.getElementById("equipName").value = "";
+        document.getElementById("equipSerial").value = "";
+        document.getElementById("equipLocation").value = "";
+        document.getElementById("equipQtd").value = "1";
+        document.getElementById("equipStatus").value = "Operacional";
+        editingId = null;
+        document.getElementById("formTitle").innerText = "Cadastrar Equipamento";
+    }
+
+    function editEquipamento(id) {
+        const equip = equipamentos.find(eq => eq.id === id);
+        if (!equip) return;
+        editingId = equip.id;
+        document.getElementById("equipName").value = equip.nome;
+        document.getElementById("equipSerial").value = equip.serial;
+        document.getElementById("equipLocation").value = equip.localizacao || "";
+        document.getElementById("equipQtd").value = equip.quantidade || 1;
+        document.getElementById("equipStatus").value = equip.status;
+        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar (salvar criará novo)";
+        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function excluirEquipamento(id) {
+        const equip = equipamentos.find(eq => eq.id === id);
+        if (equip) alert(`Para excluir "${equip.nome}", remova a linha na planilha do Google e clique em "Atualizar".`);
+    }
+
+    function renderizar() {
+        const busca = document.getElementById("searchInput").value.toLowerCase();
+        const filtroStatus = document.getElementById("filterStatusSelect").value;
+        let filtrados = equipamentos.filter(eq => {
+            const matchBusca = busca === "" || String(eq.nome || "").toLowerCase().includes(busca) || String(eq.serial || "").toLowerCase().includes(busca);
+            const matchStatus = filtroStatus === "todos" || eq.status === filtroStatus;
+            return matchBusca && matchStatus;
+        });
+        const tbody = document.getElementById("tableBody");
+        if (!tbody) return;
+        if (filtrados.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
+            return;
+        }
+        let html = "";
+        filtrados.forEach(eq => {
+            let statusClass = eq.status === "Operacional" ? "status-operacional" : (eq.status === "Manutenção" ? "status-manutencao" : "status-inativo");
+            html += `<tr>
+                <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
+                <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:12px;">${escapeHtml(eq.serial)}<\/code><\/td>
+                <td><i class="fas fa-location-dot" style="color:#4f7ea0;"><\/i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
+                <td><span style="font-weight:600;">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
+                <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
+                <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}<\/td>
+                <td class="row-actions">
+                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"><\/i>
+                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
+                <\/td>
+            <\/tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function atualizarContador() { document.getElementById("totalCount").innerText = equipamentos.length; }
+
+    function exportarCSV() {
+        if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
+        const headers = ["ID", "Nome", "Série", "Localização", "Quantidade", "Status", "Data de Registro"];
+        const linhas = equipamentos.map(eq => [ eq.id, `"${String(eq.nome || '').replace(/"/g, '""')}"`, `"${String(eq.serial || '').replace(/"/g, '""')}"`, `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, eq.quantidade || '1', eq.status, eq.registro || '' ]);
+        let csv = headers.join(",") + "\n" + linhas.map(l => l.join(",")).join("\n");
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `inventario_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        mostrarMensagem('📄 CSV exportado!', 'success');
+    }
+
+    document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
+    document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
+    document.getElementById("searchInput").oninput = () => renderizar();
+    document.getElementById("filterStatusSelect").onchange = () => renderizar();
+    document.getElementById("exportBtn").onclick = () => exportarCSV();
+    document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
+
+    carregarDaPlanilha();
+</script>
+</body>
+</html>
