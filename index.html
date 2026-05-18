@@ -85,6 +85,7 @@
             border: 1.5px solid #e2e8f0;
             font-family: 'Inter', monospace;
             font-size: 0.95rem;
+            background: white;
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
@@ -327,7 +328,19 @@
             </div>
             <div class="input-group">
                 <label><i class="fas fa-map-marker-alt"></i> Localização</label>
-                <input type="text" id="equipLocation" placeholder="Ex: PLENÁRIO, SALA 171">
+                <select id="equipLocation">
+                    <option value="">Selecione uma localização...</option>
+                    <option value="Sala 171">🏢 Sala 171</option>
+                    <option value="Sala 178">🏢 Sala 178</option>
+                    <option value="Estúdio">🎙️ Estúdio</option>
+                    <option value="Grande Auditório">🎪 Grande Auditório</option>
+                    <option value="Plenário">📢 Plenário</option>
+                    <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
+                    <option value="SSC - ADM">📋 SSC - ADM</option>
+                    <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
+                    <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
+                    <option value="17/5">📅 17/5</option>
+                </select>
             </div>
             <div class="input-group">
                 <label><i class="fas fa-boxes"></i> Quantidade</label>
@@ -409,7 +422,7 @@
 
 <script>
     // ============================================================
-    // ✅ URL ATUALIZADA DO SEU WEB APP
+    // URL DO SEU WEB APP
     // ============================================================
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzYsyFNdG3Lfujd1w8_bk-ZlR_11NxMkH65otf6P51VxyXb0RmcYDIaJgoAUAQtynwWIQ/exec";
     // ============================================================
@@ -499,13 +512,14 @@
         const nome = document.getElementById("equipName").value.trim();
         const marca = document.getElementById("equipMarca").value.trim();
         const serial = document.getElementById("equipSerial").value.trim();
-        const localizacao = document.getElementById("equipLocation").value.trim() || "Não informado";
+        const localizacao = document.getElementById("equipLocation").value;
         const quantidade = document.getElementById("equipQtd").value || "1";
         const status = document.getElementById("equipStatus").value;
 
         if (!nome) { alert("Informe o Nome/Tipo do equipamento."); return false; }
         if (!marca) { alert("Informe a Marca/Modelo do equipamento."); return false; }
         if (!serial) { alert("Informe o Número de Série/SF."); return false; }
+        if (!localizacao) { alert("Selecione a Localização do equipamento."); return false; }
         
         if (equipamentos.some(eq => eq.serial === serial)) {
             alert("Já existe um equipamento com este número de série.");
