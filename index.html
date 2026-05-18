@@ -92,7 +92,6 @@
             border-color: #2c7da0;
             box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
         }
-        /* Estilo para campo duplicado */
         .input-group input.duplicado {
             border-color: #e74c3c;
             background-color: #fff5f5;
@@ -221,6 +220,47 @@
         }
         .row-actions i:hover { color: #0f2b3d; transform: scale(1.1); }
         .empty-row td { text-align: center; padding: 48px; color: #6c7a91; font-style: italic; }
+        
+        /* Paginação */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .pagination button {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #1e293b;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: #1e4a6e;
+            color: white;
+            border-color: #1e4a6e;
+        }
+        .pagination button.active {
+            background: #1e4a6e;
+            color: white;
+            border-color: #1e4a6e;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pagination-info {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
         .footer {
             margin-top: 50px;
             text-align: center;
@@ -309,6 +349,7 @@
             .form-card { padding: 20px; }
             .btn-primary { width: 100%; justify-content: center; }
             .footer { margin-top: 30px; padding: 20px 15px 15px; }
+            .pagination button { padding: 6px 10px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -420,6 +461,10 @@
          <\/table>
     <\/div>
 
+    <!-- Paginação -->
+    <div class="pagination" id="pagination"></div>
+    <div class="pagination-info" id="paginationInfo"></div>
+
     <div class="footer">
         <div class="footer-content">
             <div class="footer-divider"></div>
@@ -450,8 +495,13 @@
     // ============================================================
     
     let equipamentos = [];
+    let equipamentosFiltrados = [];
     let editingId = null;
     let carregando = false;
+    
+    // Paginação
+    let paginaAtual = 1;
+    const ITENS_POR_PAGINA = 15;
 
     function formatarData(dataString) {
         if (!dataString || dataString === "Não registrado") return "Não registrado";
@@ -493,7 +543,6 @@
         return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 
-    // Verifica se o número de série já existe
     function verificarDuplicidade() {
         const serialInput = document.getElementById("equipSerial");
         const serial = serialInput.value.trim();
@@ -507,7 +556,6 @@
             return false;
         }
         
-        // Verifica se existe outro equipamento com o mesmo serial (exceto se estiver editando)
         const existe = equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId));
         
         if (existe) {
@@ -523,6 +571,115 @@
         }
     }
 
+    function aplicarFiltros() {
+        const busca = document.getElementById("searchInput").value.toLowerCase();
+        const filtroStatus = document.getElementById("filterStatusSelect").value;
+        
+        equipamentosFiltrados = equipamentos.filter(eq => {
+            const matchBusca = busca === "" || 
+                String(eq.nome || "").toLowerCase().includes(busca) || 
+                String(eq.marca || "").toLowerCase().includes(busca) ||
+                String(eq.serial || "").toLowerCase().includes(busca) ||
+                String(eq.localizacao || "").toLowerCase().includes(busca);
+            const matchStatus = filtroStatus === "todos" || eq.status === filtroStatus;
+            return matchBusca && matchStatus;
+        });
+        
+        paginaAtual = 1;
+        renderizarPagina();
+        atualizarPaginacao();
+    }
+
+    function renderizarPagina() {
+        const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+        const fim = inicio + ITENS_POR_PAGINA;
+        const itensPagina = equipamentosFiltrados.slice(inicio, fim);
+        
+        const tbody = document.getElementById("tableBody");
+        if (!tbody) return;
+        
+        if (itensPagina.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
+            return;
+        }
+        
+        let html = "";
+        itensPagina.forEach(eq => {
+            let statusClass = eq.status === "Operacional" ? "status-operacional" : (eq.status === "Manutenção" ? "status-manutencao" : "status-inativo");
+            html += `<tr>
+                <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
+                <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
+                <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:12px;">${escapeHtml(eq.serial)}<\/code><\/td>
+                <td><i class="fas fa-location-dot"></i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
+                <td style="text-align: center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
+                <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
+                <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}<\/td>
+                <td class="row-actions">
+                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"><\/i>
+                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
+                <\/td>
+            <\/tr>`;
+        });
+        tbody.innerHTML = html;
+        
+        // Atualizar info da paginação
+        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        const inicioMostrar = inicio + 1;
+        const fimMostrar = Math.min(fim, equipamentosFiltrados.length);
+        const infoDiv = document.getElementById("paginationInfo");
+        if (infoDiv) {
+            infoDiv.innerHTML = `Mostrando ${inicioMostrar} - ${fimMostrar} de ${equipamentosFiltrados.length} equipamentos`;
+        }
+    }
+
+    function atualizarPaginacao() {
+        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        const paginationDiv = document.getElementById("pagination");
+        if (!paginationDiv) return;
+        
+        if (totalPaginas <= 1) {
+            paginationDiv.innerHTML = "";
+            return;
+        }
+        
+        let html = '';
+        
+        // Botão Anterior
+        html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
+        
+        // Primeira página
+        if (paginaAtual > 3) {
+            html += `<button onclick="mudarPagina(1)">1</button>`;
+            if (paginaAtual > 4) html += `<button disabled>...</button>`;
+        }
+        
+        // Páginas ao redor da atual
+        for (let i = Math.max(1, paginaAtual - 2); i <= Math.min(totalPaginas, paginaAtual + 2); i++) {
+            html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
+        }
+        
+        // Última página
+        if (paginaAtual < totalPaginas - 2) {
+            if (paginaAtual < totalPaginas - 3) html += `<button disabled>...</button>`;
+            html += `<button onclick="mudarPagina(${totalPaginas})">${totalPaginas}</button>`;
+        }
+        
+        // Botão Próximo
+        html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
+        
+        paginationDiv.innerHTML = html;
+    }
+
+    function mudarPagina(pagina) {
+        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        if (pagina < 1 || pagina > totalPaginas) return;
+        paginaAtual = pagina;
+        renderizarPagina();
+        atualizarPaginacao();
+        // Scroll suave para o topo da tabela
+        document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     async function carregarDaPlanilha() {
         if (carregando) return;
         carregando = true;
@@ -532,20 +689,26 @@
             const dados = await resposta.json();
             if (dados.status === "sucesso" && dados.dados) {
                 equipamentos = dados.dados;
-                renderizar();
+                aplicarFiltros();
                 atualizarContador();
                 mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
             } else if (dados.status === "vazio") {
-                equipamentos = []; renderizar(); atualizarContador();
+                equipamentos = [];
+                equipamentosFiltrados = [];
+                renderizarPagina();
+                atualizarContador();
                 mostrarMensagem('Planilha vazia', 'error');
             } else { throw new Error(dados.mensagem || 'Erro desconhecido'); }
         } catch (erro) {
             console.error('Erro:', erro);
             mostrarMensagem('Erro ao carregar', 'error');
-            equipamentos = []; renderizar(); atualizarContador();
+            equipamentos = [];
+            equipamentosFiltrados = [];
+            renderizarPagina();
+            atualizarContador();
         }
         carregando = false;
-        verificarDuplicidade(); // Re-verifica após carregar
+        verificarDuplicidade();
     }
 
     async function excluirDaPlanilha(id) {
@@ -574,7 +737,6 @@
         if (!serial) { alert("Informe o Número de Série/SF."); return false; }
         if (!localizacao) { alert("Selecione a Localização do equipamento."); return false; }
         
-        // Verifica duplicidade novamente antes de salvar
         if (equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId))) {
             alert("❌ Já existe um equipamento com este número de série!\n\nPor favor, verifique e tente novamente.");
             return false;
@@ -636,7 +798,7 @@
         document.getElementById("equipStatus").value = "Operacional";
         editingId = null;
         document.getElementById("formTitle").innerText = "Cadastrar Equipamento";
-        verificarDuplicidade(); // Resetar mensagem de duplicidade
+        verificarDuplicidade();
     }
 
     function editEquipamento(id) {
@@ -649,88 +811,4 @@
         document.getElementById("equipLocation").value = equip.localizacao || "";
         document.getElementById("equipQtd").value = equip.quantidade || 1;
         document.getElementById("equipStatus").value = equip.status;
-        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar Equipamento";
-        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
-        verificarDuplicidade(); // Verificar se o serial atual já existe (não deve, pois é o mesmo)
-    }
-
-    function renderizar() {
-        const busca = document.getElementById("searchInput").value.toLowerCase();
-        const filtroStatus = document.getElementById("filterStatusSelect").value;
-        
-        let filtrados = equipamentos.filter(eq => {
-            const matchBusca = busca === "" || 
-                String(eq.nome || "").toLowerCase().includes(busca) || 
-                String(eq.marca || "").toLowerCase().includes(busca) ||
-                String(eq.serial || "").toLowerCase().includes(busca) ||
-                String(eq.localizacao || "").toLowerCase().includes(busca);
-            const matchStatus = filtroStatus === "todos" || eq.status === filtroStatus;
-            return matchBusca && matchStatus;
-        });
-        
-        const tbody = document.getElementById("tableBody");
-        if (!tbody) return;
-        if (filtrados.length === 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
-            return;
-        }
-        
-        let html = "";
-        filtrados.forEach(eq => {
-            let statusClass = eq.status === "Operacional" ? "status-operacional" : (eq.status === "Manutenção" ? "status-manutencao" : "status-inativo");
-            html += `<tr>
-                <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
-                <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
-                <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:12px;">${escapeHtml(eq.serial)}<\/code><\/td>
-                <td><i class="fas fa-location-dot"></i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
-                <td style="text-align: center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
-                <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
-                <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}<\/td>
-                <td class="row-actions">
-                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"><\/i>
-                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})" style="color:#b91c1c;"><\/i>
-                <\/td>
-            <\/tr>`;
-        });
-        tbody.innerHTML = html;
-    }
-
-    function atualizarContador() { document.getElementById("totalCount").innerText = equipamentos.length; }
-
-    function exportarCSV() {
-        if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
-        const headers = ["ID", "Nome/Tipo", "Marca/Modelo", "Nº Série", "Localização", "Quantidade", "Status", "Data de Registro"];
-        const linhas = equipamentos.map(eq => [ 
-            eq.id, 
-            `"${String(eq.nome || '').replace(/"/g, '""')}"`, 
-            `"${String(eq.marca || '').replace(/"/g, '""')}"`,
-            `"${String(eq.serial || '').replace(/"/g, '""')}"`, 
-            `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, 
-            eq.quantidade || '1', 
-            eq.status, 
-            eq.registro || '' 
-        ]);
-        let csv = headers.join(",") + "\n" + linhas.map(l => l.join(",")).join("\n");
-        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `inventario_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-        mostrarMensagem('📄 CSV exportado!', 'success');
-    }
-
-    // Eventos
-    document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
-    document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
-    document.getElementById("searchInput").oninput = () => renderizar();
-    document.getElementById("filterStatusSelect").onchange = () => renderizar();
-    document.getElementById("exportBtn").onclick = () => exportarCSV();
-    document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
-    document.getElementById("equipSerial").oninput = () => verificarDuplicidade();
-    document.getElementById("equipSerial").onblur = () => verificarDuplicidade();
-
-    carregarDaPlanilha();
-</script>
-</body>
-</html>
+        document.getElementById("formTitle").innerHTML = "<i class='fas fa-p
