@@ -92,6 +92,20 @@
             border-color: #2c7da0;
             box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
         }
+        /* Estilo para campo duplicado */
+        .input-group input.duplicado {
+            border-color: #e74c3c;
+            background-color: #fff5f5;
+        }
+        .mensagem-duplicado {
+            font-size: 0.7rem;
+            color: #e74c3c;
+            margin-top: 4px;
+            display: none;
+        }
+        .mensagem-duplicado.show {
+            display: block;
+        }
         .btn-primary {
             background: #1e4a6e;
             border: none;
@@ -105,6 +119,11 @@
             gap: 10px;
         }
         .btn-primary:hover { background: #0f3b58; transform: scale(0.98); }
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
         .btn-secondary {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
@@ -325,6 +344,9 @@
             <div class="input-group">
                 <label><i class="fas fa-barcode"></i> Nº de Série/SF *</label>
                 <input type="text" id="equipSerial" placeholder="SF0000" autocomplete="off">
+                <div class="mensagem-duplicado" id="msgDuplicado">
+                    <i class="fas fa-exclamation-triangle"></i> Este número de série já está cadastrado!
+                </div>
             </div>
             <div class="input-group">
                 <label><i class="fas fa-map-marker-alt"></i> Localização</label>
@@ -471,6 +493,36 @@
         return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 
+    // Verifica se o número de série já existe
+    function verificarDuplicidade() {
+        const serialInput = document.getElementById("equipSerial");
+        const serial = serialInput.value.trim();
+        const msgDiv = document.getElementById("msgDuplicado");
+        const saveBtn = document.getElementById("saveBtn");
+        
+        if (!serial) {
+            serialInput.classList.remove("duplicado");
+            msgDiv.classList.remove("show");
+            saveBtn.disabled = false;
+            return false;
+        }
+        
+        // Verifica se existe outro equipamento com o mesmo serial (exceto se estiver editando)
+        const existe = equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId));
+        
+        if (existe) {
+            serialInput.classList.add("duplicado");
+            msgDiv.classList.add("show");
+            saveBtn.disabled = true;
+            return true;
+        } else {
+            serialInput.classList.remove("duplicado");
+            msgDiv.classList.remove("show");
+            saveBtn.disabled = false;
+            return false;
+        }
+    }
+
     async function carregarDaPlanilha() {
         if (carregando) return;
         carregando = true;
@@ -493,6 +545,7 @@
             equipamentos = []; renderizar(); atualizarContador();
         }
         carregando = false;
+        verificarDuplicidade(); // Re-verifica após carregar
     }
 
     async function excluirDaPlanilha(id) {
@@ -521,8 +574,9 @@
         if (!serial) { alert("Informe o Número de Série/SF."); return false; }
         if (!localizacao) { alert("Selecione a Localização do equipamento."); return false; }
         
-        if (equipamentos.some(eq => eq.serial === serial)) {
-            alert("Já existe um equipamento com este número de série.");
+        // Verifica duplicidade novamente antes de salvar
+        if (equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId))) {
+            alert("❌ Já existe um equipamento com este número de série!\n\nPor favor, verifique e tente novamente.");
             return false;
         }
 
@@ -561,7 +615,7 @@
         const equip = equipamentos.find(eq => eq.id === id);
         if (!equip) return;
         
-        if (confirm(`Tem certeza que deseja excluir o equipamento "${equip.nome}" - ${equip.marca}?\n\nEsta ação não poderá ser desfeita.`)) {
+        if (confirm(`Tem certeza que deseja excluir o equipamento "${equip.nome}" - ${equip.marca}?\n\nNº Série: ${equip.serial}\n\nEsta ação não poderá ser desfeita.`)) {
             mostrarMensagem('Excluindo...', 'syncing');
             const excluido = await excluirDaPlanilha(id);
             if (excluido) {
@@ -582,6 +636,7 @@
         document.getElementById("equipStatus").value = "Operacional";
         editingId = null;
         document.getElementById("formTitle").innerText = "Cadastrar Equipamento";
+        verificarDuplicidade(); // Resetar mensagem de duplicidade
     }
 
     function editEquipamento(id) {
@@ -594,8 +649,9 @@
         document.getElementById("equipLocation").value = equip.localizacao || "";
         document.getElementById("equipQtd").value = equip.quantidade || 1;
         document.getElementById("equipStatus").value = equip.status;
-        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar";
+        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar Equipamento";
         document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+        verificarDuplicidade(); // Verificar se o serial atual já existe (não deve, pois é o mesmo)
     }
 
     function renderizar() {
@@ -664,12 +720,15 @@
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
 
+    // Eventos
     document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
     document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
     document.getElementById("searchInput").oninput = () => renderizar();
     document.getElementById("filterStatusSelect").onchange = () => renderizar();
     document.getElementById("exportBtn").onclick = () => exportarCSV();
     document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
+    document.getElementById("equipSerial").oninput = () => verificarDuplicidade();
+    document.getElementById("equipSerial").onblur = () => verificarDuplicidade();
 
     carregarDaPlanilha();
 </script>
