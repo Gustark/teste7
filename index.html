@@ -493,7 +493,7 @@
     let editingId = null;
     let carregando = false;
     let paginaAtual = 1;
-    const ITENS_POR_PAGINA = 15;
+    const ITENS_POR_PAGINA = 10;
 
     function formatarData(dataString) {
         if (!dataString || dataString === "Não registrado") return "Não registrado";
@@ -590,13 +590,12 @@
         const tbody = document.getElementById("tableBody");
         if (!tbody) return;
         
-        if (itensPagina.length === 0 && equipamentos.length === 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
-            return;
-        }
-        
-        if (itensPagina.length === 0 && equipamentos.length > 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde ao filtro<\/td><\/tr>`;
+        if (itensPagina.length === 0 && equipamentosFiltrados.length === 0) {
+            if (equipamentos.length === 0) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento na planilha. Cadastre o primeiro! 📭<\/td><\/tr>`;
+            } else {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde ao filtro<\/td><\/tr>`;
+            }
             return;
         }
         
@@ -623,12 +622,10 @@
         const inicioMostrar = total === 0 ? 0 : inicio + 1;
         const fimMostrar = Math.min(fim, total);
         const infoDiv = document.getElementById("paginationInfo");
-        if (infoDiv) {
-            if (total > 0) {
-                infoDiv.innerHTML = `Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos`;
-            } else {
-                infoDiv.innerHTML = ``;
-            }
+        if (infoDiv && total > 0) {
+            infoDiv.innerHTML = `Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos`;
+        } else if (infoDiv) {
+            infoDiv.innerHTML = ``;
         }
     }
 
@@ -808,44 +805,4 @@
         document.getElementById("equipLocation").value = equip.localizacao || "";
         document.getElementById("equipQtd").value = equip.quantidade || 1;
         document.getElementById("equipStatus").value = equip.status;
-        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar Equipamento";
-        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
-        verificarDuplicidade();
-    }
-
-    function exportarCSV() {
-        if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
-        const headers = ["ID", "Nome/Tipo", "Marca/Modelo", "Nº Série", "Localização", "Quantidade", "Status", "Data de Registro"];
-        const linhas = equipamentos.map(eq => [ 
-            eq.id, 
-            `"${String(eq.nome || '').replace(/"/g, '""')}"`, 
-            `"${String(eq.marca || '').replace(/"/g, '""')}"`,
-            `"${String(eq.serial || '').replace(/"/g, '""')}"`, 
-            `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, 
-            eq.quantidade || '1', 
-            eq.status, 
-            eq.registro || '' 
-        ]);
-        let csv = headers.join(",") + "\n" + linhas.map(l => l.join(",")).join("\n");
-        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `inventario_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-        mostrarMensagem('📄 CSV exportado!', 'success');
-    }
-
-    document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
-    document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
-    document.getElementById("searchInput").oninput = () => aplicarFiltros();
-    document.getElementById("filterStatusSelect").onchange = () => aplicarFiltros();
-    document.getElementById("exportBtn").onclick = () => exportarCSV();
-    document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
-    document.getElementById("equipSerial").oninput = () => verificarDuplicidade();
-    document.getElementById("equipSerial").onblur = () => verificarDuplicidade();
-
-    carregarDaPlanilha();
-</script>
-</body>
-</html>
+        document.getElementById("formTitle").innerHTML = "<i class
