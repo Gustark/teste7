@@ -221,7 +221,6 @@
         .row-actions i:hover { color: #0f2b3d; transform: scale(1.1); }
         .empty-row td { text-align: center; padding: 48px; color: #6c7a91; font-style: italic; }
         
-        /* Paginação */
         .pagination {
             display: flex;
             justify-content: center;
@@ -456,12 +455,11 @@
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr class="empty-row"><td colspan="8">Carregando equipamentos da planilha...<\/td><\/tr>
+                <tr class="empty-row"><td colspan="8">Carregando equipamentos...<\/td><\/tr>
             <\/tbody>
          <\/table>
     <\/div>
 
-    <!-- Paginação -->
     <div class="pagination" id="pagination"></div>
     <div class="pagination-info" id="paginationInfo"></div>
 
@@ -488,18 +486,12 @@
 <div id="toast" class="toast"><\/div>
 
 <script>
-    // ============================================================
-    // URL DO SEU WEB APP
-    // ============================================================
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzYsyFNdG3Lfujd1w8_bk-ZlR_11NxMkH65otf6P51VxyXb0RmcYDIaJgoAUAQtynwWIQ/exec";
-    // ============================================================
     
     let equipamentos = [];
     let equipamentosFiltrados = [];
     let editingId = null;
     let carregando = false;
-    
-    // Paginação
     let paginaAtual = 1;
     const ITENS_POR_PAGINA = 15;
 
@@ -552,7 +544,7 @@
         if (!serial) {
             serialInput.classList.remove("duplicado");
             msgDiv.classList.remove("show");
-            saveBtn.disabled = false;
+            if (saveBtn) saveBtn.disabled = false;
             return false;
         }
         
@@ -561,12 +553,12 @@
         if (existe) {
             serialInput.classList.add("duplicado");
             msgDiv.classList.add("show");
-            saveBtn.disabled = true;
+            if (saveBtn) saveBtn.disabled = true;
             return true;
         } else {
             serialInput.classList.remove("duplicado");
             msgDiv.classList.remove("show");
-            saveBtn.disabled = false;
+            if (saveBtn) saveBtn.disabled = false;
             return false;
         }
     }
@@ -598,8 +590,13 @@
         const tbody = document.getElementById("tableBody");
         if (!tbody) return;
         
-        if (itensPagina.length === 0) {
+        if (itensPagina.length === 0 && equipamentos.length === 0) {
             tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento encontrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
+            return;
+        }
+        
+        if (itensPagina.length === 0 && equipamentos.length > 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde ao filtro<\/td><\/tr>`;
             return;
         }
         
@@ -622,13 +619,16 @@
         });
         tbody.innerHTML = html;
         
-        // Atualizar info da paginação
-        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
-        const inicioMostrar = inicio + 1;
-        const fimMostrar = Math.min(fim, equipamentosFiltrados.length);
+        const total = equipamentosFiltrados.length;
+        const inicioMostrar = total === 0 ? 0 : inicio + 1;
+        const fimMostrar = Math.min(fim, total);
         const infoDiv = document.getElementById("paginationInfo");
         if (infoDiv) {
-            infoDiv.innerHTML = `Mostrando ${inicioMostrar} - ${fimMostrar} de ${equipamentosFiltrados.length} equipamentos`;
+            if (total > 0) {
+                infoDiv.innerHTML = `Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos`;
+            } else {
+                infoDiv.innerHTML = ``;
+            }
         }
     }
 
@@ -643,28 +643,22 @@
         }
         
         let html = '';
-        
-        // Botão Anterior
         html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
         
-        // Primeira página
         if (paginaAtual > 3) {
             html += `<button onclick="mudarPagina(1)">1</button>`;
             if (paginaAtual > 4) html += `<button disabled>...</button>`;
         }
         
-        // Páginas ao redor da atual
         for (let i = Math.max(1, paginaAtual - 2); i <= Math.min(totalPaginas, paginaAtual + 2); i++) {
             html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
         }
         
-        // Última página
         if (paginaAtual < totalPaginas - 2) {
             if (paginaAtual < totalPaginas - 3) html += `<button disabled>...</button>`;
             html += `<button onclick="mudarPagina(${totalPaginas})">${totalPaginas}</button>`;
         }
         
-        // Botão Próximo
         html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
         
         paginationDiv.innerHTML = html;
@@ -676,7 +670,6 @@
         paginaAtual = pagina;
         renderizarPagina();
         atualizarPaginacao();
-        // Scroll suave para o topo da tabela
         document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -690,22 +683,24 @@
             if (dados.status === "sucesso" && dados.dados) {
                 equipamentos = dados.dados;
                 aplicarFiltros();
-                atualizarContador();
+                document.getElementById("totalCount").innerText = equipamentos.length;
                 mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
             } else if (dados.status === "vazio") {
                 equipamentos = [];
                 equipamentosFiltrados = [];
                 renderizarPagina();
-                atualizarContador();
+                document.getElementById("totalCount").innerText = "0";
                 mostrarMensagem('Planilha vazia', 'error');
-            } else { throw new Error(dados.mensagem || 'Erro desconhecido'); }
+            } else {
+                throw new Error(dados.mensagem || 'Erro desconhecido');
+            }
         } catch (erro) {
             console.error('Erro:', erro);
             mostrarMensagem('Erro ao carregar', 'error');
             equipamentos = [];
             equipamentosFiltrados = [];
             renderizarPagina();
-            atualizarContador();
+            document.getElementById("totalCount").innerText = "0";
         }
         carregando = false;
         verificarDuplicidade();
@@ -738,7 +733,7 @@
         if (!localizacao) { alert("Selecione a Localização do equipamento."); return false; }
         
         if (equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId))) {
-            alert("❌ Já existe um equipamento com este número de série!\n\nPor favor, verifique e tente novamente.");
+            alert("❌ Já existe um equipamento com este número de série!");
             return false;
         }
 
@@ -765,7 +760,9 @@
                 resetForm();
                 setTimeout(() => carregarDaPlanilha(), 1000);
                 return true;
-            } else { throw new Error(resultado.mensagem || 'Erro desconhecido'); }
+            } else {
+                throw new Error(resultado.mensagem || 'Erro desconhecido');
+            }
         } catch (erro) {
             console.error('Erro no salvamento:', erro);
             mostrarMensagem('❌ Erro ao salvar', 'error');
@@ -816,10 +813,6 @@
         verificarDuplicidade();
     }
 
-    function atualizarContador() {
-        document.getElementById("totalCount").innerText = equipamentos.length;
-    }
-
     function exportarCSV() {
         if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
         const headers = ["ID", "Nome/Tipo", "Marca/Modelo", "Nº Série", "Localização", "Quantidade", "Status", "Data de Registro"];
@@ -843,7 +836,6 @@
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
 
-    // Eventos
     document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
     document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
     document.getElementById("searchInput").oninput = () => aplicarFiltros();
