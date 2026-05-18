@@ -228,7 +228,7 @@
             gap: 8px;
             margin-top: 24px;
             flex-wrap: wrap;
-            min-height: 50px;
+            padding: 10px 0;
         }
         .pagination button {
             background: white;
@@ -239,6 +239,7 @@
             font-weight: 500;
             transition: all 0.2s;
             color: #1e293b;
+            font-size: 0.85rem;
         }
         .pagination button:hover:not(:disabled) {
             background: #1e4a6e;
@@ -257,9 +258,20 @@
         .pagination-info {
             text-align: center;
             margin-top: 16px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #64748b;
-            min-height: 30px;
+            font-weight: 500;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 40px;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .pagination-container {
+            text-align: center;
+            margin-top: 20px;
         }
         
         .footer {
@@ -350,7 +362,7 @@
             .form-card { padding: 20px; }
             .btn-primary { width: 100%; justify-content: center; }
             .footer { margin-top: 30px; padding: 20px 15px 15px; }
-            .pagination button { padding: 6px 10px; font-size: 0.75rem; }
+            .pagination button { padding: 6px 10px; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -462,8 +474,10 @@
          <\/table>
     <\/div>
 
-    <div class="pagination" id="pagination"></div>
-    <div class="pagination-info" id="paginationInfo"></div>
+    <div class="pagination-container">
+        <div class="pagination" id="pagination"></div>
+        <div class="pagination-info" id="paginationInfo"></div>
+    </div>
 
     <div class="footer">
         <div class="footer-content">
@@ -495,23 +509,7 @@
     let editingId = null;
     let carregando = false;
     let paginaAtual = 1;
-    const ITENS_POR_PAGINA = 5;  // Alterado para 5 para testar paginação
-
-    // Dados de exemplo para teste (caso a planilha esteja vazia)
-    const DADOS_EXEMPLO = [
-        { id: 1, nome: "Notebook Dell", marca: "Dell Inspiron", serial: "SN001", localizacao: "Sala 171", status: "Operacional", quantidade: "2", registro: new Date().toLocaleString('pt-BR') },
-        { id: 2, nome: "Projetor Epson", marca: "Epson EB-685W", serial: "SN002", localizacao: "Grande Auditório", status: "Operacional", quantidade: "1", registro: new Date().toLocaleString('pt-BR') },
-        { id: 3, nome: "Monitor LG", marca: "LG UltraGear", serial: "SN003", localizacao: "Sala 178", status: "Operacional", quantidade: "3", registro: new Date().toLocaleString('pt-BR') },
-        { id: 4, nome: "Switch Cisco", marca: "Cisco 2960", serial: "SN004", localizacao: "Sala dos técnicos", status: "Manutenção", quantidade: "1", registro: new Date().toLocaleString('pt-BR') },
-        { id: 5, nome: "Impressora HP", marca: "HP LaserJet", serial: "SN005", localizacao: "SSC - ADM", status: "Operacional", quantidade: "1", registro: new Date().toLocaleString('pt-BR') },
-        { id: 6, nome: "Tablet Samsung", marca: "Samsung Tab S8", serial: "SN006", localizacao: "Plenário", status: "Operacional", quantidade: "4", registro: new Date().toLocaleString('pt-BR') },
-        { id: 7, nome: "Caixa de Som", marca: "JBL Flip", serial: "SN007", localizacao: "Estúdio", status: "Operacional", quantidade: "2", registro: new Date().toLocaleString('pt-BR') },
-        { id: 8, nome: "Roteador TP-Link", marca: "TP-Link Archer", serial: "SN008", localizacao: "17/5", status: "Operacional", quantidade: "1", registro: new Date().toLocaleString('pt-BR') },
-        { id: 9, nome: "Webcam Logitech", marca: "Logitech C920", serial: "SN009", localizacao: "Pequeno Auditório", status: "Operacional", quantidade: "3", registro: new Date().toLocaleString('pt-BR') },
-        { id: 10, nome: "Microfone Shure", marca: "Shure SM7B", serial: "SN010", localizacao: "Estúdio", status: "Operacional", quantidade: "2", registro: new Date().toLocaleString('pt-BR') },
-        { id: 11, nome: "Fonte de Alimentação", marca: "Corsair", serial: "SN011", localizacao: "Sala 171", status: "Manutenção", quantidade: "1", registro: new Date().toLocaleString('pt-BR') },
-        { id: 12, nome: "HD Externo", marca: "Seagate", serial: "SN012", localizacao: "Sala 178", status: "Operacional", quantidade: "3", registro: new Date().toLocaleString('pt-BR') }
-    ];
+    let ITENS_POR_PAGINA = 10;  // 10 itens por página
 
     function formatarData(dataString) {
         if (!dataString || dataString === "Não registrado") return "Não registrado";
@@ -595,6 +593,8 @@
             return matchBusca && matchStatus;
         });
         
+        console.log("Total filtrados:", equipamentosFiltrados.length);
+        
         paginaAtual = 1;
         renderizarPagina();
         atualizarPaginacao();
@@ -641,7 +641,7 @@
         const fimMostrar = Math.min(fim, total);
         const infoDiv = document.getElementById("paginationInfo");
         if (infoDiv && total > 0) {
-            infoDiv.innerHTML = `Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
+            infoDiv.innerHTML = `📄 Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
         } else if (infoDiv) {
             infoDiv.innerHTML = ``;
         }
@@ -651,6 +651,8 @@
         const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
         const paginationDiv = document.getElementById("pagination");
         if (!paginationDiv) return;
+        
+        console.log("Total de páginas:", totalPaginas);
         
         if (totalPaginas <= 1) {
             paginationDiv.innerHTML = "";
@@ -700,22 +702,22 @@
                 aplicarFiltros();
                 document.getElementById("totalCount").innerText = equipamentos.length;
                 mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
-            } else if (dados.status === "vazio" || !dados.dados || dados.dados.length === 0) {
-                // Usar dados de exemplo para demonstrar a paginação
-                equipamentos = DADOS_EXEMPLO;
-                aplicarFiltros();
-                document.getElementById("totalCount").innerText = equipamentos.length;
-                mostrarMensagem(`⚠️ Planilha vazia. ${equipamentos.length} equipamentos de exemplo carregados para demonstração.`, 'error');
             } else {
-                throw new Error(dados.mensagem || 'Erro desconhecido');
+                equipamentos = [];
+                equipamentosFiltrados = [];
+                renderizarPagina();
+                atualizarPaginacao();
+                document.getElementById("totalCount").innerText = "0";
+                mostrarMensagem('Planilha vazia', 'error');
             }
         } catch (erro) {
             console.error('Erro:', erro);
-            // Em caso de erro de conexão, usar dados de exemplo
-            equipamentos = DADOS_EXEMPLO;
-            aplicarFiltros();
-            document.getElementById("totalCount").innerText = equipamentos.length;
-            mostrarMensagem(`⚠️ Usando dados de exemplo (${equipamentos.length} equipamentos)`, 'error');
+            mostrarMensagem('Erro ao carregar', 'error');
+            equipamentos = [];
+            equipamentosFiltrados = [];
+            renderizarPagina();
+            atualizarPaginacao();
+            document.getElementById("totalCount").innerText = "0";
         }
         carregando = false;
         verificarDuplicidade();
