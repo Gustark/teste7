@@ -7,35 +7,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-primary: #f5f7fa;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f8fafc;
-            --bg-card: #ffffff;
-            --border: #e2e8f0;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #06b6d4;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
-            --shadow: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-        }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: #f5f7fa;
+            color: #1e293b;
             padding: 32px 24px;
         }
         
-        .container { max-width: 1600px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
         
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -46,59 +29,57 @@
         }
         
         .title-section h1 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            background: var(--gradient);
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
         }
         
         .title-section p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 8px;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
         
         .stats-badge {
-            background: var(--bg-secondary);
+            background: white;
             border-radius: 60px;
-            padding: 10px 24px;
-            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-weight: 600;
-            box-shadow: var(--shadow);
+            font-size: 0.9rem;
         }
         
-        .stats-badge i {
-            color: var(--accent-primary);
-            font-size: 1.2rem;
-        }
+        .stats-badge i { color: #3b82f6; }
         
         .sync-status {
-            background: var(--bg-secondary);
+            background: white;
             border-radius: 60px;
             padding: 10px 20px;
             font-size: 0.75rem;
             display: flex;
             align-items: center;
             gap: 10px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
         }
         
         .sync-status.syncing { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
         .sync-status.error { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .sync-status.success { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
         
+        /* Form Card */
         .form-card {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 28px 32px;
-            margin-bottom: 32px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
+            background: white;
+            border-radius: 20px;
+            padding: 24px 28px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .form-grid {
@@ -111,23 +92,22 @@
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         
         .input-group label {
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: var(--text-secondary);
+            color: #64748b;
         }
         
         .input-group input, .input-group select {
-            padding: 12px 16px;
+            padding: 12px 14px;
             border-radius: 12px;
-            border: 1.5px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+            border: 1.5px solid #e2e8f0;
+            background: white;
             font-family: 'Inter', monospace;
             font-size: 0.9rem;
             transition: all 0.2s;
@@ -135,18 +115,18 @@
         
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: var(--accent-primary);
+            border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
         
         .input-group input.duplicado {
-            border-color: var(--danger);
+            border-color: #ef4444;
             background: #fef2f2;
         }
         
         .mensagem-duplicado {
             font-size: 0.7rem;
-            color: var(--danger);
+            color: #ef4444;
             margin-top: 4px;
             display: none;
         }
@@ -154,7 +134,7 @@
         .mensagem-duplicado.show { display: block; }
         
         .btn-primary {
-            background: var(--gradient);
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
             border: none;
             padding: 12px 28px;
             border-radius: 40px;
@@ -168,12 +148,12 @@
         }
         
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
-        .btn-primary:disabled { background: var(--border); cursor: not-allowed; opacity: 0.6; transform: none; }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
         
         .btn-secondary {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 8px 20px;
             border-radius: 40px;
             font-weight: 500;
@@ -181,7 +161,7 @@
             transition: all 0.2s;
         }
         
-        .btn-secondary:hover { background: var(--bg-tertiary); border-color: var(--accent-primary); }
+        .btn-secondary:hover { background: #f8fafc; border-color: #3b82f6; }
         
         .action-buttons {
             display: flex;
@@ -189,6 +169,7 @@
             justify-content: flex-end;
         }
         
+        /* Filter Bar */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -207,43 +188,41 @@
         }
         
         .search-box {
-            background: var(--bg-secondary);
+            background: white;
             border-radius: 48px;
             padding: 8px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             flex: 1;
             min-width: 200px;
         }
         
-        .search-box i { color: var(--text-secondary); }
+        .search-box i { color: #64748b; }
         .search-box input {
             border: none;
             padding: 10px 0;
             width: 100%;
             font-size: 0.9rem;
             background: transparent;
-            color: var(--text-primary);
         }
         .search-box input:focus { outline: none; }
         
         .filter-select {
             border-radius: 40px;
-            padding: 10px 24px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
             font-weight: 500;
             cursor: pointer;
-            min-width: 160px;
+            min-width: 150px;
         }
         
         .btn-clear {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
             padding: 8px 20px;
             border-radius: 40px;
             font-weight: 500;
@@ -251,27 +230,23 @@
             transition: all 0.2s;
         }
         
-        .btn-clear:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border-color: var(--accent-primary);
-        }
+        .btn-clear:hover { background: #f8fafc; color: #1e293b; }
         
         .filter-stats {
             font-size: 0.75rem;
-            color: var(--text-secondary);
-            background: var(--bg-secondary);
+            color: #64748b;
+            background: white;
             padding: 6px 14px;
             border-radius: 40px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
         }
         
+        /* Table */
         .table-wrapper {
-            background: var(--bg-card);
+            background: white;
             border-radius: 20px;
             overflow-x: auto;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            border: 1px solid #e2e8f0;
         }
         
         .inventory-table {
@@ -283,67 +258,57 @@
         
         .inventory-table th {
             text-align: left;
-            padding: 18px 20px;
-            background: var(--bg-tertiary);
+            padding: 16px 16px;
+            background: #f8fafc;
             font-weight: 700;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
             cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
         }
         
-        .inventory-table th:hover {
-            color: var(--accent-primary);
-        }
-        
-        .inventory-table th i {
-            margin-left: 8px;
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
+        .inventory-table th:hover { color: #3b82f6; }
+        .inventory-table th i { margin-left: 6px; font-size: 0.7rem; opacity: 0.6; }
         
         .inventory-table td {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
         }
         
-        .inventory-table tr:hover {
-            background: rgba(59,130,246,0.04);
-        }
+        .inventory-table tr:hover { background: #f8fafc; }
         
         .inventory-table th:nth-child(5),
         .inventory-table td:nth-child(5) {
             text-align: center;
-            width: 80px;
+            width: 70px;
         }
         
         .status-badge {
             display: inline-block;
-            padding: 5px 14px;
+            padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
         }
         
-        .status-operacional { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
-        .status-manutencao { background: #fed7aa; color: #c2410c; border: 1px solid #fdba74; }
-        .status-inativo { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .status-operacional { background: #d1fae5; color: #059669; }
+        .status-manutencao { background: #fed7aa; color: #c2410c; }
+        .status-inativo { background: #fee2e2; color: #dc2626; }
         
         .row-actions i {
-            font-size: 1.1rem;
-            margin: 0 8px;
+            font-size: 1rem;
+            margin: 0 6px;
             cursor: pointer;
             transition: all 0.2s;
-            color: var(--text-secondary);
+            color: #64748b;
         }
         
-        .row-actions i:hover { color: var(--accent-primary); transform: scale(1.1); }
-        .row-actions i:last-child:hover { color: var(--danger); }
+        .row-actions i:hover { color: #3b82f6; transform: scale(1.1); }
+        .row-actions i:last-child:hover { color: #ef4444; }
         
-        .empty-row td { text-align: center; padding: 60px; color: var(--text-secondary); font-style: italic; }
+        .empty-row td { text-align: center; padding: 60px; color: #64748b; font-style: italic; }
         
+        /* Pagination */
         .pagination-container {
             text-align: center;
             margin-top: 30px;
@@ -358,24 +323,24 @@
         }
         
         .pagination button {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
+            background: white;
+            border: 1px solid #e2e8f0;
             padding: 8px 14px;
             border-radius: 40px;
             cursor: pointer;
             font-weight: 500;
             transition: all 0.2s;
-            color: var(--text-primary);
+            color: #1e293b;
         }
         
         .pagination button:hover:not(:disabled) {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
+            background: #3b82f6;
+            border-color: #3b82f6;
             color: white;
         }
         
         .pagination button.active {
-            background: var(--gradient);
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
             border-color: transparent;
             color: white;
         }
@@ -389,44 +354,45 @@
             display: inline-block;
             margin-top: 16px;
             font-size: 0.8rem;
-            color: var(--text-secondary);
-            background: var(--bg-secondary);
+            color: #64748b;
+            background: white;
             padding: 8px 20px;
             border-radius: 40px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
         }
         
+        /* Footer */
         .footer {
-            margin-top: 60px;
+            margin-top: 50px;
             text-align: center;
             padding: 30px 20px 20px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid #e2e8f0;
         }
         
         .footer-divider {
             width: 60px;
             height: 3px;
-            background: var(--gradient);
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
             margin: 0 auto 20px;
             border-radius: 3px;
         }
         
         .footer-text {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
+            color: #64748b;
+            font-size: 0.75rem;
         }
         
-        .footer-text i { color: var(--accent-primary); margin: 0 4px; }
+        .footer-text i { color: #3b82f6; margin: 0 4px; }
         .footer-name {
             font-weight: 700;
-            background: var(--gradient);
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
         }
         
         .footer-heart {
-            color: var(--danger);
+            color: #ef4444;
             animation: pulse 1.5s ease infinite;
             display: inline-block;
         }
@@ -437,30 +403,26 @@
         }
         
         .social-links {
-            margin-top: 15px;
+            margin-top: 12px;
             display: flex;
             justify-content: center;
-            gap: 25px;
+            gap: 20px;
         }
         
         .social-links a {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+            color: #64748b;
+            font-size: 1rem;
             transition: all 0.3s ease;
         }
         
-        .social-links a:hover {
-            color: var(--accent-primary);
-            transform: translateY(-3px);
-        }
+        .social-links a:hover { color: #3b82f6; transform: translateY(-3px); }
         
         .toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: var(--bg-card);
-            border: 1px solid var(--accent-primary);
-            color: var(--text-primary);
+            background: #1e293b;
+            color: white;
             padding: 12px 24px;
             border-radius: 40px;
             font-size: 0.85rem;
@@ -468,7 +430,6 @@
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
-            box-shadow: var(--shadow-lg);
         }
         
         .toast.show { opacity: 1; }
@@ -476,23 +437,16 @@
         .registro-data {
             font-family: monospace;
             font-size: 0.7rem;
-            color: var(--text-secondary);
+            color: #64748b;
             white-space: nowrap;
         }
         
-        .marca-modelo {
-            font-weight: 500;
-            color: var(--accent-secondary);
-        }
-        
-        .quantidade-numero {
-            font-weight: 700;
-            font-size: 1rem;
-        }
+        .marca-modelo { font-weight: 500; color: #06b6d4; }
+        .quantidade-numero { font-weight: 700; font-size: 1rem; }
         
         @media (max-width: 680px) {
-            body { padding: 20px 16px; }
-            .form-card { padding: 20px; }
+            body { padding: 16px; }
+            .form-card { padding: 16px; }
             .btn-primary { width: 100%; justify-content: center; }
             .filters-group { flex-direction: column; align-items: stretch; }
             .search-box { width: 100%; }
@@ -505,7 +459,7 @@
     <div class="header">
         <div class="title-section">
             <h1><i class="fas fa-microchip"></i> Inventário EGESP</h1>
-            <p>Gestão de equipamentos desenvolvido para organização da EGESP</p>
+            <p>Gestão de equipamentos sincronizada com Google Planilhas</p>
         </div>
         <div style="display: flex; gap: 12px;">
             <div class="sync-status" id="syncStatus">
@@ -519,27 +473,25 @@
     </div>
 
     <div class="form-card" id="formCard">
-        <h3 style="margin-bottom: 20px; font-weight: 700;"><i class="fas fa-plus-circle" style="color: var(--accent-primary);"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
+        <h3 style="margin-bottom: 20px;"><i class="fas fa-plus-circle" style="color: #3b82f6;"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
         <div class="form-grid">
             <div class="input-group">
-                <label><i class="fas fa-tag"></i> Nome / Tipo *</label>
-                <input type="text" id="equipName" placeholder="Ex: Notebook" autocomplete="off">
+                <label>Nome / Tipo *</label>
+                <input type="text" id="equipName" placeholder="Ex: Notebook">
             </div>
             <div class="input-group">
-                <label><i class="fas fa-industry"></i> Marca / Modelo *</label>
-                <input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron 15" autocomplete="off">
+                <label>Marca / Modelo *</label>
+                <input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron">
             </div>
             <div class="input-group">
-                <label><i class="fas fa-barcode"></i> Nº de Série/SF *</label>
-                <input type="text" id="equipSerial" placeholder="SF0000" autocomplete="off">
-                <div class="mensagem-duplicado" id="msgDuplicado">
-                    <i class="fas fa-exclamation-triangle"></i> Este número de série já está cadastrado!
-                </div>
+                <label>Nº de Série *</label>
+                <input type="text" id="equipSerial" placeholder="SF0000">
+                <div class="mensagem-duplicado" id="msgDuplicado">⚠️ Este número de série já está cadastrado!</div>
             </div>
             <div class="input-group">
-                <label><i class="fas fa-map-marker-alt"></i> Localização</label>
+                <label>Localização</label>
                 <select id="equipLocation">
-                    <option value="">Selecione uma localização...</option>
+                    <option value="">Selecione...</option>
                     <option value="Sala 171">🏢 Sala 171</option>
                     <option value="Sala 178">🏢 Sala 178</option>
                     <option value="Estúdio">🎙️ Estúdio</option>
@@ -553,11 +505,11 @@
                 </select>
             </div>
             <div class="input-group">
-                <label><i class="fas fa-boxes"></i> Quantidade</label>
-                <input type="number" id="equipQtd" value="1" min="1" step="1">
+                <label>Quantidade</label>
+                <input type="number" id="equipQtd" value="1" min="1">
             </div>
             <div class="input-group">
-                <label><i class="fas fa-chart-line"></i> Status</label>
+                <label>Status</label>
                 <select id="equipStatus">
                     <option value="Operacional">🟢 Operacional</option>
                     <option value="Manutenção">🟡 Manutenção</option>
@@ -566,8 +518,8 @@
             </div>
         </div>
         <div class="action-buttons">
-            <button class="btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancelar</button>
-            <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Salvar Equipamento</button>
+            <button class="btn-secondary" id="cancelBtn">Cancelar</button>
+            <button class="btn-primary" id="saveBtn">Salvar Equipamento</button>
         </div>
     </div>
 
@@ -596,7 +548,7 @@
                 <option value="Manutenção">⚠️ Manutenção</option>
                 <option value="Inativo">❌ Inativo</option>
             </select>
-            <button id="clearFiltersBtn" class="btn-clear"><i class="fas fa-eraser"></i> Limpar Filtros</button>
+            <button id="clearFiltersBtn" class="btn-clear">Limpar Filtros</button>
         </div>
         <div class="filter-stats" id="filterStats"></div>
     </div>
@@ -604,22 +556,13 @@
     <div class="table-wrapper">
         <table class="inventory-table">
             <thead>
-                <tr>
-                    <th class="sortable" data-field="nome">Nome / Tipo <i class="fas fa-sort"></i></th>
-                    <th class="sortable" data-field="marca">Marca / Modelo <i class="fas fa-sort"></i></th>
-                    <th class="sortable" data-field="serial">Nº Série <i class="fas fa-sort"></i></th>
-                    <th class="sortable" data-field="localizacao">Localização <i class="fas fa-sort"></i></th>
-                    <th style="text-align: center;">Qtd</th>
-                    <th class="sortable" data-field="status">Status <i class="fas fa-sort"></i></th>
-                    <th class="sortable" data-field="registro">Data de Registro <i class="fas fa-sort"></i></th>
-                    <th style="width: 100px;">Ações</th>
-                </tr>
+                <tr><th>Nome / Tipo</th><th>Marca / Modelo</th><th>Nº Série</th><th>Localização</th><th>Qtd</th><th>Status</th><th>Data Registro</th><th>Ações</th></tr>
             </thead>
             <tbody id="tableBody">
-                <tr class="empty-row"><td colspan="8">Carregando equipamentos...<\/td><\/tr>
-            <\/tbody>
-         <\/table>
-    <\/div>
+                <tr><td colspan="8" style="text-align:center; padding:60px;">Carregando equipamentos...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <div class="pagination-container">
         <div class="pagination" id="pagination"></div>
@@ -633,18 +576,12 @@
             <span class="footer-name">Gustavo Hugo</span>
             <i class="fas fa-heart footer-heart"></i>
         </div>
-        <div class="footer-text" style="font-size: 0.7rem; margin-top: 8px;">
+        <div class="footer-text" style="margin-top: 8px;">
             <i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas
         </div>
-        <div class="social-links">
-            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-        </div>
     </div>
-<\/div>
-
-<div id="toast" class="toast"><\/div>
+</div>
+<div id="toast" class="toast"></div>
 
 <script>
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzYsyFNdG3Lfujd1w8_bk-ZlR_11NxMkH65otf6P51VxyXb0RmcYDIaJgoAUAQtynwWIQ/exec";
@@ -655,25 +592,6 @@
     let carregando = false;
     let paginaAtual = 1;
     let ITENS_POR_PAGINA = 10;
-    let sortField = 'nome';
-    let sortOrder = 'asc';
-
-    function formatarData(dataString) {
-        if (!dataString || dataString === "Não registrado") return "Não registrado";
-        try {
-            const data = new Date(dataString);
-            if (isNaN(data.getTime())) return dataString;
-            return data.toLocaleString('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        } catch (e) {
-            return dataString;
-        }
-    }
 
     function mostrarMensagem(texto, tipo) {
         const toast = document.getElementById('toast');
@@ -685,30 +603,26 @@
         const statusText = document.getElementById('syncText');
         const statusDiv = document.getElementById('syncStatus');
         if (statusText && statusDiv) {
-            statusDiv.className = 'sync-status';
-            if (tipo === 'error') {
-                statusDiv.classList.add('error');
-                statusText.innerText = 'Erro';
-            } else if (tipo === 'syncing') {
-                statusDiv.classList.add('syncing');
-                statusText.innerText = texto;
-            } else if (tipo === 'success') {
-                statusDiv.classList.add('success');
-                statusText.innerText = texto;
-            } else {
-                statusText.innerText = texto;
-            }
+            statusDiv.classList.remove('syncing', 'error', 'success');
+            if (tipo === 'error') { statusDiv.classList.add('error'); statusText.innerText = 'Erro'; }
+            else if (tipo === 'syncing') { statusDiv.classList.add('syncing'); statusText.innerText = texto; }
+            else if (tipo === 'success') { statusDiv.classList.add('success'); statusText.innerText = texto; }
+            else { statusText.innerText = texto; }
         }
     }
 
+    function formatarData(dataString) {
+        if (!dataString) return 'Não registrado';
+        try {
+            const data = new Date(dataString);
+            if (isNaN(data.getTime())) return dataString;
+            return data.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        } catch(e) { return dataString; }
+    }
+
     function escapeHtml(str) {
-        if (str === null || str === undefined) return "";
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 
     function verificarDuplicidade() {
@@ -717,119 +631,51 @@
         const serial = serialInput.value.trim();
         const msgDiv = document.getElementById('msgDuplicado');
         const saveBtn = document.getElementById('saveBtn');
-        
         if (!serial) {
             serialInput.classList.remove('duplicado');
-            if (msgDiv) msgDiv.classList.remove('show');
-            if (saveBtn) saveBtn.disabled = false;
-            return false;
+            if(msgDiv) msgDiv.classList.remove('show');
+            if(saveBtn) saveBtn.disabled = false;
+            return;
         }
-        
-        const existe = equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId));
-        
+        const existe = equipamentos.some(eq => eq.serial === serial);
         if (existe) {
             serialInput.classList.add('duplicado');
-            if (msgDiv) msgDiv.classList.add('show');
-            if (saveBtn) saveBtn.disabled = true;
-            return true;
+            if(msgDiv) msgDiv.classList.add('show');
+            if(saveBtn) saveBtn.disabled = true;
         } else {
             serialInput.classList.remove('duplicado');
-            if (msgDiv) msgDiv.classList.remove('show');
-            if (saveBtn) saveBtn.disabled = false;
-            return false;
+            if(msgDiv) msgDiv.classList.remove('show');
+            if(saveBtn) saveBtn.disabled = false;
         }
-    }
-
-    function ordenarEquipamentos(array) {
-        return [...array].sort(function(a, b) {
-            let valA = a[sortField] || '';
-            let valB = b[sortField] || '';
-            
-            if (sortField === 'registro') {
-                valA = new Date(valA) || 0;
-                valB = new Date(valB) || 0;
-            }
-            
-            if (typeof valA === 'string') {
-                valA = valA.toLowerCase();
-                valB = valB.toLowerCase();
-            }
-            
-            if (sortOrder === 'asc') {
-                return valA > valB ? 1 : -1;
-            } else {
-                return valA < valB ? 1 : -1;
-            }
-        });
     }
 
     function aplicarFiltros() {
-        const buscaInput = document.getElementById('searchInput');
-        const filtroStatusSelect = document.getElementById('filterStatusSelect');
-        const filtroLocalSelect = document.getElementById('filterLocation');
+        const busca = (document.getElementById('searchInput')?.value || '').toLowerCase();
+        const statusFiltro = document.getElementById('filterStatusSelect')?.value || 'todos';
+        const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
         
-        const busca = buscaInput ? buscaInput.value.toLowerCase() : '';
-        const filtroStatus = filtroStatusSelect ? filtroStatusSelect.value : 'todos';
-        const filtroLocal = filtroLocalSelect ? filtroLocalSelect.value : 'todos';
-        
-        let filtrados = equipamentos.filter(function(eq) {
+        equipamentosFiltrados = equipamentos.filter(eq => {
             const matchBusca = busca === '' || 
-                String(eq.nome || '').toLowerCase().includes(busca) || 
-                String(eq.marca || '').toLowerCase().includes(busca) ||
-                String(eq.serial || '').toLowerCase().includes(busca);
-            const matchStatus = filtroStatus === 'todos' || eq.status === filtroStatus;
-            const matchLocal = filtroLocal === 'todos' || eq.localizacao === filtroLocal;
+                (eq.nome || '').toLowerCase().includes(busca) ||
+                (eq.marca || '').toLowerCase().includes(busca) ||
+                (eq.serial || '').toLowerCase().includes(busca);
+            const matchStatus = statusFiltro === 'todos' || eq.status === statusFiltro;
+            const matchLocal = localFiltro === 'todos' || eq.localizacao === localFiltro;
             return matchBusca && matchStatus && matchLocal;
         });
-        
-        equipamentosFiltrados = ordenarEquipamentos(filtrados);
         
         const statsDiv = document.getElementById('filterStats');
         if (statsDiv) {
             if (equipamentosFiltrados.length !== equipamentos.length) {
-                statsDiv.innerHTML = '🎯 Mostrando ' + equipamentosFiltrados.length + ' de ' + equipamentos.length + ' equipamentos';
+                statsDiv.innerHTML = `🎯 Mostrando ${equipamentosFiltrados.length} de ${equipamentos.length} equipamentos`;
             } else {
-                statsDiv.innerHTML = '📊 Total: ' + equipamentos.length + ' equipamentos';
+                statsDiv.innerHTML = `📊 Total: ${equipamentos.length} equipamentos`;
             }
         }
         
         paginaAtual = 1;
         renderizarPagina();
         atualizarPaginacao();
-    }
-
-    function mudarOrdenacao(campo) {
-        if (sortField === campo) {
-            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-        } else {
-            sortField = campo;
-            sortOrder = 'asc';
-        }
-        
-        const icons = document.querySelectorAll('.sortable i');
-        for (var i = 0; i < icons.length; i++) {
-            icons[i].className = 'fas fa-sort';
-        }
-        
-        const th = document.querySelector('.sortable[data-field="' + campo + '"] i');
-        if (th) {
-            th.className = 'fas fa-sort-' + (sortOrder === 'asc' ? 'up' : 'down');
-        }
-        
-        aplicarFiltros();
-    }
-
-    function limparFiltros() {
-        const searchInput = document.getElementById('searchInput');
-        const filterStatus = document.getElementById('filterStatusSelect');
-        const filterLocation = document.getElementById('filterLocation');
-        
-        if (searchInput) searchInput.value = '';
-        if (filterStatus) filterStatus.value = 'todos';
-        if (filterLocation) filterLocation.value = 'todos';
-        
-        aplicarFiltros();
-        mostrarMensagem('🧹 Filtros limpos!', 'success');
     }
 
     function renderizarPagina() {
@@ -840,52 +686,43 @@
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
         
-        if (itensPagina.length === 0 && equipamentosFiltrados.length === 0) {
-            if (equipamentos.length === 0) {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
-            } else {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
-            }
+        if (itensPagina.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:60px;">📭 Nenhum equipamento encontrado</td></tr>';
+            document.getElementById('paginationInfo').innerHTML = '';
             return;
         }
         
-        var html = '';
-        for (var i = 0; i < itensPagina.length; i++) {
-            var eq = itensPagina[i];
-            var statusClass = '';
-            if (eq.status === 'Operacional') statusClass = 'status-operacional';
-            else if (eq.status === 'Manutenção') statusClass = 'status-manutencao';
-            else statusClass = 'status-inativo';
-            
-            html += '<tr>';
-            html += '<td><strong>' + escapeHtml(eq.nome) + '</strong></td>';
-            html += '<td><span class="marca-modelo">' + escapeHtml(eq.marca || 'Não informado') + '</span></td>';
-            html += '<td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">' + escapeHtml(eq.serial) + '</code></td>';
-            html += '<td><i class="fas fa-location-dot" style="color: var(--accent-secondary);"></i> ' + escapeHtml(eq.localizacao || 'Não informado') + '</td>';
-            html += '<td style="text-align: center;"><span class="quantidade-numero">' + escapeHtml(eq.quantidade || '1') + '</span></td>';
-            html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(eq.status) + '</span></td>';
-            html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
-            html += '<td class="row-actions">';
-            html += '<i class="fas fa-edit" onclick="editEquipamento(' + eq.id + ')"></i>';
-            html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(' + eq.id + ')"></i>';
-            html += '</td></tr>';
+        let html = '';
+        for (let eq of itensPagina) {
+            let statusClass = eq.status === 'Operacional' ? 'status-operacional' : (eq.status === 'Manutenção' ? 'status-manutencao' : 'status-inativo');
+            html += `<tr>
+                <td><strong>${escapeHtml(eq.nome)}</strong></td>
+                <td><span class="marca-modelo">${escapeHtml(eq.marca || '-')}</span></td>
+                <td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}</code></td>
+                <td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ${escapeHtml(eq.localizacao || '-')}</td>
+                <td style="text-align:center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || '1')}</span></td>
+                <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}</span></td>
+                <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}</td>
+                <td class="row-actions">
+                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"></i>
+                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})"></i>
+                </td>
+            </tr>`;
         }
         tbody.innerHTML = html;
         
-        var total = equipamentosFiltrados.length;
-        var inicioMostrar = total === 0 ? 0 : inicio + 1;
-        var fimMostrar = Math.min(fim, total);
-        var infoDiv = document.getElementById('paginationInfo');
-        if (infoDiv && total > 0) {
-            infoDiv.innerHTML = '📄 Mostrando ' + inicioMostrar + ' - ' + fimMostrar + ' de ' + total + ' equipamentos | Página ' + paginaAtual + ' de ' + Math.ceil(total / ITENS_POR_PAGINA);
-        } else if (infoDiv) {
-            infoDiv.innerHTML = '';
+        const total = equipamentosFiltrados.length;
+        const inicioMostrar = inicio + 1;
+        const fimMostrar = Math.min(fim, total);
+        const infoDiv = document.getElementById('paginationInfo');
+        if (infoDiv) {
+            infoDiv.innerHTML = `📄 Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
         }
     }
 
     function atualizarPaginacao() {
-        var totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
-        var paginationDiv = document.getElementById('pagination');
+        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        const paginationDiv = document.getElementById('pagination');
         if (!paginationDiv) return;
         
         if (totalPaginas <= 1) {
@@ -893,36 +730,36 @@
             return;
         }
         
-        var html = '';
-        html += '<button onclick="mudarPagina(' + (paginaAtual - 1) + ')" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i> Anterior</button>';
+        let html = '';
+        html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
         
-        if (paginaAtual > 3) {
-            html += '<button onclick="mudarPagina(1)">1</button>';
-            if (paginaAtual > 4) html += '<button disabled>...</button>';
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i === 1 || i === totalPaginas || (i >= paginaAtual - 2 && i <= paginaAtual + 2)) {
+                html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
+            } else if (i === paginaAtual - 3 || i === paginaAtual + 3) {
+                html += `<button disabled>...</button>`;
+            }
         }
         
-        for (var i = Math.max(1, paginaAtual - 2); i <= Math.min(totalPaginas, paginaAtual + 2); i++) {
-            html += '<button onclick="mudarPagina(' + i + ')" class="' + (i === paginaAtual ? 'active' : '') + '">' + i + '</button>';
-        }
-        
-        if (paginaAtual < totalPaginas - 2) {
-            if (paginaAtual < totalPaginas - 3) html += '<button disabled>...</button>';
-            html += '<button onclick="mudarPagina(' + totalPaginas + ')">' + totalPaginas + '</button>';
-        }
-        
-        html += '<button onclick="mudarPagina(' + (paginaAtual + 1) + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '>Próximo <i class="fas fa-chevron-right"></i></button>';
-        
+        html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
         paginationDiv.innerHTML = html;
     }
 
     function mudarPagina(pagina) {
-        var totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
         if (pagina < 1 || pagina > totalPaginas) return;
         paginaAtual = pagina;
         renderizarPagina();
         atualizarPaginacao();
-        var tableWrapper = document.querySelector('.table-wrapper');
-        if (tableWrapper) tableWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function limparFiltros() {
+        if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+        if (document.getElementById('filterStatusSelect')) document.getElementById('filterStatusSelect').value = 'todos';
+        if (document.getElementById('filterLocation')) document.getElementById('filterLocation').value = 'todos';
+        aplicarFiltros();
+        mostrarMensagem('🧹 Filtros limpos!', 'success');
     }
 
     async function carregarDaPlanilha() {
@@ -930,32 +767,24 @@
         carregando = true;
         mostrarMensagem('Carregando...', 'syncing');
         try {
-            var resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
-            var dados = await resposta.json();
-            if (dados.status === 'sucesso' && dados.dados && dados.dados.length > 0) {
+            const resposta = await fetch(`${URL_WEB_APP}?t=${Date.now()}`);
+            const dados = await resposta.json();
+            if (dados.status === 'sucesso' && dados.dados) {
                 equipamentos = dados.dados;
                 aplicarFiltros();
-                var totalCount = document.getElementById('totalCount');
-                if (totalCount) totalCount.innerText = equipamentos.length;
-                mostrarMensagem(equipamentos.length + ' equipamentos carregados', 'success');
+                document.getElementById('totalCount').innerText = equipamentos.length;
+                mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
             } else {
                 equipamentos = [];
-                equipamentosFiltrados = [];
-                renderizarPagina();
-                atualizarPaginacao();
-                var totalCount = document.getElementById('totalCount');
-                if (totalCount) totalCount.innerText = '0';
+                aplicarFiltros();
+                document.getElementById('totalCount').innerText = '0';
                 mostrarMensagem('Planilha vazia', 'error');
             }
         } catch (erro) {
             console.error('Erro:', erro);
             mostrarMensagem('Erro ao carregar', 'error');
             equipamentos = [];
-            equipamentosFiltrados = [];
-            renderizarPagina();
-            atualizarPaginacao();
-            var totalCount = document.getElementById('totalCount');
-            if (totalCount) totalCount.innerText = '0';
+            aplicarFiltros();
         }
         carregando = false;
         verificarDuplicidade();
@@ -963,213 +792,105 @@
 
     async function excluirDaPlanilha(id) {
         try {
-            var params = new URLSearchParams({ acao: 'excluir', id: id });
-            var urlCompleta = URL_WEB_APP + '?' + params.toString();
-            var resposta = await fetch(urlCompleta);
-            var resultado = await resposta.json();
+            const resposta = await fetch(`${URL_WEB_APP}?acao=excluir&id=${id}`);
+            const resultado = await resposta.json();
             return resultado.status === 'sucesso';
-        } catch (erro) {
-            console.error('Erro na exclusão:', erro);
-            return false;
-        }
+        } catch (erro) { return false; }
     }
 
     async function salvarEquipamento() {
-        var nome = document.getElementById('equipName').value.trim();
-        var marca = document.getElementById('equipMarca').value.trim();
-        var serial = document.getElementById('equipSerial').value.trim();
-        var localizacao = document.getElementById('equipLocation').value;
-        var quantidade = document.getElementById('equipQtd').value || '1';
-        var status = document.getElementById('equipStatus').value;
+        const nome = document.getElementById('equipName')?.value.trim();
+        const marca = document.getElementById('equipMarca')?.value.trim();
+        const serial = document.getElementById('equipSerial')?.value.trim();
+        const localizacao = document.getElementById('equipLocation')?.value;
+        const quantidade = document.getElementById('equipQtd')?.value || '1';
+        const status = document.getElementById('equipStatus')?.value;
 
-        if (!nome) { alert('Informe o Nome/Tipo do equipamento.'); return false; }
-        if (!marca) { alert('Informe a Marca/Modelo do equipamento.'); return false; }
-        if (!serial) { alert('Informe o Número de Série/SF.'); return false; }
-        if (!localizacao) { alert('Selecione a Localização do equipamento.'); return false; }
+        if (!nome) { alert('Informe o Nome/Tipo'); return; }
+        if (!marca) { alert('Informe a Marca/Modelo'); return; }
+        if (!serial) { alert('Informe o Número de Série'); return; }
+        if (!localizacao) { alert('Selecione a Localização'); return; }
         
-        var existe = false;
-        for (var i = 0; i < equipamentos.length; i++) {
-            if (equipamentos[i].serial === serial && (editingId === null || equipamentos[i].id !== editingId)) {
-                existe = true;
-                break;
-            }
+        if (equipamentos.some(eq => eq.serial === serial)) {
+            alert('❌ Este número de série já está cadastrado!');
+            return;
         }
-        if (existe) {
-            alert('❌ Já existe um equipamento com este número de série!');
-            return false;
-        }
-
-        var agora = new Date();
-        var dataHora = agora.toLocaleString('pt-BR');
 
         mostrarMensagem('Salvando...', 'syncing');
         try {
-            var params = new URLSearchParams({ 
-                acao: 'salvar', 
-                nome: nome, 
-                marca: marca,
-                serial: serial, 
-                localizacao: localizacao, 
-                quantidade: quantidade, 
-                status: status, 
-                registro: dataHora 
-            });
-            var urlCompleta = URL_WEB_APP + '?' + params.toString();
-            var resposta = await fetch(urlCompleta);
-            var resultado = await resposta.json();
+            const params = new URLSearchParams({ acao: 'salvar', nome, marca, serial, localizacao, quantidade, status, registro: new Date().toLocaleString('pt-BR') });
+            const resposta = await fetch(`${URL_WEB_APP}?${params.toString()}`);
+            const resultado = await resposta.json();
             if (resultado.status === 'sucesso') {
                 mostrarMensagem('✅ Salvo com sucesso!', 'success');
-                resetForm();
-                setTimeout(function() { carregarDaPlanilha(); }, 1000);
-                return true;
+                document.getElementById('equipName').value = '';
+                document.getElementById('equipMarca').value = '';
+                document.getElementById('equipSerial').value = '';
+                document.getElementById('equipLocation').value = '';
+                document.getElementById('equipQtd').value = '1';
+                document.getElementById('equipStatus').value = 'Operacional';
+                setTimeout(() => carregarDaPlanilha(), 1000);
             } else {
-                throw new Error(resultado.mensagem || 'Erro desconhecido');
+                throw new Error(resultado.mensagem);
             }
         } catch (erro) {
-            console.error('Erro no salvamento:', erro);
             mostrarMensagem('❌ Erro ao salvar', 'error');
-            return false;
         }
     }
 
     async function excluirEquipamento(id) {
-        var equip = null;
-        for (var i = 0; i < equipamentos.length; i++) {
-            if (equipamentos[i].id === id) {
-                equip = equipamentos[i];
-                break;
-            }
-        }
+        const equip = equipamentos.find(eq => eq.id === id);
         if (!equip) return;
-        
-        if (confirm('Tem certeza que deseja excluir o equipamento "' + equip.nome + '" - ' + equip.marca + '?\n\nNº Série: ' + equip.serial + '\n\nEsta ação não poderá ser desfeita.')) {
+        if (confirm(`Excluir "${equip.nome}" - ${equip.marca}?\n\nNº Série: ${equip.serial}\n\nEsta ação não pode ser desfeita.`)) {
             mostrarMensagem('Excluindo...', 'syncing');
-            var excluido = await excluirDaPlanilha(id);
-            if (excluido) {
+            const ok = await excluirDaPlanilha(id);
+            if (ok) {
                 mostrarMensagem('🗑️ Equipamento excluído!', 'success');
-                setTimeout(function() { carregarDaPlanilha(); }, 500);
+                setTimeout(() => carregarDaPlanilha(), 500);
             } else {
                 mostrarMensagem('❌ Erro ao excluir', 'error');
             }
         }
     }
 
-    function resetForm() {
-        var equipName = document.getElementById('equipName');
-        var equipMarca = document.getElementById('equipMarca');
-        var equipSerial = document.getElementById('equipSerial');
-        var equipLocation = document.getElementById('equipLocation');
-        var equipQtd = document.getElementById('equipQtd');
-        var equipStatus = document.getElementById('equipStatus');
-        var formTitle = document.getElementById('formTitle');
-        
-        if (equipName) equipName.value = '';
-        if (equipMarca) equipMarca.value = '';
-        if (equipSerial) equipSerial.value = '';
-        if (equipLocation) equipLocation.value = '';
-        if (equipQtd) equipQtd.value = '1';
-        if (equipStatus) equipStatus.value = 'Operacional';
-        
-        editingId = null;
-        if (formTitle) formTitle.innerText = 'Cadastrar Equipamento';
-        verificarDuplicidade();
-    }
-
     function editEquipamento(id) {
-        var equip = null;
-        for (var i = 0; i < equipamentos.length; i++) {
-            if (equipamentos[i].id === id) {
-                equip = equipamentos[i];
-                break;
-            }
-        }
+        const equip = equipamentos.find(eq => eq.id === id);
         if (!equip) return;
-        
-        editingId = equip.id;
-        var equipName = document.getElementById('equipName');
-        var equipMarca = document.getElementById('equipMarca');
-        var equipSerial = document.getElementById('equipSerial');
-        var equipLocation = document.getElementById('equipLocation');
-        var equipQtd = document.getElementById('equipQtd');
-        var equipStatus = document.getElementById('equipStatus');
-        var formTitle = document.getElementById('formTitle');
-        
-        if (equipName) equipName.value = equip.nome;
-        if (equipMarca) equipMarca.value = equip.marca || '';
-        if (equipSerial) equipSerial.value = equip.serial;
-        if (equipLocation) equipLocation.value = equip.localizacao || '';
-        if (equipQtd) equipQtd.value = equip.quantidade || 1;
-        if (equipStatus) equipStatus.value = equip.status;
-        if (formTitle) formTitle.innerHTML = '<i class="fas fa-pen-alt"></i> Editar Equipamento';
-        
-        var formCard = document.getElementById('formCard');
-        if (formCard) formCard.scrollIntoView({ behavior: 'smooth' });
-        verificarDuplicidade();
+        document.getElementById('equipName').value = equip.nome;
+        document.getElementById('equipMarca').value = equip.marca || '';
+        document.getElementById('equipSerial').value = equip.serial;
+        document.getElementById('equipLocation').value = equip.localizacao || '';
+        document.getElementById('equipQtd').value = equip.quantidade || 1;
+        document.getElementById('equipStatus').value = equip.status;
+        document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editando (salvar criará novo)';
+        document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
     }
 
     function exportarCSV() {
-        if (!equipamentos.length) { alert('Nenhum equipamento para exportar'); return; }
-        var headers = ['ID', 'Nome/Tipo', 'Marca/Modelo', 'Nº Série', 'Localização', 'Quantidade', 'Status', 'Data de Registro'];
-        var linhas = [];
-        for (var i = 0; i < equipamentos.length; i++) {
-            var eq = equipamentos[i];
-            linhas.push([ 
-                eq.id, 
-                '"' + String(eq.nome || '').replace(/"/g, '""') + '"', 
-                '"' + String(eq.marca || '').replace(/"/g, '""') + '"',
-                '"' + String(eq.serial || '').replace(/"/g, '""') + '"', 
-                '"' + String(eq.localizacao || '').replace(/"/g, '""') + '"', 
-                eq.quantidade || '1', 
-                eq.status, 
-                eq.registro || '' 
-            ]);
-        }
-        var csv = headers.join(',') + '\n';
-        for (var j = 0; j < linhas.length; j++) {
-            csv += linhas[j].join(',') + '\n';
-        }
-        var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        var link = document.createElement('a');
+        if (!equipamentos.length) { alert('Nenhum dado para exportar'); return; }
+        const headers = ['ID', 'Nome', 'Marca', 'Série', 'Localização', 'Quantidade', 'Status', 'Registro'];
+        const linhas = equipamentos.map(eq => [eq.id, eq.nome, eq.marca, eq.serial, eq.localizacao, eq.quantidade, eq.status, eq.registro]);
+        let csv = headers.join(',') + '\n' + linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'inventario_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.csv';
+        link.download = `inventario_${new Date().toISOString().slice(0,10)}.csv`;
         link.click();
         URL.revokeObjectURL(link.href);
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
 
-    // Eventos - usando window.onload para garantir que os elementos existem
-    window.onload = function() {
-        var saveBtn = document.getElementById('saveBtn');
-        var cancelBtn = document.getElementById('cancelBtn');
-        var searchInput = document.getElementById('searchInput');
-        var filterStatus = document.getElementById('filterStatusSelect');
-        var filterLocation = document.getElementById('filterLocation');
-        var clearBtn = document.getElementById('clearFiltersBtn');
-        var exportBtn = document.getElementById('exportBtn');
-        var refreshBtn = document.getElementById('refreshBtn');
-        var equipSerial = document.getElementById('equipSerial');
-        
-        if (saveBtn) saveBtn.onclick = function(e) { e.preventDefault(); salvarEquipamento(); };
-        if (cancelBtn) cancelBtn.onclick = function(e) { e.preventDefault(); resetForm(); };
-        if (searchInput) searchInput.oninput = function() { aplicarFiltros(); };
-        if (filterStatus) filterStatus.onchange = function() { aplicarFiltros(); };
-        if (filterLocation) filterLocation.onchange = function() { aplicarFiltros(); };
-        if (clearBtn) clearBtn.onclick = function() { limparFiltros(); };
-        if (exportBtn) exportBtn.onclick = function() { exportarCSV(); };
-        if (refreshBtn) refreshBtn.onclick = function() { carregarDaPlanilha(); };
-        if (equipSerial) equipSerial.oninput = function() { verificarDuplicidade(); };
-        if (equipSerial) equipSerial.onblur = function() { verificarDuplicidade(); };
-        
-        var sortableHeaders = document.querySelectorAll('.sortable');
-        for (var i = 0; i < sortableHeaders.length; i++) {
-            sortableHeaders[i].addEventListener('click', function() {
-                var field = this.getAttribute('data-field');
-                if (field) mudarOrdenacao(field);
-            });
-        }
-        
-        carregarDaPlanilha();
-    };
+    document.getElementById('saveBtn').onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
+    document.getElementById('cancelBtn').onclick = (e) => { e.preventDefault(); location.reload(); };
+    document.getElementById('searchInput').oninput = () => aplicarFiltros();
+    document.getElementById('filterStatusSelect').onchange = () => aplicarFiltros();
+    document.getElementById('filterLocation').onchange = () => aplicarFiltros();
+    document.getElementById('clearFiltersBtn').onclick = () => limparFiltros();
+    document.getElementById('exportBtn').onclick = () => exportarCSV();
+    document.getElementById('refreshBtn').onclick = () => carregarDaPlanilha();
+    document.getElementById('equipSerial').oninput = () => verificarDuplicidade();
+
+    carregarDaPlanilha();
 </script>
 </body>
 </html>
