@@ -36,7 +36,6 @@
         
         .container { max-width: 1600px; margin: 0 auto; }
         
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -93,7 +92,6 @@
         .sync-status.error { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .sync-status.success { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
         
-        /* Form Card */
         .form-card {
             background: var(--bg-card);
             border-radius: 24px;
@@ -155,7 +153,6 @@
         
         .mensagem-duplicado.show { display: block; }
         
-        /* Buttons */
         .btn-primary {
             background: var(--gradient);
             border: none;
@@ -192,7 +189,6 @@
             justify-content: flex-end;
         }
         
-        /* Filter Bar */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -270,7 +266,6 @@
             border: 1px solid var(--border);
         }
         
-        /* Table */
         .table-wrapper {
             background: var(--bg-card);
             border-radius: 20px;
@@ -349,7 +344,6 @@
         
         .empty-row td { text-align: center; padding: 60px; color: var(--text-secondary); font-style: italic; }
         
-        /* Pagination */
         .pagination-container {
             text-align: center;
             margin-top: 30px;
@@ -402,7 +396,6 @@
             border: 1px solid var(--border);
         }
         
-        /* Footer */
         .footer {
             margin-top: 60px;
             text-align: center;
@@ -682,7 +675,7 @@
         }
     }
 
-    function mostrarMensagem(texto, tipo = 'normal') {
+    function mostrarMensagem(texto, tipo) {
         const toast = document.getElementById('toast');
         if (toast) {
             toast.textContent = texto;
@@ -693,27 +686,41 @@
         const statusDiv = document.getElementById('syncStatus');
         if (statusText && statusDiv) {
             statusDiv.className = 'sync-status';
-            if (tipo === 'error') { statusDiv.classList.add('error'); statusText.innerText = 'Erro'; }
-            else if (tipo === 'syncing') { statusDiv.classList.add('syncing'); statusText.innerText = texto; }
-            else if (tipo === 'success') { statusDiv.classList.add('success'); statusText.innerText = texto; }
-            else { statusText.innerText = texto; }
+            if (tipo === 'error') {
+                statusDiv.classList.add('error');
+                statusText.innerText = 'Erro';
+            } else if (tipo === 'syncing') {
+                statusDiv.classList.add('syncing');
+                statusText.innerText = texto;
+            } else if (tipo === 'success') {
+                statusDiv.classList.add('success');
+                statusText.innerText = texto;
+            } else {
+                statusText.innerText = texto;
+            }
         }
     }
 
     function escapeHtml(str) {
         if (str === null || str === undefined) return "";
-        return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 
     function verificarDuplicidade() {
-        const serialInput = document.getElementById("equipSerial");
+        const serialInput = document.getElementById('equipSerial');
+        if (!serialInput) return;
         const serial = serialInput.value.trim();
-        const msgDiv = document.getElementById("msgDuplicado");
-        const saveBtn = document.getElementById("saveBtn");
+        const msgDiv = document.getElementById('msgDuplicado');
+        const saveBtn = document.getElementById('saveBtn');
         
         if (!serial) {
-            serialInput.classList.remove("duplicado");
-            msgDiv.classList.remove("show");
+            serialInput.classList.remove('duplicado');
+            if (msgDiv) msgDiv.classList.remove('show');
             if (saveBtn) saveBtn.disabled = false;
             return false;
         }
@@ -721,20 +728,20 @@
         const existe = equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId));
         
         if (existe) {
-            serialInput.classList.add("duplicado");
-            msgDiv.classList.add("show");
+            serialInput.classList.add('duplicado');
+            if (msgDiv) msgDiv.classList.add('show');
             if (saveBtn) saveBtn.disabled = true;
             return true;
         } else {
-            serialInput.classList.remove("duplicado");
-            msgDiv.classList.remove("show");
+            serialInput.classList.remove('duplicado');
+            if (msgDiv) msgDiv.classList.remove('show');
             if (saveBtn) saveBtn.disabled = false;
             return false;
         }
     }
 
     function ordenarEquipamentos(array) {
-        return [...array].sort((a, b) => {
+        return [...array].sort(function(a, b) {
             let valA = a[sortField] || '';
             let valB = b[sortField] || '';
             
@@ -757,27 +764,33 @@
     }
 
     function aplicarFiltros() {
-        const busca = document.getElementById("searchInput").value.toLowerCase();
-        const filtroStatus = document.getElementById("filterStatusSelect").value;
-        const filtroLocal = document.getElementById("filterLocation").value;
+        const buscaInput = document.getElementById('searchInput');
+        const filtroStatusSelect = document.getElementById('filterStatusSelect');
+        const filtroLocalSelect = document.getElementById('filterLocation');
         
-        let filtrados = equipamentos.filter(eq => {
-            const matchBusca = busca === "" || 
-                String(eq.nome || "").toLowerCase().includes(busca) || 
-                String(eq.marca || "").toLowerCase().includes(busca) ||
-                String(eq.serial || "").toLowerCase().includes(busca);
-            const matchStatus = filtroStatus === "todos" || eq.status === filtroStatus;
-            const matchLocal = filtroLocal === "todos" || eq.localizacao === filtroLocal;
+        const busca = buscaInput ? buscaInput.value.toLowerCase() : '';
+        const filtroStatus = filtroStatusSelect ? filtroStatusSelect.value : 'todos';
+        const filtroLocal = filtroLocalSelect ? filtroLocalSelect.value : 'todos';
+        
+        let filtrados = equipamentos.filter(function(eq) {
+            const matchBusca = busca === '' || 
+                String(eq.nome || '').toLowerCase().includes(busca) || 
+                String(eq.marca || '').toLowerCase().includes(busca) ||
+                String(eq.serial || '').toLowerCase().includes(busca);
+            const matchStatus = filtroStatus === 'todos' || eq.status === filtroStatus;
+            const matchLocal = filtroLocal === 'todos' || eq.localizacao === filtroLocal;
             return matchBusca && matchStatus && matchLocal;
         });
         
         equipamentosFiltrados = ordenarEquipamentos(filtrados);
         
-        const statsDiv = document.getElementById("filterStats");
-        if (statsDiv && equipamentosFiltrados.length !== equipamentos.length) {
-            statsDiv.innerHTML = `🎯 Mostrando ${equipamentosFiltrados.length} de ${equipamentos.length} equipamentos`;
-        } else if (statsDiv) {
-            statsDiv.innerHTML = `📊 Total: ${equipamentos.length} equipamentos`;
+        const statsDiv = document.getElementById('filterStats');
+        if (statsDiv) {
+            if (equipamentosFiltrados.length !== equipamentos.length) {
+                statsDiv.innerHTML = '🎯 Mostrando ' + equipamentosFiltrados.length + ' de ' + equipamentos.length + ' equipamentos';
+            } else {
+                statsDiv.innerHTML = '📊 Total: ' + equipamentos.length + ' equipamentos';
+            }
         }
         
         paginaAtual = 1;
@@ -793,22 +806,28 @@
             sortOrder = 'asc';
         }
         
-        document.querySelectorAll('.sortable i').forEach(icon => {
-            icon.className = 'fas fa-sort';
-        });
+        const icons = document.querySelectorAll('.sortable i');
+        for (var i = 0; i < icons.length; i++) {
+            icons[i].className = 'fas fa-sort';
+        }
         
-        const th = document.querySelector(`.sortable[data-field="${campo}"] i`);
+        const th = document.querySelector('.sortable[data-field="' + campo + '"] i');
         if (th) {
-            th.className = `fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}`;
+            th.className = 'fas fa-sort-' + (sortOrder === 'asc' ? 'up' : 'down');
         }
         
         aplicarFiltros();
     }
 
     function limparFiltros() {
-        document.getElementById("searchInput").value = "";
-        document.getElementById("filterStatusSelect").value = "todos";
-        document.getElementById("filterLocation").value = "todos";
+        const searchInput = document.getElementById('searchInput');
+        const filterStatus = document.getElementById('filterStatusSelect');
+        const filterLocation = document.getElementById('filterLocation');
+        
+        if (searchInput) searchInput.value = '';
+        if (filterStatus) filterStatus.value = 'todos';
+        if (filterLocation) filterLocation.value = 'todos';
+        
         aplicarFiltros();
         mostrarMensagem('🧹 Filtros limpos!', 'success');
     }
@@ -818,87 +837,92 @@
         const fim = inicio + ITENS_POR_PAGINA;
         const itensPagina = equipamentosFiltrados.slice(inicio, fim);
         
-        const tbody = document.getElementById("tableBody");
+        const tbody = document.getElementById('tableBody');
         if (!tbody) return;
         
         if (itensPagina.length === 0 && equipamentosFiltrados.length === 0) {
             if (equipamentos.length === 0) {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
             } else {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>`;
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
             }
             return;
         }
         
-        let html = "";
-        itensPagina.forEach(eq => {
-            let statusClass = eq.status === "Operacional" ? "status-operacional" : (eq.status === "Manutenção" ? "status-manutencao" : "status-inativo");
-            html += `<tr>
-                <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
-                <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
-                <td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}<\/code><\/td>
-                <td><i class="fas fa-location-dot" style="color: var(--accent-secondary);"></i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
-                <td style="text-align: center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
-                <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
-                <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}<\/td>
-                <td class="row-actions">
-                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"><\/i>
-                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})"><\/i>
-                <\/td>
-            <\/tr>`;
-        });
+        var html = '';
+        for (var i = 0; i < itensPagina.length; i++) {
+            var eq = itensPagina[i];
+            var statusClass = '';
+            if (eq.status === 'Operacional') statusClass = 'status-operacional';
+            else if (eq.status === 'Manutenção') statusClass = 'status-manutencao';
+            else statusClass = 'status-inativo';
+            
+            html += '<tr>';
+            html += '<td><strong>' + escapeHtml(eq.nome) + '</strong></td>';
+            html += '<td><span class="marca-modelo">' + escapeHtml(eq.marca || 'Não informado') + '</span></td>';
+            html += '<td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">' + escapeHtml(eq.serial) + '</code></td>';
+            html += '<td><i class="fas fa-location-dot" style="color: var(--accent-secondary);"></i> ' + escapeHtml(eq.localizacao || 'Não informado') + '</td>';
+            html += '<td style="text-align: center;"><span class="quantidade-numero">' + escapeHtml(eq.quantidade || '1') + '</span></td>';
+            html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(eq.status) + '</span></td>';
+            html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
+            html += '<td class="row-actions">';
+            html += '<i class="fas fa-edit" onclick="editEquipamento(' + eq.id + ')"></i>';
+            html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(' + eq.id + ')"></i>';
+            html += '</td></tr>';
+        }
         tbody.innerHTML = html;
         
-        const total = equipamentosFiltrados.length;
-        const inicioMostrar = total === 0 ? 0 : inicio + 1;
-        const fimMostrar = Math.min(fim, total);
-        const infoDiv = document.getElementById("paginationInfo");
+        var total = equipamentosFiltrados.length;
+        var inicioMostrar = total === 0 ? 0 : inicio + 1;
+        var fimMostrar = Math.min(fim, total);
+        var infoDiv = document.getElementById('paginationInfo');
         if (infoDiv && total > 0) {
-            infoDiv.innerHTML = `📄 Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
+            infoDiv.innerHTML = '📄 Mostrando ' + inicioMostrar + ' - ' + fimMostrar + ' de ' + total + ' equipamentos | Página ' + paginaAtual + ' de ' + Math.ceil(total / ITENS_POR_PAGINA);
         } else if (infoDiv) {
-            infoDiv.innerHTML = ``;
+            infoDiv.innerHTML = '';
         }
     }
 
     function atualizarPaginacao() {
-        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
-        const paginationDiv = document.getElementById("pagination");
+        var totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        var paginationDiv = document.getElementById('pagination');
         if (!paginationDiv) return;
         
         if (totalPaginas <= 1) {
-            paginationDiv.innerHTML = "";
+            paginationDiv.innerHTML = '';
             return;
         }
         
-        let html = '';
-        html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
+        var html = '';
+        html += '<button onclick="mudarPagina(' + (paginaAtual - 1) + ')" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i> Anterior</button>';
         
         if (paginaAtual > 3) {
-            html += `<button onclick="mudarPagina(1)">1</button>`;
-            if (paginaAtual > 4) html += `<button disabled>...</button>`;
+            html += '<button onclick="mudarPagina(1)">1</button>';
+            if (paginaAtual > 4) html += '<button disabled>...</button>';
         }
         
-        for (let i = Math.max(1, paginaAtual - 2); i <= Math.min(totalPaginas, paginaAtual + 2); i++) {
-            html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
+        for (var i = Math.max(1, paginaAtual - 2); i <= Math.min(totalPaginas, paginaAtual + 2); i++) {
+            html += '<button onclick="mudarPagina(' + i + ')" class="' + (i === paginaAtual ? 'active' : '') + '">' + i + '</button>';
         }
         
         if (paginaAtual < totalPaginas - 2) {
-            if (paginaAtual < totalPaginas - 3) html += `<button disabled>...</button>`;
-            html += `<button onclick="mudarPagina(${totalPaginas})">${totalPaginas}</button>`;
+            if (paginaAtual < totalPaginas - 3) html += '<button disabled>...</button>';
+            html += '<button onclick="mudarPagina(' + totalPaginas + ')">' + totalPaginas + '</button>';
         }
         
-        html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
+        html += '<button onclick="mudarPagina(' + (paginaAtual + 1) + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '>Próximo <i class="fas fa-chevron-right"></i></button>';
         
         paginationDiv.innerHTML = html;
     }
 
     function mudarPagina(pagina) {
-        const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+        var totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
         if (pagina < 1 || pagina > totalPaginas) return;
         paginaAtual = pagina;
         renderizarPagina();
         atualizarPaginacao();
-        document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var tableWrapper = document.querySelector('.table-wrapper');
+        if (tableWrapper) tableWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async function carregarDaPlanilha() {
@@ -906,19 +930,21 @@
         carregando = true;
         mostrarMensagem('Carregando...', 'syncing');
         try {
-            const resposta = await fetch(`${URL_WEB_APP}?t=${Date.now()}`);
-            const dados = await resposta.json();
-            if (dados.status === "sucesso" && dados.dados && dados.dados.length > 0) {
+            var resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
+            var dados = await resposta.json();
+            if (dados.status === 'sucesso' && dados.dados && dados.dados.length > 0) {
                 equipamentos = dados.dados;
                 aplicarFiltros();
-                document.getElementById("totalCount").innerText = equipamentos.length;
-                mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
+                var totalCount = document.getElementById('totalCount');
+                if (totalCount) totalCount.innerText = equipamentos.length;
+                mostrarMensagem(equipamentos.length + ' equipamentos carregados', 'success');
             } else {
                 equipamentos = [];
                 equipamentosFiltrados = [];
                 renderizarPagina();
                 atualizarPaginacao();
-                document.getElementById("totalCount").innerText = "0";
+                var totalCount = document.getElementById('totalCount');
+                if (totalCount) totalCount.innerText = '0';
                 mostrarMensagem('Planilha vazia', 'error');
             }
         } catch (erro) {
@@ -928,7 +954,8 @@
             equipamentosFiltrados = [];
             renderizarPagina();
             atualizarPaginacao();
-            document.getElementById("totalCount").innerText = "0";
+            var totalCount = document.getElementById('totalCount');
+            if (totalCount) totalCount.innerText = '0';
         }
         carregando = false;
         verificarDuplicidade();
@@ -936,11 +963,11 @@
 
     async function excluirDaPlanilha(id) {
         try {
-            const params = new URLSearchParams({ acao: 'excluir', id: id });
-            const urlCompleta = `${URL_WEB_APP}?${params.toString()}`;
-            const resposta = await fetch(urlCompleta);
-            const resultado = await resposta.json();
-            return resultado.status === "sucesso";
+            var params = new URLSearchParams({ acao: 'excluir', id: id });
+            var urlCompleta = URL_WEB_APP + '?' + params.toString();
+            var resposta = await fetch(urlCompleta);
+            var resultado = await resposta.json();
+            return resultado.status === 'sucesso';
         } catch (erro) {
             console.error('Erro na exclusão:', erro);
             return false;
@@ -948,45 +975,52 @@
     }
 
     async function salvarEquipamento() {
-        const nome = document.getElementById("equipName").value.trim();
-        const marca = document.getElementById("equipMarca").value.trim();
-        const serial = document.getElementById("equipSerial").value.trim();
-        const localizacao = document.getElementById("equipLocation").value;
-        const quantidade = document.getElementById("equipQtd").value || "1";
-        const status = document.getElementById("equipStatus").value;
+        var nome = document.getElementById('equipName').value.trim();
+        var marca = document.getElementById('equipMarca').value.trim();
+        var serial = document.getElementById('equipSerial').value.trim();
+        var localizacao = document.getElementById('equipLocation').value;
+        var quantidade = document.getElementById('equipQtd').value || '1';
+        var status = document.getElementById('equipStatus').value;
 
-        if (!nome) { alert("Informe o Nome/Tipo do equipamento."); return false; }
-        if (!marca) { alert("Informe a Marca/Modelo do equipamento."); return false; }
-        if (!serial) { alert("Informe o Número de Série/SF."); return false; }
-        if (!localizacao) { alert("Selecione a Localização do equipamento."); return false; }
+        if (!nome) { alert('Informe o Nome/Tipo do equipamento.'); return false; }
+        if (!marca) { alert('Informe a Marca/Modelo do equipamento.'); return false; }
+        if (!serial) { alert('Informe o Número de Série/SF.'); return false; }
+        if (!localizacao) { alert('Selecione a Localização do equipamento.'); return false; }
         
-        if (equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId))) {
-            alert("❌ Já existe um equipamento com este número de série!");
+        var existe = false;
+        for (var i = 0; i < equipamentos.length; i++) {
+            if (equipamentos[i].serial === serial && (editingId === null || equipamentos[i].id !== editingId)) {
+                existe = true;
+                break;
+            }
+        }
+        if (existe) {
+            alert('❌ Já existe um equipamento com este número de série!');
             return false;
         }
 
-        const agora = new Date();
-        const dataHora = agora.toLocaleString('pt-BR');
+        var agora = new Date();
+        var dataHora = agora.toLocaleString('pt-BR');
 
         mostrarMensagem('Salvando...', 'syncing');
         try {
-            const params = new URLSearchParams({ 
+            var params = new URLSearchParams({ 
                 acao: 'salvar', 
-                nome, 
-                marca,
-                serial, 
-                localizacao, 
-                quantidade, 
-                status, 
+                nome: nome, 
+                marca: marca,
+                serial: serial, 
+                localizacao: localizacao, 
+                quantidade: quantidade, 
+                status: status, 
                 registro: dataHora 
             });
-            const urlCompleta = `${URL_WEB_APP}?${params.toString()}`;
-            const resposta = await fetch(urlCompleta);
-            const resultado = await resposta.json();
-            if (resultado.status === "sucesso") {
+            var urlCompleta = URL_WEB_APP + '?' + params.toString();
+            var resposta = await fetch(urlCompleta);
+            var resultado = await resposta.json();
+            if (resultado.status === 'sucesso') {
                 mostrarMensagem('✅ Salvo com sucesso!', 'success');
                 resetForm();
-                setTimeout(() => carregarDaPlanilha(), 1000);
+                setTimeout(function() { carregarDaPlanilha(); }, 1000);
                 return true;
             } else {
                 throw new Error(resultado.mensagem || 'Erro desconhecido');
@@ -999,15 +1033,21 @@
     }
 
     async function excluirEquipamento(id) {
-        const equip = equipamentos.find(eq => eq.id === id);
+        var equip = null;
+        for (var i = 0; i < equipamentos.length; i++) {
+            if (equipamentos[i].id === id) {
+                equip = equipamentos[i];
+                break;
+            }
+        }
         if (!equip) return;
         
-        if (confirm(`Tem certeza que deseja excluir o equipamento "${equip.nome}" - ${equip.marca}?\n\nNº Série: ${equip.serial}\n\nEsta ação não poderá ser desfeita.`)) {
+        if (confirm('Tem certeza que deseja excluir o equipamento "' + equip.nome + '" - ' + equip.marca + '?\n\nNº Série: ' + equip.serial + '\n\nEsta ação não poderá ser desfeita.')) {
             mostrarMensagem('Excluindo...', 'syncing');
-            const excluido = await excluirDaPlanilha(id);
+            var excluido = await excluirDaPlanilha(id);
             if (excluido) {
                 mostrarMensagem('🗑️ Equipamento excluído!', 'success');
-                setTimeout(() => carregarDaPlanilha(), 500);
+                setTimeout(function() { carregarDaPlanilha(); }, 500);
             } else {
                 mostrarMensagem('❌ Erro ao excluir', 'error');
             }
@@ -1015,74 +1055,121 @@
     }
 
     function resetForm() {
-        document.getElementById("equipName").value = "";
-        document.getElementById("equipMarca").value = "";
-        document.getElementById("equipSerial").value = "";
-        document.getElementById("equipLocation").value = "";
-        document.getElementById("equipQtd").value = "1";
-        document.getElementById("equipStatus").value = "Operacional";
+        var equipName = document.getElementById('equipName');
+        var equipMarca = document.getElementById('equipMarca');
+        var equipSerial = document.getElementById('equipSerial');
+        var equipLocation = document.getElementById('equipLocation');
+        var equipQtd = document.getElementById('equipQtd');
+        var equipStatus = document.getElementById('equipStatus');
+        var formTitle = document.getElementById('formTitle');
+        
+        if (equipName) equipName.value = '';
+        if (equipMarca) equipMarca.value = '';
+        if (equipSerial) equipSerial.value = '';
+        if (equipLocation) equipLocation.value = '';
+        if (equipQtd) equipQtd.value = '1';
+        if (equipStatus) equipStatus.value = 'Operacional';
+        
         editingId = null;
-        document.getElementById("formTitle").innerText = "Cadastrar Equipamento";
+        if (formTitle) formTitle.innerText = 'Cadastrar Equipamento';
         verificarDuplicidade();
     }
 
     function editEquipamento(id) {
-        const equip = equipamentos.find(eq => eq.id === id);
+        var equip = null;
+        for (var i = 0; i < equipamentos.length; i++) {
+            if (equipamentos[i].id === id) {
+                equip = equipamentos[i];
+                break;
+            }
+        }
         if (!equip) return;
+        
         editingId = equip.id;
-        document.getElementById("equipName").value = equip.nome;
-        document.getElementById("equipMarca").value = equip.marca || "";
-        document.getElementById("equipSerial").value = equip.serial;
-        document.getElementById("equipLocation").value = equip.localizacao || "";
-        document.getElementById("equipQtd").value = equip.quantidade || 1;
-        document.getElementById("equipStatus").value = equip.status;
-        document.getElementById("formTitle").innerHTML = "<i class='fas fa-pen-alt'></i> Editar Equipamento";
-        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+        var equipName = document.getElementById('equipName');
+        var equipMarca = document.getElementById('equipMarca');
+        var equipSerial = document.getElementById('equipSerial');
+        var equipLocation = document.getElementById('equipLocation');
+        var equipQtd = document.getElementById('equipQtd');
+        var equipStatus = document.getElementById('equipStatus');
+        var formTitle = document.getElementById('formTitle');
+        
+        if (equipName) equipName.value = equip.nome;
+        if (equipMarca) equipMarca.value = equip.marca || '';
+        if (equipSerial) equipSerial.value = equip.serial;
+        if (equipLocation) equipLocation.value = equip.localizacao || '';
+        if (equipQtd) equipQtd.value = equip.quantidade || 1;
+        if (equipStatus) equipStatus.value = equip.status;
+        if (formTitle) formTitle.innerHTML = '<i class="fas fa-pen-alt"></i> Editar Equipamento';
+        
+        var formCard = document.getElementById('formCard');
+        if (formCard) formCard.scrollIntoView({ behavior: 'smooth' });
         verificarDuplicidade();
     }
 
     function exportarCSV() {
-        if (!equipamentos.length) { alert("Nenhum equipamento para exportar"); return; }
-        const headers = ["ID", "Nome/Tipo", "Marca/Modelo", "Nº Série", "Localização", "Quantidade", "Status", "Data de Registro"];
-        const linhas = equipamentos.map(eq => [ 
-            eq.id, 
-            `"${String(eq.nome || '').replace(/"/g, '""')}"`, 
-            `"${String(eq.marca || '').replace(/"/g, '""')}"`,
-            `"${String(eq.serial || '').replace(/"/g, '""')}"`, 
-            `"${String(eq.localizacao || '').replace(/"/g, '""')}"`, 
-            eq.quantidade || '1', 
-            eq.status, 
-            eq.registro || '' 
-        ]);
-        let csv = headers.join(",") + "\n" + linhas.map(l => l.join(",")).join("\n");
-        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
+        if (!equipamentos.length) { alert('Nenhum equipamento para exportar'); return; }
+        var headers = ['ID', 'Nome/Tipo', 'Marca/Modelo', 'Nº Série', 'Localização', 'Quantidade', 'Status', 'Data de Registro'];
+        var linhas = [];
+        for (var i = 0; i < equipamentos.length; i++) {
+            var eq = equipamentos[i];
+            linhas.push([ 
+                eq.id, 
+                '"' + String(eq.nome || '').replace(/"/g, '""') + '"', 
+                '"' + String(eq.marca || '').replace(/"/g, '""') + '"',
+                '"' + String(eq.serial || '').replace(/"/g, '""') + '"', 
+                '"' + String(eq.localizacao || '').replace(/"/g, '""') + '"', 
+                eq.quantidade || '1', 
+                eq.status, 
+                eq.registro || '' 
+            ]);
+        }
+        var csv = headers.join(',') + '\n';
+        for (var j = 0; j < linhas.length; j++) {
+            csv += linhas[j].join(',') + '\n';
+        }
+        var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `inventario_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        link.download = 'inventario_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.csv';
         link.click();
         URL.revokeObjectURL(link.href);
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
 
-    document.getElementById("saveBtn").onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
-    document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
-    document.getElementById("searchInput").oninput = () => aplicarFiltros();
-    document.getElementById("filterStatusSelect").onchange = () => aplicarFiltros();
-    document.getElementById("filterLocation").onchange = () => aplicarFiltros();
-    document.getElementById("clearFiltersBtn").onclick = () => limparFiltros();
-    document.getElementById("exportBtn").onclick = () => exportarCSV();
-    document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
-    document.getElementById("equipSerial").oninput = () => verificarDuplicidade();
-    document.getElementById("equipSerial").onblur = () => verificarDuplicidade();
-    
-    document.querySelectorAll('.sortable').forEach(th => {
-        th.addEventListener('click', () => {
-            const field = th.getAttribute('data-field');
-            if (field) mudarOrdenacao(field);
-        });
-    });
-
-    carregarDaPlanilha();
+    // Eventos - usando window.onload para garantir que os elementos existem
+    window.onload = function() {
+        var saveBtn = document.getElementById('saveBtn');
+        var cancelBtn = document.getElementById('cancelBtn');
+        var searchInput = document.getElementById('searchInput');
+        var filterStatus = document.getElementById('filterStatusSelect');
+        var filterLocation = document.getElementById('filterLocation');
+        var clearBtn = document.getElementById('clearFiltersBtn');
+        var exportBtn = document.getElementById('exportBtn');
+        var refreshBtn = document.getElementById('refreshBtn');
+        var equipSerial = document.getElementById('equipSerial');
+        
+        if (saveBtn) saveBtn.onclick = function(e) { e.preventDefault(); salvarEquipamento(); };
+        if (cancelBtn) cancelBtn.onclick = function(e) { e.preventDefault(); resetForm(); };
+        if (searchInput) searchInput.oninput = function() { aplicarFiltros(); };
+        if (filterStatus) filterStatus.onchange = function() { aplicarFiltros(); };
+        if (filterLocation) filterLocation.onchange = function() { aplicarFiltros(); };
+        if (clearBtn) clearBtn.onclick = function() { limparFiltros(); };
+        if (exportBtn) exportBtn.onclick = function() { exportarCSV(); };
+        if (refreshBtn) refreshBtn.onclick = function() { carregarDaPlanilha(); };
+        if (equipSerial) equipSerial.oninput = function() { verificarDuplicidade(); };
+        if (equipSerial) equipSerial.onblur = function() { verificarDuplicidade(); };
+        
+        var sortableHeaders = document.querySelectorAll('.sortable');
+        for (var i = 0; i < sortableHeaders.length; i++) {
+            sortableHeaders[i].addEventListener('click', function() {
+                var field = this.getAttribute('data-field');
+                if (field) mudarOrdenacao(field);
+            });
+        }
+        
+        carregarDaPlanilha();
+    };
 </script>
 </body>
 </html>
