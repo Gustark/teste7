@@ -18,7 +18,6 @@
         
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -72,7 +71,6 @@
         .sync-status.error { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .sync-status.success { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
         
-        /* Form Card */
         .form-card {
             background: white;
             border-radius: 20px;
@@ -89,7 +87,6 @@
             margin-bottom: 20px;
         }
         
-        /* Linha inteira para observações */
         .observacoes-group {
             grid-column: 1 / -1;
             margin-top: 5px;
@@ -138,7 +135,6 @@
             background: #fef2f2;
         }
         
-        /* Destaque para observações quando status é manutenção/inativo */
         .observacoes-group.destaque label {
             color: #dc2626;
         }
@@ -146,11 +142,6 @@
         .observacoes-group.destaque textarea {
             border-color: #dc2626;
             background: #fef2f2;
-        }
-        
-        .observacoes-group.destaque textarea:focus {
-            border-color: #dc2626;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
         }
         
         .mensagem-duplicado {
@@ -198,7 +189,6 @@
             justify-content: flex-end;
         }
         
-        /* Filter Bar */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -270,12 +260,12 @@
             border: 1px solid #e2e8f0;
         }
         
-        /* Table */
         .table-wrapper {
             background: white;
             border-radius: 20px;
             overflow-x: auto;
             border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
         }
         
         .inventory-table {
@@ -352,10 +342,10 @@
         
         .empty-row td { text-align: center; padding: 60px; color: #64748b; font-style: italic; }
         
-        /* Pagination */
         .pagination-container {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 20px;
+            margin-bottom: 30px;
         }
         
         .pagination {
@@ -405,9 +395,8 @@
             border: 1px solid #e2e8f0;
         }
         
-        /* Footer */
         .footer {
-            margin-top: 50px;
+            margin-top: 30px;
             text-align: center;
             padding: 30px 20px 20px;
             border-top: 1px solid #e2e8f0;
@@ -607,15 +596,27 @@
     </div>
 
     <div class="table-wrapper">
-        <table class="inventory-table">
+        <table class="inventory-table" id="inventoryTable">
             <thead>
-                <tr><th>Nome / Tipo</th><th>Marca / Modelo</th><th>Nº Série</th><th>Localização</th><th>Qtd</th><th>Status</th><th>Observações</th><th>Data Registro</th><th>Ações</th></tr>
+                <tr>
+                    <th>Nome / Tipo</th>
+                    <th>Marca / Modelo</th>
+                    <th>Nº Série</th>
+                    <th>Localização</th>
+                    <th>Qtd</th>
+                    <th>Status</th>
+                    <th>Observações</th>
+                    <th>Data Registro</th>
+                    <th>Ações</th>
+                </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...</td><\/tr>
+                <tr class="empty-row">
+                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...</td>
+                </tr>
             </tbody>
-         <\/table>
-    <\/div>
+        </table>
+    </div>
 
     <div class="pagination-container">
         <div class="pagination" id="pagination"></div>
@@ -632,6 +633,11 @@
         <div class="footer-text" style="margin-top: 8px;">
             <i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas
         </div>
+        <div class="social-links">
+            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
     </div>
 </div>
 <div id="toast" class="toast"></div>
@@ -646,7 +652,6 @@
     let paginaAtual = 1;
     let ITENS_POR_PAGINA = 10;
 
-    // Monitora mudança no status para destacar o campo observações
     function configurarStatusListener() {
         const statusSelect = document.getElementById('equipStatus');
         const observacoesGroup = document.getElementById('observacoesGroup');
@@ -763,8 +768,11 @@
         if (!tbody) return;
         
         if (itensPagina.length === 0) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento encontrado</td><\/tr>';
-            document.getElementById('paginationInfo').innerHTML = '';
+            if (equipamentos.length === 0) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
+            } else {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
+            }
             return;
         }
         
@@ -794,8 +802,10 @@
         const inicioMostrar = inicio + 1;
         const fimMostrar = Math.min(fim, total);
         const infoDiv = document.getElementById('paginationInfo');
-        if (infoDiv) {
+        if (infoDiv && total > 0) {
             infoDiv.innerHTML = `📄 Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
+        } else if (infoDiv) {
+            infoDiv.innerHTML = '';
         }
     }
 
@@ -894,7 +904,6 @@
         if (!serial) { alert('Informe o Número de Série'); return; }
         if (!localizacao) { alert('Selecione a Localização'); return; }
         
-        // Validação: se status for Manutenção ou Inativo, observações é obrigatória
         if ((status === 'Manutenção' || status === 'Inativo') && !observacoes) {
             alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!\n\nDescreva o problema ou motivo.');
             document.getElementById('equipObservacoes').focus();
@@ -971,7 +980,6 @@
         document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editando (salvar criará novo)';
         document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
         
-        // Atualizar destaque do campo observações
         const statusSelect = document.getElementById('equipStatus');
         const observacoesGroup = document.getElementById('observacoesGroup');
         const obsObrigatorio = document.getElementById('obsObrigatorio');
