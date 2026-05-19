@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INVENTÁRIO EGESP</title>
+    <title>Inventário EGESP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0a0c10;
-            --bg-secondary: #13161c;
-            --bg-tertiary: #1a1f2a;
-            --bg-card: #1e2430;
-            --border: #2d3548;
-            --text-primary: #f0f3f8;
-            --text-secondary: #9ca3af;
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
             --accent-primary: #3b82f6;
             --accent-secondary: #06b6d4;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
             --gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -60,7 +62,7 @@
         }
         
         .stats-badge {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border-radius: 60px;
             padding: 10px 24px;
             border: 1px solid var(--border);
@@ -68,6 +70,7 @@
             align-items: center;
             gap: 12px;
             font-weight: 600;
+            box-shadow: var(--shadow);
         }
         
         .stats-badge i {
@@ -76,7 +79,7 @@
         }
         
         .sync-status {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border-radius: 60px;
             padding: 10px 20px;
             font-size: 0.75rem;
@@ -86,9 +89,9 @@
             border: 1px solid var(--border);
         }
         
-        .sync-status.syncing { background: #2d2a1a; color: var(--warning); border-color: var(--warning); }
-        .sync-status.error { background: #2a1a1a; color: var(--danger); border-color: var(--danger); }
-        .sync-status.success { background: #1a2a1a; color: var(--success); border-color: var(--success); }
+        .sync-status.syncing { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+        .sync-status.error { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+        .sync-status.success { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
         
         /* Form Card */
         .form-card {
@@ -97,7 +100,7 @@
             padding: 28px 32px;
             margin-bottom: 32px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-lg);
         }
         
         .form-grid {
@@ -135,12 +138,12 @@
         .input-group input:focus, .input-group select:focus {
             outline: none;
             border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
         
         .input-group input.duplicado {
             border-color: var(--danger);
-            background: #2a1a1a;
+            background: #fef2f2;
         }
         
         .mensagem-duplicado {
@@ -168,7 +171,7 @@
         }
         
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
-        .btn-primary:disabled { background: var(--border); cursor: not-allowed; opacity: 0.6; }
+        .btn-primary:disabled { background: var(--border); cursor: not-allowed; opacity: 0.6; transform: none; }
         
         .btn-secondary {
             background: var(--bg-secondary);
@@ -181,7 +184,7 @@
             transition: all 0.2s;
         }
         
-        .btn-secondary:hover { background: var(--border); }
+        .btn-secondary:hover { background: var(--bg-tertiary); border-color: var(--accent-primary); }
         
         .action-buttons {
             display: flex;
@@ -199,6 +202,14 @@
             margin-bottom: 24px;
         }
         
+        .filters-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+        
         .search-box {
             background: var(--bg-secondary);
             border-radius: 48px;
@@ -208,7 +219,7 @@
             gap: 12px;
             border: 1px solid var(--border);
             flex: 1;
-            max-width: 350px;
+            min-width: 200px;
         }
         
         .search-box i { color: var(--text-secondary); }
@@ -222,7 +233,7 @@
         }
         .search-box input:focus { outline: none; }
         
-        .filter-status select {
+        .filter-select {
             border-radius: 40px;
             padding: 10px 24px;
             border: 1px solid var(--border);
@@ -230,6 +241,33 @@
             color: var(--text-primary);
             font-weight: 500;
             cursor: pointer;
+            min-width: 160px;
+        }
+        
+        .btn-clear {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-clear:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        .filter-stats {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
         }
         
         /* Table */
@@ -238,6 +276,7 @@
             border-radius: 20px;
             overflow-x: auto;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
         
         .inventory-table {
@@ -250,10 +289,23 @@
         .inventory-table th {
             text-align: left;
             padding: 18px 20px;
-            background: var(--bg-secondary);
+            background: var(--bg-tertiary);
             font-weight: 700;
             color: var(--text-secondary);
             border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .inventory-table th:hover {
+            color: var(--accent-primary);
+        }
+        
+        .inventory-table th i {
+            margin-left: 8px;
+            font-size: 0.7rem;
+            opacity: 0.6;
         }
         
         .inventory-table td {
@@ -262,7 +314,7 @@
         }
         
         .inventory-table tr:hover {
-            background: rgba(59,130,246,0.05);
+            background: rgba(59,130,246,0.04);
         }
         
         .inventory-table th:nth-child(5),
@@ -280,9 +332,9 @@
             text-transform: uppercase;
         }
         
-        .status-operacional { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
-        .status-manutencao { background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
-        .status-inativo { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+        .status-operacional { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+        .status-manutencao { background: #fed7aa; color: #c2410c; border: 1px solid #fdba74; }
+        .status-inativo { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
         
         .row-actions i {
             font-size: 1.1rem;
@@ -325,15 +377,17 @@
         .pagination button:hover:not(:disabled) {
             background: var(--accent-primary);
             border-color: var(--accent-primary);
+            color: white;
         }
         
         .pagination button.active {
             background: var(--gradient);
             border-color: transparent;
+            color: white;
         }
         
         .pagination button:disabled {
-            opacity: 0.4;
+            opacity: 0.5;
             cursor: not-allowed;
         }
         
@@ -345,6 +399,7 @@
             background: var(--bg-secondary);
             padding: 8px 20px;
             border-radius: 40px;
+            border: 1px solid var(--border);
         }
         
         /* Footer */
@@ -420,7 +475,7 @@
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: var(--shadow-lg);
         }
         
         .toast.show { opacity: 1; }
@@ -446,6 +501,9 @@
             body { padding: 20px 16px; }
             .form-card { padding: 20px; }
             .btn-primary { width: 100%; justify-content: center; }
+            .filters-group { flex-direction: column; align-items: stretch; }
+            .search-box { width: 100%; }
+            .filter-select { width: 100%; }
         }
     </style>
 </head>
@@ -453,7 +511,7 @@
 <div class="container">
     <div class="header">
         <div class="title-section">
-            <h1><i class="fas fa-microchip"></i> INVENTÁRIO EGESP</h1>
+            <h1><i class="fas fa-microchip"></i> Inventário EGESP</h1>
             <p>Gestão de equipamentos sincronizada com Google Planilhas</p>
         </div>
         <div style="display: flex; gap: 12px;">
@@ -521,33 +579,46 @@
     </div>
 
     <div class="filter-bar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Buscar por nome, marca, série ou local...">
-        </div>
-        <div class="filter-status">
-            <select id="filterStatusSelect">
+        <div class="filters-group">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nome, marca, série...">
+            </div>
+            <select id="filterLocation" class="filter-select">
+                <option value="todos">📍 Todas localizações</option>
+                <option value="Sala 171">🏢 Sala 171</option>
+                <option value="Sala 178">🏢 Sala 178</option>
+                <option value="Estúdio">🎙️ Estúdio</option>
+                <option value="Grande Auditório">🎪 Grande Auditório</option>
+                <option value="Plenário">📢 Plenário</option>
+                <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
+                <option value="SSC - ADM">📋 SSC - ADM</option>
+                <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
+                <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
+                <option value="17/5">📅 17/5</option>
+            </select>
+            <select id="filterStatusSelect" class="filter-select">
                 <option value="todos">📋 Todos os status</option>
                 <option value="Operacional">✅ Operacional</option>
                 <option value="Manutenção">⚠️ Manutenção</option>
                 <option value="Inativo">❌ Inativo</option>
             </select>
+            <button id="clearFiltersBtn" class="btn-clear"><i class="fas fa-eraser"></i> Limpar Filtros</button>
         </div>
-        <button class="btn-secondary" id="exportBtn"><i class="fas fa-file-csv"></i> Exportar CSV</button>
-        <button class="btn-secondary" id="refreshBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
+        <div class="filter-stats" id="filterStats"></div>
     </div>
 
     <div class="table-wrapper">
         <table class="inventory-table">
             <thead>
                 <tr>
-                    <th>Nome / Tipo</th>
-                    <th>Marca / Modelo</th>
-                    <th>Nº Série</th>
-                    <th>Localização</th>
+                    <th class="sortable" data-field="nome">Nome / Tipo <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="marca">Marca / Modelo <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="serial">Nº Série <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="localizacao">Localização <i class="fas fa-sort"></i></th>
                     <th style="text-align: center;">Qtd</th>
-                    <th>Status</th>
-                    <th>Data de Registro</th>
+                    <th class="sortable" data-field="status">Status <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="registro">Data de Registro <i class="fas fa-sort"></i></th>
                     <th style="width: 100px;">Ações</th>
                 </tr>
             </thead>
@@ -591,6 +662,8 @@
     let carregando = false;
     let paginaAtual = 1;
     let ITENS_POR_PAGINA = 10;
+    let sortField = 'nome';
+    let sortOrder = 'asc';
 
     function formatarData(dataString) {
         if (!dataString || dataString === "Não registrado") return "Não registrado";
@@ -660,23 +733,84 @@
         }
     }
 
+    function ordenarEquipamentos(array) {
+        return [...array].sort((a, b) => {
+            let valA = a[sortField] || '';
+            let valB = b[sortField] || '';
+            
+            if (sortField === 'registro') {
+                valA = new Date(valA) || 0;
+                valB = new Date(valB) || 0;
+            }
+            
+            if (typeof valA === 'string') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
+            
+            if (sortOrder === 'asc') {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+    }
+
     function aplicarFiltros() {
         const busca = document.getElementById("searchInput").value.toLowerCase();
         const filtroStatus = document.getElementById("filterStatusSelect").value;
+        const filtroLocal = document.getElementById("filterLocation").value;
         
-        equipamentosFiltrados = equipamentos.filter(eq => {
+        let filtrados = equipamentos.filter(eq => {
             const matchBusca = busca === "" || 
                 String(eq.nome || "").toLowerCase().includes(busca) || 
                 String(eq.marca || "").toLowerCase().includes(busca) ||
-                String(eq.serial || "").toLowerCase().includes(busca) ||
-                String(eq.localizacao || "").toLowerCase().includes(busca);
+                String(eq.serial || "").toLowerCase().includes(busca);
             const matchStatus = filtroStatus === "todos" || eq.status === filtroStatus;
-            return matchBusca && matchStatus;
+            const matchLocal = filtroLocal === "todos" || eq.localizacao === filtroLocal;
+            return matchBusca && matchStatus && matchLocal;
         });
+        
+        equipamentosFiltrados = ordenarEquipamentos(filtrados);
+        
+        const statsDiv = document.getElementById("filterStats");
+        if (statsDiv && equipamentosFiltrados.length !== equipamentos.length) {
+            statsDiv.innerHTML = `🎯 Mostrando ${equipamentosFiltrados.length} de ${equipamentos.length} equipamentos`;
+        } else if (statsDiv) {
+            statsDiv.innerHTML = `📊 Total: ${equipamentos.length} equipamentos`;
+        }
         
         paginaAtual = 1;
         renderizarPagina();
         atualizarPaginacao();
+    }
+
+    function mudarOrdenacao(campo) {
+        if (sortField === campo) {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = campo;
+            sortOrder = 'asc';
+        }
+        
+        document.querySelectorAll('.sortable i').forEach(icon => {
+            icon.className = 'fas fa-sort';
+        });
+        
+        const th = document.querySelector(`.sortable[data-field="${campo}"] i`);
+        if (th) {
+            th.className = `fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}`;
+        }
+        
+        aplicarFiltros();
+    }
+
+    function limparFiltros() {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("filterStatusSelect").value = "todos";
+        document.getElementById("filterLocation").value = "todos";
+        aplicarFiltros();
+        mostrarMensagem('🧹 Filtros limpos!', 'success');
     }
 
     function renderizarPagina() {
@@ -691,7 +825,7 @@
             if (equipamentos.length === 0) {
                 tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>`;
             } else {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde ao filtro<\/td><\/tr>`;
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>`;
             }
             return;
         }
@@ -699,10 +833,10 @@
         let html = "";
         itensPagina.forEach(eq => {
             let statusClass = eq.status === "Operacional" ? "status-operacional" : (eq.status === "Manutenção" ? "status-manutencao" : "status-inativo");
-            html += `</tr>
+            html += `<tr>
                 <td><strong>${escapeHtml(eq.nome)}<\/strong><\/td>
                 <td><span class="marca-modelo">${escapeHtml(eq.marca || "Não informado")}<\/span><\/td>
-                <td><code style="background:rgba(59,130,246,0.1); padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}<\/code><\/td>
+                <td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}<\/code><\/td>
                 <td><i class="fas fa-location-dot" style="color: var(--accent-secondary);"></i> ${escapeHtml(eq.localizacao || "Não informado")}<\/td>
                 <td style="text-align: center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || "1")}<\/span><\/td>
                 <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}<\/span><\/td>
@@ -934,10 +1068,19 @@
     document.getElementById("cancelBtn").onclick = (e) => { e.preventDefault(); resetForm(); };
     document.getElementById("searchInput").oninput = () => aplicarFiltros();
     document.getElementById("filterStatusSelect").onchange = () => aplicarFiltros();
+    document.getElementById("filterLocation").onchange = () => aplicarFiltros();
+    document.getElementById("clearFiltersBtn").onclick = () => limparFiltros();
     document.getElementById("exportBtn").onclick = () => exportarCSV();
     document.getElementById("refreshBtn").onclick = () => carregarDaPlanilha();
     document.getElementById("equipSerial").oninput = () => verificarDuplicidade();
     document.getElementById("equipSerial").onblur = () => verificarDuplicidade();
+    
+    document.querySelectorAll('.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+            const field = th.getAttribute('data-field');
+            if (field) mudarOrdenacao(field);
+        });
+    });
 
     carregarDaPlanilha();
 </script>
