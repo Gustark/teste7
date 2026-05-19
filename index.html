@@ -451,6 +451,7 @@
             .filters-group { flex-direction: column; align-items: stretch; }
             .search-box { width: 100%; }
             .filter-select { width: 100%; }
+            .pagination button { padding: 6px 10px; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -549,6 +550,8 @@
                 <option value="Inativo">❌ Inativo</option>
             </select>
             <button id="clearFiltersBtn" class="btn-clear">Limpar Filtros</button>
+            <button id="exportBtn" class="btn-clear"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            <button id="refreshBtn" class="btn-clear"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
         <div class="filter-stats" id="filterStats"></div>
     </div>
@@ -561,7 +564,7 @@
             <tbody id="tableBody">
                 <tr><td colspan="8" style="text-align:center; padding:60px;">Carregando equipamentos...</td></tr>
             </tbody>
-        </table>
+         </table>
     </div>
 
     <div class="pagination-container">
@@ -687,7 +690,7 @@
         if (!tbody) return;
         
         if (itensPagina.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:60px;">📭 Nenhum equipamento encontrado</td></tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">📭 Nenhum equipamento encontrado</td></tr>';
             document.getElementById('paginationInfo').innerHTML = '';
             return;
         }
@@ -731,8 +734,12 @@
         }
         
         let html = '';
+        // Botão primeira página
+        html += `<button onclick="mudarPagina(1)" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
+        // Botão anterior
         html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
         
+        // Páginas numeradas
         for (let i = 1; i <= totalPaginas; i++) {
             if (i === 1 || i === totalPaginas || (i >= paginaAtual - 2 && i <= paginaAtual + 2)) {
                 html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
@@ -741,7 +748,11 @@
             }
         }
         
+        // Botão próximo
         html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
+        // Botão última página
+        html += `<button onclick="mudarPagina(${totalPaginas})" ${paginaAtual === totalPaginas ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
+        
         paginationDiv.innerHTML = html;
     }
 
@@ -880,6 +891,7 @@
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
 
+    // Eventos
     document.getElementById('saveBtn').onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
     document.getElementById('cancelBtn').onclick = (e) => { e.preventDefault(); location.reload(); };
     document.getElementById('searchInput').oninput = () => aplicarFiltros();
