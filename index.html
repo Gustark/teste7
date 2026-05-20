@@ -830,7 +830,7 @@ function mostrarMensagem(texto, tipo) {
     if (toast) {
         toast.textContent = texto;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
     const statusText = document.getElementById('syncText');
     const statusDiv = document.getElementById('syncStatus');
@@ -960,7 +960,7 @@ function mudarOrdenacao(campo) {
 }
 
 // ============================================================
-// FILTROS - CORRIGIDO COM toSafeString
+// FILTROS
 // ============================================================
 
 function aplicarFiltros() {
@@ -969,7 +969,6 @@ function aplicarFiltros() {
     const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
     
     let filtrados = equipamentos.filter(function(eq) {
-        // Usando toSafeString para evitar erros de tipo
         const nome = toSafeString(eq.nome).toLowerCase();
         const marca = toSafeString(eq.marca).toLowerCase();
         const serial = toSafeString(eq.serial).toLowerCase();
@@ -1109,7 +1108,7 @@ function mudarPagina(pagina) {
 }
 
 // ============================================================
-// CRUD - COMUNICAÇÃO COM PLANILHA (CORRIGIDO)
+// CRUD - COMUNICAÇÃO COM PLANILHA
 // ============================================================
 
 async function carregarDaPlanilha() {
@@ -1125,11 +1124,10 @@ async function carregarDaPlanilha() {
         
         const dados = await resposta.json();
         
-        console.log('Dados recebidos da planilha:', dados); // Para debug
+        console.log('Dados recebidos da planilha:', dados);
         
         if (dados && dados.status === 'sucesso' && Array.isArray(dados.dados)) {
             equipamentos = dados.dados.map(function(eq, index) {
-                // Mapeamento seguro - converte qualquer tipo para string quando necessário
                 return {
                     id: eq.id || eq.ID || (index + 1),
                     nome: toSafeString(eq.nome || eq.Nome || eq.B || ''),
@@ -1160,16 +1158,57 @@ async function carregarDaPlanilha() {
     verificarDuplicidade();
 }
 
+// ============================================================
+// FUNÇÃO DE EXCLUIR CORRIGIDA
+// ============================================================
+
 async function excluirDaPlanilha(id) {
     try {
-        const resposta = await fetch(URL_WEB_APP + '?acao=excluir&id=' + id + '&t=' + Date.now());
+        // Usando POST em vez de GET para exclusão (mais confiável)
+        const params = new URLSearchParams();
+        params.append('acao', 'excluir');
+        params.append('id', id);
+        
+        const resposta = await fetch(URL_WEB_APP, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        });
+        
         const resultado = await resposta.json();
+        console.log('Resposta da exclusão:', resultado);
         return resultado.status === 'sucesso';
     } catch (erro) {
         console.error('Erro na exclusão:', erro);
         return false;
     }
 }
+
+async function excluirEquipamento(id) {
+    const equip = equipamentos.find(eq => eq.id === id);
+    if (!equip) {
+        mostrarMensagem('Equipamento não encontrado!', 'error');
+        return;
+    }
+    
+    if (confirm(`⚠️ EXCLUIR EQUIPAMENTO ⚠️\n\n${equip.nome} - ${equip.marca}\nNº Série: ${equip.serial}\n\nEsta ação não pode ser desfeita!\n\nClique em OK para confirmar a exclusão.`)) {
+        mostrarMensagem('Excluindo equipamento...', 'syncing');
+        const ok = await excluirDaPlanilha(id);
+        if (ok) {
+            mostrarMensagem('✅ Equipamento excluído com sucesso!', 'success');
+            // Recarrega a lista após 1 segundo
+            setTimeout(() => carregarDaPlanilha(), 1000);
+        } else {
+            mostrarMensagem('❌ Erro ao excluir equipamento. Tente novamente.', 'error');
+        }
+    }
+}
+
+// ============================================================
+// FUNÇÃO DE SALVAR (CORRIGIDA)
+// ============================================================
 
 async function salvarEquipamento() {
     const nome = document.getElementById('equipName')?.value.trim();
@@ -1199,24 +1238,31 @@ async function salvarEquipamento() {
     mostrarMensagem('Salvando...', 'syncing');
     try {
         const acao = editingId ? 'editar' : 'salvar';
-        const params = new URLSearchParams({ 
-            acao: acao,
-            nome: nome,
-            marca: marca,
-            serial: serial,
-            localizacao: localizacao,
-            quantidade: quantidade,
-            status: status,
-            observacoes: observacoes,
-            registro: new Date().toLocaleString('pt-BR')
-        });
+        const params = new URLSearchParams();
+        params.append('acao', acao);
+        params.append('nome', nome);
+        params.append('marca', marca);
+        params.append('serial', serial);
+        params.append('localizacao', localizacao);
+        params.append('quantidade', quantidade);
+        params.append('status', status);
+        params.append('observacoes', observacoes);
+        params.append('registro', new Date().toLocaleString('pt-BR'));
         
         if (editingId) {
             params.append('id', editingId);
         }
         
-        const resposta = await fetch(URL_WEB_APP + '?' + params.toString());
+        const resposta = await fetch(URL_WEB_APP, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        });
+        
         const resultado = await resposta.json();
+        console.log('Resposta do salvamento:', resultado);
         
         if (resultado.status === 'sucesso') {
             mostrarMensagem(editingId ? '✅ Atualizado com sucesso!' : '✅ Salvo com sucesso!', 'success');
@@ -1228,21 +1274,6 @@ async function salvarEquipamento() {
     } catch (erro) {
         console.error('Erro:', erro);
         mostrarMensagem('❌ Erro ao salvar: ' + erro.message, 'error');
-    }
-}
-
-async function excluirEquipamento(id) {
-    const equip = equipamentos.find(eq => eq.id === id);
-    if (!equip) return;
-    if (confirm('Excluir "' + equip.nome + '" - ' + equip.marca + '?\n\nNº Série: ' + equip.serial + '\n\nEsta ação não pode ser desfeita.')) {
-        mostrarMensagem('Excluindo...', 'syncing');
-        const ok = await excluirDaPlanilha(id);
-        if (ok) {
-            mostrarMensagem('🗑️ Equipamento excluído!', 'success');
-            setTimeout(() => carregarDaPlanilha(), 500);
-        } else {
-            mostrarMensagem('❌ Erro ao excluir', 'error');
-        }
     }
 }
 
