@@ -776,9 +776,9 @@
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO - URL DO WEB APP
+// CONFIGURAÇÃO - URL DO WEB APP (ATUALIZE COM SUA URL)
 // ============================================================
-const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbynan2wQpK9dgw0qLvA13FBQ2T0OWua5HqBphmYwTyyYjNoxRk86vr4MtTaopQf8hiwNQ/exec";
+const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbwqnuFhkdgaN2RQuFt3_cW9eVNc_tjK5aEYao0HLRsilUDnv_2kIaeILHrzuOpmk6ik6Q/exec";
         
 // ============================================================
 // VARIÁVEIS GLOBAIS
@@ -1053,8 +1053,8 @@ function renderizarPagina() {
         html += '<td class="observacoes-cell">' + observacoesHtml + '</td>';
         html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
         html += '<td class="row-actions">';
-        html += '<i class="fas fa-edit" onclick="editEquipamento(' + eq.id + ')"></i>';
-        html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(' + eq.id + ')"></i>';
+        html += '<i class="fas fa-edit" onclick="editEquipamento(\'' + eq.id + '\')"></i>';
+        html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(\'' + eq.id + '\')"></i>';
         html += '</td></tr>';
     }
     tbody.innerHTML = html;
@@ -1108,7 +1108,7 @@ function mudarPagina(pagina) {
 }
 
 // ============================================================
-// CRUD - COMUNICAÇÃO COM PLANILHA
+// CRUD - COMUNICAÇÃO COM PLANILHA (TUDO VIA GET)
 // ============================================================
 
 async function carregarDaPlanilha() {
@@ -1116,7 +1116,7 @@ async function carregarDaPlanilha() {
     carregando = true;
     mostrarMensagem('Carregando...', 'syncing');
     try {
-        const resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
+        const resposta = await fetch(URL_WEB_APP + '?acao=listar&t=' + Date.now());
         
         if (!resposta.ok) {
             throw new Error(`HTTP ${resposta.status}: ${resposta.statusText}`);
@@ -1158,25 +1158,10 @@ async function carregarDaPlanilha() {
     verificarDuplicidade();
 }
 
-// ============================================================
-// FUNÇÃO DE EXCLUIR CORRIGIDA
-// ============================================================
-
 async function excluirDaPlanilha(id) {
     try {
-        // Usando POST em vez de GET para exclusão (mais confiável)
-        const params = new URLSearchParams();
-        params.append('acao', 'excluir');
-        params.append('id', id);
-        
-        const resposta = await fetch(URL_WEB_APP, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params.toString()
-        });
-        
+        const url = `${URL_WEB_APP}?acao=excluir&id=${encodeURIComponent(id)}&t=${Date.now()}`;
+        const resposta = await fetch(url);
         const resultado = await resposta.json();
         console.log('Resposta da exclusão:', resultado);
         return resultado.status === 'sucesso';
@@ -1198,17 +1183,12 @@ async function excluirEquipamento(id) {
         const ok = await excluirDaPlanilha(id);
         if (ok) {
             mostrarMensagem('✅ Equipamento excluído com sucesso!', 'success');
-            // Recarrega a lista após 1 segundo
             setTimeout(() => carregarDaPlanilha(), 1000);
         } else {
             mostrarMensagem('❌ Erro ao excluir equipamento. Tente novamente.', 'error');
         }
     }
 }
-
-// ============================================================
-// FUNÇÃO DE SALVAR (CORRIGIDA)
-// ============================================================
 
 async function salvarEquipamento() {
     const nome = document.getElementById('equipName')?.value.trim();
@@ -1238,29 +1218,13 @@ async function salvarEquipamento() {
     mostrarMensagem('Salvando...', 'syncing');
     try {
         const acao = editingId ? 'editar' : 'salvar';
-        const params = new URLSearchParams();
-        params.append('acao', acao);
-        params.append('nome', nome);
-        params.append('marca', marca);
-        params.append('serial', serial);
-        params.append('localizacao', localizacao);
-        params.append('quantidade', quantidade);
-        params.append('status', status);
-        params.append('observacoes', observacoes);
-        params.append('registro', new Date().toLocaleString('pt-BR'));
+        let url = `${URL_WEB_APP}?acao=${acao}&nome=${encodeURIComponent(nome)}&marca=${encodeURIComponent(marca)}&serial=${encodeURIComponent(serial)}&localizacao=${encodeURIComponent(localizacao)}&quantidade=${quantidade}&status=${encodeURIComponent(status)}&observacoes=${encodeURIComponent(observacoes)}&t=${Date.now()}`;
         
         if (editingId) {
-            params.append('id', editingId);
+            url += `&id=${encodeURIComponent(editingId)}`;
         }
         
-        const resposta = await fetch(URL_WEB_APP, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params.toString()
-        });
-        
+        const resposta = await fetch(url);
         const resultado = await resposta.json();
         console.log('Resposta do salvamento:', resultado);
         
