@@ -596,7 +596,7 @@
     </div>
 
     <div class="table-wrapper">
-        <table class="inventory-table" id="inventoryTable">
+        <table class="inventory-table">
             <thead>
                 <tr>
                     <th>Nome / Tipo</th>
@@ -886,8 +886,12 @@
         try {
             const resposta = await fetch(`${URL_WEB_APP}?acao=excluir&id=${id}`);
             const resultado = await resposta.json();
+            console.log('Resposta exclusão:', resultado);
             return resultado.status === 'sucesso';
-        } catch (erro) { return false; }
+        } catch (erro) { 
+            console.error('Erro na exclusão:', erro);
+            return false; 
+        }
     }
 
     async function salvarEquipamento() {
