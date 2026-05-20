@@ -612,11 +612,11 @@
             </thead>
             <tbody id="tableBody">
                 <tr class="empty-row">
-                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...<\/td>
+                <\/tr>
+            <\/tbody>
+         <\/table>
+    <\/div>
 
     <div class="pagination-container">
         <div class="pagination" id="pagination"></div>
@@ -639,8 +639,8 @@
             <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
         </div>
     </div>
-</div>
-<div id="toast" class="toast"></div>
+<\/div>
+<div id="toast" class="toast"><\/div>
 
 <script>
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzYsyFNdG3Lfujd1w8_bk-ZlR_11NxMkH65otf6P51VxyXb0RmcYDIaJgoAUAQtynwWIQ/exec";
@@ -769,9 +769,9 @@
         
         if (itensPagina.length === 0) {
             if (equipamentos.length === 0) {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>';
             } else {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>';
             }
             return;
         }
@@ -919,14 +919,14 @@
         try {
             const params = new URLSearchParams({ 
                 acao: 'salvar', 
-                nome, 
-                marca, 
-                serial, 
-                localizacao, 
-                quantidade, 
-                status, 
-                observacoes,
-                registro: new Date().toLocaleString('pt-BR') 
+                nome: nome,
+                marca: marca,
+                serial: serial,
+                localizacao: localizacao,
+                quantidade: quantidade,
+                status: status,
+                observacoes: observacoes,
+                registro: new Date().toLocaleString('pt-BR')
             });
             const resposta = await fetch(`${URL_WEB_APP}?${params.toString()}`);
             const resultado = await resposta.json();
@@ -944,6 +944,7 @@
                 throw new Error(resultado.mensagem);
             }
         } catch (erro) {
+            console.error('Erro:', erro);
             mostrarMensagem('❌ Erro ao salvar', 'error');
         }
     }
