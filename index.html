@@ -2,183 +2,800 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventário EGESP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Inventário EGESP - Gestão de Equipamentos</title>
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ===== VARIÁVEIS ===== */
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f5f7fa; color: #1e293b; padding: 32px 24px; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 32px 24px;
+        }
+        
         .container { max-width: 1400px; margin: 0 auto; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 32px; gap: 16px; }
-        .title-section h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #06b6d4); background-clip: text; -webkit-background-clip: text; color: transparent; }
-        .title-section p { color: #64748b; font-size: 0.85rem; margin-top: 5px; }
-        .stats-badge { background: white; border-radius: 60px; padding: 10px 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; font-weight: 600; }
-        .stats-badge i { color: #3b82f6; }
-        .sync-status { background: white; border-radius: 60px; padding: 10px 20px; font-size: 0.75rem; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0; }
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            gap: 16px;
+        }
+        
+        .title-section h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .title-section p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .stats-badge {
+            background: var(--bg-secondary);
+            border-radius: 60px;
+            padding: 10px 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+        
+        .stats-badge i { color: var(--accent-primary); font-size: 1.2rem; }
+        
+        .sync-status {
+            background: var(--bg-secondary);
+            border-radius: 60px;
+            padding: 10px 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border);
+        }
+        
         .sync-status.syncing { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
         .sync-status.error { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .sync-status.success { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
         
-        .form-card { background: white; border-radius: 20px; padding: 24px 28px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .observacoes-group { grid-column: 1 / -1; margin-top: 5px; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        .input-group label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
-        .input-group input, .input-group select, .input-group textarea { padding: 12px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: white; font-size: 0.9rem; transition: all 0.2s; resize: vertical; }
-        .input-group textarea { min-height: 80px; font-family: 'Inter', sans-serif; }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .input-group input.duplicado { border-color: #ef4444; background: #fef2f2; }
-        .observacoes-group.destaque label { color: #dc2626; }
-        .observacoes-group.destaque textarea { border-color: #dc2626; background: #fef2f2; }
-        .mensagem-duplicado { font-size: 0.7rem; color: #ef4444; margin-top: 4px; display: none; }
+        /* ===== FORMULÁRIO ===== */
+        .form-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .form-card h3 {
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .form-card h3 i { color: var(--accent-primary); margin-right: 8px; }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-group label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        
+        .input-group label i { margin-right: 5px; }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'Inter', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .input-group textarea {
+            min-height: 80px;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        
+        .input-group input.duplicado {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+        
+        .observacoes-group {
+            grid-column: 1 / -1;
+            margin-top: 5px;
+        }
+        
+        .observacoes-group.destaque label {
+            color: var(--danger);
+        }
+        
+        .observacoes-group.destaque textarea {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+        
+        .mensagem-duplicado {
+            font-size: 0.7rem;
+            color: var(--danger);
+            margin-top: 4px;
+            display: none;
+        }
+        
         .mensagem-duplicado.show { display: block; }
         
-        .btn-primary { background: linear-gradient(135deg, #3b82f6, #06b6d4); border: none; padding: 12px 28px; border-radius: 40px; font-weight: 700; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.2s; }
+        /* ===== BOTÕES ===== */
+        .btn-primary {
+            background: var(--gradient);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
-        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
-        .btn-secondary { background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 40px; font-weight: 500; cursor: pointer; }
-        .btn-secondary:hover { background: #f8fafc; border-color: #3b82f6; }
-        .action-buttons { display: flex; gap: 12px; justify-content: flex-end; }
+        .btn-primary:disabled { background: var(--border); cursor: not-allowed; opacity: 0.6; transform: none; }
         
-        .filter-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
-        .filters-group { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; flex: 1; }
-        .search-box { background: white; border-radius: 48px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; border: 1px solid #e2e8f0; flex: 1; min-width: 200px; }
-        .search-box i { color: #64748b; }
-        .search-box input { border: none; padding: 10px 0; width: 100%; background: transparent; }
+        .btn-secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover { background: var(--bg-tertiary); border-color: var(--accent-primary); }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        /* ===== BARRA DE FILTROS ===== */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .filters-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .search-box {
+            background: var(--bg-secondary);
+            border-radius: 48px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-box i { color: var(--text-secondary); }
+        .search-box input {
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 0.9rem;
+            background: transparent;
+            color: var(--text-primary);
+        }
         .search-box input:focus { outline: none; }
-        .filter-select { border-radius: 40px; padding: 10px 20px; border: 1px solid #e2e8f0; background: white; font-weight: 500; cursor: pointer; min-width: 150px; }
-        .btn-clear { background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 8px 20px; border-radius: 40px; cursor: pointer; }
-        .btn-clear:hover { background: #f8fafc; color: #1e293b; }
-        .filter-stats { font-size: 0.75rem; color: #64748b; background: white; padding: 6px 14px; border-radius: 40px; border: 1px solid #e2e8f0; }
         
-        .table-wrapper { background: white; border-radius: 20px; overflow-x: auto; border: 1px solid #e2e8f0; margin-bottom: 30px; }
-        .inventory-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
-        .inventory-table th { text-align: left; padding: 16px; background: #f8fafc; font-weight: 700; color: #64748b; border-bottom: 1px solid #e2e8f0; cursor: pointer; }
-        .inventory-table th:hover { color: #3b82f6; }
-        .inventory-table td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
-        .inventory-table tr:hover { background: #f8fafc; }
-        .inventory-table th:nth-child(5), .inventory-table td:nth-child(5) { text-align: center; width: 70px; }
+        .filter-select {
+            border-radius: 40px;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 160px;
+        }
         
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .status-operacional { background: #d1fae5; color: #059669; }
-        .status-manutencao { background: #fed7aa; color: #c2410c; }
-        .status-inativo { background: #fee2e2; color: #dc2626; }
+        .btn-clear {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
         
-        .observacoes-cell { max-width: 250px; font-size: 0.75rem; color: #64748b; word-break: break-word; line-height: 1.4; }
-        .observacoes-cell i { color: #f59e0b; margin-right: 5px; }
-        .row-actions i { font-size: 1rem; margin: 0 6px; cursor: pointer; color: #64748b; }
-        .row-actions i:hover { color: #3b82f6; transform: scale(1.1); }
-        .row-actions i:last-child:hover { color: #ef4444; }
-        .empty-row td { text-align: center; padding: 60px; color: #64748b; font-style: italic; }
+        .btn-clear:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
         
-        .pagination-container { text-align: center; margin-top: 20px; margin-bottom: 30px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .pagination button { background: white; border: 1px solid #e2e8f0; padding: 8px 14px; border-radius: 40px; cursor: pointer; font-weight: 500; color: #1e293b; }
-        .pagination button:hover:not(:disabled) { background: #3b82f6; border-color: #3b82f6; color: white; }
-        .pagination button.active { background: linear-gradient(135deg, #3b82f6, #06b6d4); border-color: transparent; color: white; }
-        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .pagination-info { display: inline-block; margin-top: 16px; font-size: 0.8rem; color: #64748b; background: white; padding: 8px 20px; border-radius: 40px; border: 1px solid #e2e8f0; }
+        .filter-stats {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
         
-        .footer { margin-top: 30px; text-align: center; padding: 30px 20px 20px; border-top: 1px solid #e2e8f0; }
-        .footer-divider { width: 60px; height: 3px; background: linear-gradient(135deg, #3b82f6, #06b6d4); margin: 0 auto 20px; border-radius: 3px; }
-        .footer-text { color: #64748b; font-size: 0.75rem; }
-        .footer-text i { color: #3b82f6; margin: 0 4px; }
-        .footer-name { font-weight: 700; background: linear-gradient(135deg, #3b82f6, #06b6d4); background-clip: text; -webkit-background-clip: text; color: transparent; }
-        .footer-heart { color: #ef4444; animation: pulse 1.5s ease infinite; display: inline-block; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .social-links { margin-top: 12px; display: flex; justify-content: center; gap: 20px; }
-        .social-links a { color: #64748b; font-size: 1rem; transition: all 0.3s ease; }
-        .social-links a:hover { color: #3b82f6; transform: translateY(-3px); }
+        /* ===== TABELA ===== */
+        .table-wrapper {
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
         
-        .toast { position: fixed; bottom: 30px; right: 30px; background: #1e293b; color: white; padding: 12px 24px; border-radius: 40px; font-size: 0.85rem; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 1100px;
+        }
+        
+        .inventory-table th {
+            text-align: left;
+            padding: 18px 20px;
+            background: var(--bg-tertiary);
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .inventory-table th:hover { color: var(--accent-primary); }
+        .inventory-table th i { margin-left: 8px; font-size: 0.7rem; opacity: 0.6; }
+        
+        .inventory-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        .inventory-table tr:hover { background: rgba(59,130,246,0.04); }
+        
+        .inventory-table th:nth-child(5),
+        .inventory-table td:nth-child(5) {
+            text-align: center;
+            width: 80px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .status-operacional { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+        .status-manutencao { background: #fed7aa; color: #c2410c; border: 1px solid #fdba74; }
+        .status-inativo { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        
+        .observacoes-cell {
+            max-width: 250px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        
+        .observacoes-cell i {
+            color: var(--warning);
+            margin-right: 5px;
+        }
+        
+        .row-actions i {
+            font-size: 1.1rem;
+            margin: 0 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        
+        .row-actions i:hover { color: var(--accent-primary); transform: scale(1.1); }
+        .row-actions i:last-child:hover { color: var(--danger); }
+        
+        .empty-row td {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        /* ===== PAGINAÇÃO ===== */
+        .pagination-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .pagination button {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+        
+        .pagination button.active {
+            background: var(--gradient);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
+        
+        /* ===== RODAPÉ ===== */
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 30px 20px 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gradient);
+            margin: 0 auto 20px;
+            border-radius: 3px;
+        }
+        
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+        
+        .footer-text i { color: var(--accent-primary); margin: 0 4px; }
+        
+        .footer-name {
+            font-weight: 700;
+            background: var(--gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .footer-heart {
+            color: var(--danger);
+            animation: pulse 1.5s ease infinite;
+            display: inline-block;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .social-links {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+        
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--accent-primary);
+            transform: translateY(-3px);
+        }
+        
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-primary);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: var(--shadow-lg);
+        }
+        
         .toast.show { opacity: 1; }
-        .registro-data { font-family: monospace; font-size: 0.7rem; color: #64748b; white-space: nowrap; }
-        .marca-modelo { font-weight: 500; color: #06b6d4; }
+        
+        /* ===== UTILITÁRIOS ===== */
+        .registro-data {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .marca-modelo { font-weight: 500; color: var(--accent-secondary); }
         .quantidade-numero { font-weight: 700; font-size: 1rem; }
         
+        /* ===== RESPONSIVO ===== */
         @media (max-width: 680px) {
-            body { padding: 16px; }
-            .form-card { padding: 16px; }
+            body { padding: 20px 16px; }
+            .form-card { padding: 20px; }
             .btn-primary { width: 100%; justify-content: center; }
             .filters-group { flex-direction: column; align-items: stretch; }
-            .search-box, .filter-select { width: 100%; }
+            .search-box { width: 100%; }
+            .filter-select { width: 100%; }
             .pagination button { padding: 6px 10px; font-size: 0.7rem; }
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- CABEÇALHO -->
     <div class="header">
         <div class="title-section">
             <h1><i class="fas fa-microchip"></i> Inventário EGESP</h1>
             <p>Gestão de equipamentos sincronizada com Google Planilhas</p>
         </div>
         <div style="display: flex; gap: 12px;">
-            <div class="sync-status" id="syncStatus"><i class="fas fa-cloud"></i> <span id="syncText">Carregando...</span></div>
-            <div class="stats-badge" id="statsBadge"><i class="fas fa-laptop-code"></i> <span id="totalCount">0</span> equipamentos</div>
+            <div class="sync-status" id="syncStatus">
+                <i class="fas fa-cloud"></i> <span id="syncText">Carregando...</span>
+            </div>
+            <div class="stats-badge" id="statsBadge">
+                <i class="fas fa-laptop-code"></i>
+                <span id="totalCount">0</span> equipamentos
+            </div>
         </div>
     </div>
 
+    <!-- FORMULÁRIO DE CADASTRO -->
     <div class="form-card" id="formCard">
-        <h3 style="margin-bottom: 20px;"><i class="fas fa-plus-circle" style="color: #3b82f6;"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
+        <h3><i class="fas fa-plus-circle"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
         <div class="form-grid">
-            <div class="input-group"><label><i class="fas fa-tag"></i> Nome / Tipo *</label><input type="text" id="equipName" placeholder="Ex: Notebook"></div>
-            <div class="input-group"><label><i class="fas fa-industry"></i> Marca / Modelo *</label><input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron"></div>
-            <div class="input-group"><label><i class="fas fa-barcode"></i> Nº de Série *</label><input type="text" id="equipSerial" placeholder="SF0000"><div class="mensagem-duplicado" id="msgDuplicado">⚠️ Este número de série já está cadastrado!</div></div>
-            <div class="input-group"><label><i class="fas fa-map-marker-alt"></i> Localização</label><select id="equipLocation"><option value="">Selecione...</option><option value="Sala 171">🏢 Sala 171</option><option value="Sala 178">🏢 Sala 178</option><option value="Estúdio">🎙️ Estúdio</option><option value="Grande Auditório">🎪 Grande Auditório</option><option value="Plenário">📢 Plenário</option><option value="Sala dos técnicos">🔧 Sala dos técnicos</option><option value="SSC - ADM">📋 SSC - ADM</option><option value="Pequeno Auditório">🎤 Pequeno Auditório</option><option value="Gráfica - Copa">🖨️ Gráfica - Copa</option><option value="17/5">📅 17/5</option></select></div>
-            <div class="input-group"><label><i class="fas fa-boxes"></i> Quantidade</label><input type="number" id="equipQtd" value="1" min="1"></div>
-            <div class="input-group"><label><i class="fas fa-chart-line"></i> Status</label><select id="equipStatus"><option value="Operacional">🟢 Operacional</option><option value="Manutenção">🟡 Manutenção</option><option value="Inativo">🔴 Inativo</option></select></div>
-            <div class="observacoes-group" id="observacoesGroup"><div class="input-group"><label><i class="fas fa-pen-alt"></i> Observações <span id="obsObrigatorio" style="display:none; color:#dc2626;">(obrigatório para Manutenção/Inativo)</span></label><textarea id="equipObservacoes" rows="2" placeholder="Descreva o problema, motivo da manutenção, etc..."></textarea></div></div>
+            <div class="input-group">
+                <label><i class="fas fa-tag"></i> Nome / Tipo *</label>
+                <input type="text" id="equipName" placeholder="Ex: Notebook" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-industry"></i> Marca / Modelo *</label>
+                <input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron 15" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-barcode"></i> Nº de Série/SF *</label>
+                <input type="text" id="equipSerial" placeholder="SF0000" autocomplete="off">
+                <div class="mensagem-duplicado" id="msgDuplicado">
+                    <i class="fas fa-exclamation-triangle"></i> Este número de série já está cadastrado!
+                </div>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-map-marker-alt"></i> Localização</label>
+                <select id="equipLocation">
+                    <option value="">Selecione uma localização...</option>
+                    <option value="Sala 171">🏢 Sala 171</option>
+                    <option value="Sala 178">🏢 Sala 178</option>
+                    <option value="Estúdio">🎙️ Estúdio</option>
+                    <option value="Grande Auditório">🎪 Grande Auditório</option>
+                    <option value="Plenário">📢 Plenário</option>
+                    <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
+                    <option value="SSC - ADM">📋 SSC - ADM</option>
+                    <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
+                    <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
+                    <option value="17/5">📅 17/5</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-boxes"></i> Quantidade</label>
+                <input type="number" id="equipQtd" value="1" min="1" step="1">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-chart-line"></i> Status</label>
+                <select id="equipStatus">
+                    <option value="Operacional">🟢 Operacional</option>
+                    <option value="Manutenção">🟡 Manutenção</option>
+                    <option value="Inativo">🔴 Inativo</option>
+                </select>
+            </div>
+            <div class="observacoes-group" id="observacoesGroup">
+                <div class="input-group">
+                    <label><i class="fas fa-pen-alt"></i> Observações <span id="obsObrigatorio" style="display:none; color:#dc2626;">(obrigatório para Manutenção/Inativo)</span></label>
+                    <textarea id="equipObservacoes" rows="2" placeholder="Descreva o problema, motivo da manutenção, etc..."></textarea>
+                </div>
+            </div>
         </div>
-        <div class="action-buttons"><button class="btn-secondary" id="cancelBtn">Cancelar</button><button class="btn-primary" id="saveBtn">Salvar Equipamento</button></div>
+        <div class="action-buttons">
+            <button class="btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancelar</button>
+            <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Salvar Equipamento</button>
+        </div>
     </div>
 
+    <!-- BARRA DE FILTROS -->
     <div class="filter-bar">
         <div class="filters-group">
-            <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Buscar por nome, marca, série..."></div>
-            <select id="filterLocation" class="filter-select"><option value="todos">📍 Todas localizações</option><option value="Sala 171">🏢 Sala 171</option><option value="Sala 178">🏢 Sala 178</option><option value="Estúdio">🎙️ Estúdio</option><option value="Grande Auditório">🎪 Grande Auditório</option><option value="Plenário">📢 Plenário</option><option value="Sala dos técnicos">🔧 Sala dos técnicos</option><option value="SSC - ADM">📋 SSC - ADM</option><option value="Pequeno Auditório">🎤 Pequeno Auditório</option><option value="Gráfica - Copa">🖨️ Gráfica - Copa</option><option value="17/5">📅 17/5</option></select>
-            <select id="filterStatusSelect" class="filter-select"><option value="todos">📋 Todos os status</option><option value="Operacional">✅ Operacional</option><option value="Manutenção">⚠️ Manutenção</option><option value="Inativo">❌ Inativo</option></select>
-            <button id="clearFiltersBtn" class="btn-clear">Limpar Filtros</button>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nome, marca, série...">
+            </div>
+            <select id="filterLocation" class="filter-select">
+                <option value="todos">📍 Todas localizações</option>
+                <option value="Sala 171">🏢 Sala 171</option>
+                <option value="Sala 178">🏢 Sala 178</option>
+                <option value="Estúdio">🎙️ Estúdio</option>
+                <option value="Grande Auditório">🎪 Grande Auditório</option>
+                <option value="Plenário">📢 Plenário</option>
+                <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
+                <option value="SSC - ADM">📋 SSC - ADM</option>
+                <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
+                <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
+                <option value="17/5">📅 17/5</option>
+            </select>
+            <select id="filterStatusSelect" class="filter-select">
+                <option value="todos">📋 Todos os status</option>
+                <option value="Operacional">✅ Operacional</option>
+                <option value="Manutenção">⚠️ Manutenção</option>
+                <option value="Inativo">❌ Inativo</option>
+            </select>
+            <button id="clearFiltersBtn" class="btn-clear"><i class="fas fa-eraser"></i> Limpar Filtros</button>
             <button id="exportBtn" class="btn-clear"><i class="fas fa-file-csv"></i> Exportar CSV</button>
             <button id="refreshBtn" class="btn-clear"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
         <div class="filter-stats" id="filterStats"></div>
     </div>
 
+    <!-- TABELA DE EQUIPAMENTOS -->
     <div class="table-wrapper">
-        <table class="inventory-table">
-            <thead><tr><th>Nome / Tipo</th><th>Marca / Modelo</th><th>Nº Série</th><th>Localização</th><th>Qtd</th><th>Status</th><th>Observações</th><th>Data Registro</th><th>Ações</th></tr></thead>
-            <tbody id="tableBody"><tr class="empty-row"><td colspan="9">Carregando equipamentos...<\/td><\/tr><\/tbody>
-        <\/table>
+        <table class="inventory-table" id="inventoryTable">
+            <thead>
+                <tr>
+                    <th class="sortable" data-field="nome">Nome / Tipo <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="marca">Marca / Modelo <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="serial">Nº Série <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="localizacao">Localização <i class="fas fa-sort"></i></th>
+                    <th style="text-align: center;">Qtd</th>
+                    <th class="sortable" data-field="status">Status <i class="fas fa-sort"></i></th>
+                    <th>Observações</th>
+                    <th class="sortable" data-field="registro">Data Registro <i class="fas fa-sort"></i></th>
+                    <th style="width: 100px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr class="empty-row">
+                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...<\/td>
+                <\/tr>
+            <\/tbody>
+         <\/table>
     <\/div>
 
+    <!-- PAGINAÇÃO -->
     <div class="pagination-container">
         <div class="pagination" id="pagination"></div>
         <div class="pagination-info" id="paginationInfo"></div>
     </div>
 
+    <!-- RODAPÉ -->
     <div class="footer">
         <div class="footer-divider"></div>
-        <div class="footer-text"><i class="fas fa-code"></i> Desenvolvido por <span class="footer-name">Gustavo Hugo</span> <i class="fas fa-heart footer-heart"></i></div>
-        <div class="footer-text" style="margin-top: 8px;"><i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas</div>
+        <div class="footer-text">
+            <i class="fas fa-code"></i> Desenvolvido por 
+            <span class="footer-name">Gustavo Hugo</span>
+            <i class="fas fa-heart footer-heart"></i>
+        </div>
+        <div class="footer-text" style="margin-top: 8px;">
+            <i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas
+        </div>
+        <div class="social-links">
+            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
     </div>
 <\/div>
+
 <div id="toast" class="toast"><\/div>
 
 <script>
+    // ============================================================
+    // CONFIGURAÇÃO - URL DO WEB APP
+    // ============================================================
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbznu4Ei-U1yIMU-ylc8WOCDiOHaB75COdIQQrBFBQgYfkbTZTFISWk-IkPHNJyPryUfDg/exec";
     
-    let equipamentos = [], equipamentosFiltrados = [], editingId = null, carregando = false, paginaAtual = 1, ITENS_POR_PAGINA = 10;
-
+    // ============================================================
+    // VARIÁVEIS GLOBAIS
+    // ============================================================
+    let equipamentos = [];
+    let equipamentosFiltrados = [];
+    let editingId = null;
+    let carregando = false;
+    let paginaAtual = 1;
+    let ITENS_POR_PAGINA = 10;
+    let sortField = 'nome';
+    let sortOrder = 'asc';
+    
+    // ============================================================
+    // FUNÇÕES AUXILIARES
+    // ============================================================
+    
+    function formatarData(dataString) {
+        if (!dataString || dataString === "Não registrado") return "Não registrado";
+        try {
+            const data = new Date(dataString);
+            if (isNaN(data.getTime())) return dataString;
+            return data.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return dataString;
+        }
+    }
+    
+    function mostrarMensagem(texto, tipo) {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = texto;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        const statusText = document.getElementById('syncText');
+        const statusDiv = document.getElementById('syncStatus');
+        if (statusText && statusDiv) {
+            statusDiv.className = 'sync-status';
+            if (tipo === 'error') {
+                statusDiv.classList.add('error');
+                statusText.innerText = 'Erro';
+            } else if (tipo === 'syncing') {
+                statusDiv.classList.add('syncing');
+                statusText.innerText = texto;
+            } else if (tipo === 'success') {
+                statusDiv.classList.add('success');
+                statusText.innerText = texto;
+            } else {
+                statusText.innerText = texto;
+            }
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
     function configurarStatusListener() {
         const statusSelect = document.getElementById('equipStatus');
         const observacoesGroup = document.getElementById('observacoesGroup');
         const obsObrigatorio = document.getElementById('obsObrigatorio');
         if (!statusSelect) return;
-        function atualizar() {
-            if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
+        
+        function atualizarDestaqueObservacoes() {
+            const status = statusSelect.value;
+            if (status === 'Manutenção' || status === 'Inativo') {
                 observacoesGroup.classList.add('destaque');
                 if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
             } else {
@@ -186,115 +803,219 @@
                 if (obsObrigatorio) obsObrigatorio.style.display = 'none';
             }
         }
-        statusSelect.addEventListener('change', atualizar);
-        atualizar();
+        
+        statusSelect.addEventListener('change', atualizarDestaqueObservacoes);
+        atualizarDestaqueObservacoes();
     }
-
-    function mostrarMensagem(texto, tipo) {
-        const toast = document.getElementById('toast');
-        if (toast) { toast.textContent = texto; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2500); }
-        const statusText = document.getElementById('syncText');
-        const statusDiv = document.getElementById('syncStatus');
-        if (statusText && statusDiv) {
-            statusDiv.classList.remove('syncing', 'error', 'success');
-            if (tipo === 'error') { statusDiv.classList.add('error'); statusText.innerText = 'Erro'; }
-            else if (tipo === 'syncing') { statusDiv.classList.add('syncing'); statusText.innerText = texto; }
-            else if (tipo === 'success') { statusDiv.classList.add('success'); statusText.innerText = texto; }
-            else { statusText.innerText = texto; }
-        }
-    }
-
-    function formatarData(dataString) {
-        if (!dataString) return 'Não registrado';
-        try { const data = new Date(dataString); if (isNaN(data.getTime())) return dataString; return data.toLocaleString('pt-BR'); } catch(e) { return dataString; }
-    }
-
-    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m)); }
-
+    
+    // ============================================================
+    // VERIFICAÇÃO DE DUPLICIDADE
+    // ============================================================
     function verificarDuplicidade() {
         const serialInput = document.getElementById('equipSerial');
         if (!serialInput) return;
         const serial = serialInput.value.trim();
         const msgDiv = document.getElementById('msgDuplicado');
         const saveBtn = document.getElementById('saveBtn');
+        
         if (!serial) {
             serialInput.classList.remove('duplicado');
             if(msgDiv) msgDiv.classList.remove('show');
             if(saveBtn) saveBtn.disabled = false;
-            return;
+            return false;
         }
-        const existe = equipamentos.some(eq => eq.serial === serial);
+        
+        const existe = equipamentos.some(eq => eq.serial === serial && (editingId === null || eq.id !== editingId));
+        
         if (existe) {
             serialInput.classList.add('duplicado');
             if(msgDiv) msgDiv.classList.add('show');
             if(saveBtn) saveBtn.disabled = true;
+            return true;
         } else {
             serialInput.classList.remove('duplicado');
             if(msgDiv) msgDiv.classList.remove('show');
             if(saveBtn) saveBtn.disabled = false;
+            return false;
         }
     }
-
+    
+    // ============================================================
+    // ORDENAÇÃO
+    // ============================================================
+    function ordenarEquipamentos(array) {
+        return [...array].sort(function(a, b) {
+            let valA = a[sortField] || '';
+            let valB = b[sortField] || '';
+            
+            if (sortField === 'registro') {
+                valA = new Date(valA) || 0;
+                valB = new Date(valB) || 0;
+            }
+            
+            if (typeof valA === 'string') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
+            
+            if (sortOrder === 'asc') {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+    }
+    
+    function mudarOrdenacao(campo) {
+        if (sortField === campo) {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = campo;
+            sortOrder = 'asc';
+        }
+        
+        const icons = document.querySelectorAll('.sortable i');
+        for (var i = 0; i < icons.length; i++) {
+            icons[i].className = 'fas fa-sort';
+        }
+        
+        const th = document.querySelector('.sortable[data-field="' + campo + '"] i');
+        if (th) {
+            th.className = 'fas fa-sort-' + (sortOrder === 'asc' ? 'up' : 'down');
+        }
+        
+        aplicarFiltros();
+    }
+    
+    // ============================================================
+    // FILTROS
+    // ============================================================
     function aplicarFiltros() {
         const busca = (document.getElementById('searchInput')?.value || '').toLowerCase();
         const statusFiltro = document.getElementById('filterStatusSelect')?.value || 'todos';
         const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
-        equipamentosFiltrados = equipamentos.filter(eq => {
-            const matchBusca = busca === '' || (eq.nome || '').toLowerCase().includes(busca) || (eq.marca || '').toLowerCase().includes(busca) || (eq.serial || '').toLowerCase().includes(busca);
+        
+        let filtrados = equipamentos.filter(function(eq) {
+            const matchBusca = busca === '' || 
+                String(eq.nome || '').toLowerCase().includes(busca) || 
+                String(eq.marca || '').toLowerCase().includes(busca) ||
+                String(eq.serial || '').toLowerCase().includes(busca);
             const matchStatus = statusFiltro === 'todos' || eq.status === statusFiltro;
             const matchLocal = localFiltro === 'todos' || eq.localizacao === localFiltro;
             return matchBusca && matchStatus && matchLocal;
         });
+        
+        equipamentosFiltrados = ordenarEquipamentos(filtrados);
+        
         const statsDiv = document.getElementById('filterStats');
-        if (statsDiv) statsDiv.innerHTML = equipamentosFiltrados.length !== equipamentos.length ? `🎯 Mostrando ${equipamentosFiltrados.length} de ${equipamentos.length} equipamentos` : `📊 Total: ${equipamentos.length} equipamentos`;
+        if (statsDiv) {
+            if (equipamentosFiltrados.length !== equipamentos.length) {
+                statsDiv.innerHTML = '🎯 Mostrando ' + equipamentosFiltrados.length + ' de ' + equipamentos.length + ' equipamentos';
+            } else {
+                statsDiv.innerHTML = '📊 Total: ' + equipamentos.length + ' equipamentos';
+            }
+        }
+        
         paginaAtual = 1;
         renderizarPagina();
         atualizarPaginacao();
     }
-
+    
+    function limparFiltros() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterStatusSelect').value = 'todos';
+        document.getElementById('filterLocation').value = 'todos';
+        aplicarFiltros();
+        mostrarMensagem('🧹 Filtros limpos!', 'success');
+    }
+    
+    // ============================================================
+    // PAGINAÇÃO
+    // ============================================================
     function renderizarPagina() {
         const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
         const fim = inicio + ITENS_POR_PAGINA;
         const itensPagina = equipamentosFiltrados.slice(inicio, fim);
+        
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
-        if (itensPagina.length === 0) {
-            tbody.innerHTML = equipamentos.length === 0 ? '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>' : '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>';
+        
+        if (itensPagina.length === 0 && equipamentosFiltrados.length === 0) {
+            if (equipamentos.length === 0) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>';
+            } else {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>';
+            }
             return;
         }
+        
         let html = '';
-        for (let eq of itensPagina) {
-            let statusClass = eq.status === 'Operacional' ? 'status-operacional' : (eq.status === 'Manutenção' ? 'status-manutencao' : 'status-inativo');
-            let observacoesHtml = eq.observacoes ? `<i class="fas fa-comment-dots"></i> ${escapeHtml(eq.observacoes).substring(0, 80)}${escapeHtml(eq.observacoes).length > 80 ? '...' : ''}` : '<span style="color:#cbd5e1;"><i class="far fa-comment"></i> Sem observações</span>';
-            html += `<tr><td><strong>${escapeHtml(eq.nome)}</strong></td><td><span class="marca-modelo">${escapeHtml(eq.marca || '-')}</span></td><td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}</code></td><td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ${escapeHtml(eq.localizacao || '-')}</td><td style="text-align:center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || '1')}</span></td><td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}</span></td><td class="observacoes-cell">${observacoesHtml}</td><td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}</td><td class="row-actions"><i class="fas fa-edit" onclick="editEquipamento(${eq.id})"></i><i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})"></i></td></tr>`;
+        for (let i = 0; i < itensPagina.length; i++) {
+            const eq = itensPagina[i];
+            let statusClass = '';
+            if (eq.status === 'Operacional') statusClass = 'status-operacional';
+            else if (eq.status === 'Manutenção') statusClass = 'status-manutencao';
+            else statusClass = 'status-inativo';
+            
+            let observacoesHtml = eq.observacoes ? 
+                '<i class="fas fa-comment-dots"></i> ' + escapeHtml(eq.observacoes).substring(0, 80) + (escapeHtml(eq.observacoes).length > 80 ? '...' : '') : 
+                '<span style="color:#cbd5e1;"><i class="far fa-comment"></i> Sem observações</span>';
+            
+            html += '<tr>';
+            html += '<td><strong>' + escapeHtml(eq.nome) + '</strong></td>';
+            html += '<td><span class="marca-modelo">' + escapeHtml(eq.marca || '-') + '</span></td>';
+            html += '<td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">' + escapeHtml(eq.serial) + '</code></td>';
+            html += '<td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ' + escapeHtml(eq.localizacao || '-') + '</td>';
+            html += '<td style="text-align:center;"><span class="quantidade-numero">' + escapeHtml(eq.quantidade || '1') + '</span></td>';
+            html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(eq.status) + '</span></td>';
+            html += '<td class="observacoes-cell">' + observacoesHtml + '</td>';
+            html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
+            html += '<td class="row-actions">';
+            html += '<i class="fas fa-edit" onclick="editEquipamento(' + eq.id + ')"></i>';
+            html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(' + eq.id + ')"></i>';
+            html += '<\/td><\/tr>';
         }
         tbody.innerHTML = html;
+        
         const total = equipamentosFiltrados.length;
+        const inicioMostrar = total === 0 ? 0 : inicio + 1;
+        const fimMostrar = Math.min(fim, total);
         const infoDiv = document.getElementById('paginationInfo');
-        if (infoDiv && total > 0) infoDiv.innerHTML = `📄 Mostrando ${inicio + 1} - ${Math.min(fim, total)} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
-        else if (infoDiv) infoDiv.innerHTML = '';
+        if (infoDiv && total > 0) {
+            infoDiv.innerHTML = '📄 Mostrando ' + inicioMostrar + ' - ' + fimMostrar + ' de ' + total + ' equipamentos | Página ' + paginaAtual + ' de ' + Math.ceil(total / ITENS_POR_PAGINA);
+        } else if (infoDiv) {
+            infoDiv.innerHTML = '';
+        }
     }
-
+    
     function atualizarPaginacao() {
         const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
         const paginationDiv = document.getElementById('pagination');
         if (!paginationDiv) return;
-        if (totalPaginas <= 1) { paginationDiv.innerHTML = ''; return; }
+        
+        if (totalPaginas <= 1) {
+            paginationDiv.innerHTML = '';
+            return;
+        }
+        
         let html = '';
-        html += `<button onclick="mudarPagina(1)" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
-        html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
+        html += '<button onclick="mudarPagina(1)" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-angle-double-left"></i></button>';
+        html += '<button onclick="mudarPagina(' + (paginaAtual - 1) + ')" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i> Anterior</button>';
+        
         for (let i = 1; i <= totalPaginas; i++) {
             if (i === 1 || i === totalPaginas || (i >= paginaAtual - 2 && i <= paginaAtual + 2)) {
-                html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
+                html += '<button onclick="mudarPagina(' + i + ')" class="' + (i === paginaAtual ? 'active' : '') + '">' + i + '</button>';
             } else if (i === paginaAtual - 3 || i === paginaAtual + 3) {
-                html += `<button disabled>...</button>`;
+                html += '<button disabled>...</button>';
             }
         }
-        html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
-        html += `<button onclick="mudarPagina(${totalPaginas})" ${paginaAtual === totalPaginas ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
+        
+        html += '<button onclick="mudarPagina(' + (paginaAtual + 1) + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '>Próximo <i class="fas fa-chevron-right"></i></button>';
+        html += '<button onclick="mudarPagina(' + totalPaginas + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '><i class="fas fa-angle-double-right"></i></button>';
+        
         paginationDiv.innerHTML = html;
     }
-
+    
     function mudarPagina(pagina) {
         const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
         if (pagina < 1 || pagina > totalPaginas) return;
@@ -303,27 +1024,23 @@
         atualizarPaginacao();
         document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-
-    function limparFiltros() {
-        if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
-        if (document.getElementById('filterStatusSelect')) document.getElementById('filterStatusSelect').value = 'todos';
-        if (document.getElementById('filterLocation')) document.getElementById('filterLocation').value = 'todos';
-        aplicarFiltros();
-        mostrarMensagem('🧹 Filtros limpos!', 'success');
-    }
-
+    
+    // ============================================================
+    // CRUD - COMUNICAÇÃO COM PLANILHA
+    // ============================================================
+    
     async function carregarDaPlanilha() {
         if (carregando) return;
         carregando = true;
         mostrarMensagem('Carregando...', 'syncing');
         try {
-            const resposta = await fetch(`${URL_WEB_APP}?t=${Date.now()}`);
+            const resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
             const dados = await resposta.json();
             if (dados.status === 'sucesso' && dados.dados) {
                 equipamentos = dados.dados;
                 aplicarFiltros();
                 document.getElementById('totalCount').innerText = equipamentos.length;
-                mostrarMensagem(`${equipamentos.length} equipamentos carregados`, 'success');
+                mostrarMensagem(equipamentos.length + ' equipamentos carregados', 'success');
             } else {
                 equipamentos = [];
                 aplicarFiltros();
@@ -339,15 +1056,18 @@
         carregando = false;
         verificarDuplicidade();
     }
-
+    
     async function excluirDaPlanilha(id) {
         try {
-            const resposta = await fetch(`${URL_WEB_APP}?acao=excluir&id=${id}`);
+            const resposta = await fetch(URL_WEB_APP + '?acao=excluir&id=' + id);
             const resultado = await resposta.json();
             return resultado.status === 'sucesso';
-        } catch (erro) { return false; }
+        } catch (erro) {
+            console.error('Erro na exclusão:', erro);
+            return false;
+        }
     }
-
+    
     async function salvarEquipamento() {
         const nome = document.getElementById('equipName')?.value.trim();
         const marca = document.getElementById('equipMarca')?.value.trim();
@@ -356,53 +1076,94 @@
         const quantidade = document.getElementById('equipQtd')?.value || '1';
         const status = document.getElementById('equipStatus')?.value;
         const observacoes = document.getElementById('equipObservacoes')?.value.trim() || '';
-
-        if (!nome) { alert('Informe o Nome/Tipo'); return; }
-        if (!marca) { alert('Informe a Marca/Modelo'); return; }
-        if (!serial) { alert('Informe o Número de Série'); return; }
-        if (!localizacao) { alert('Selecione a Localização'); return; }
+        
+        if (!nome) { alert('Informe o Nome/Tipo do equipamento.'); return false; }
+        if (!marca) { alert('Informe a Marca/Modelo do equipamento.'); return false; }
+        if (!serial) { alert('Informe o Número de Série/SF.'); return false; }
+        if (!localizacao) { alert('Selecione a Localização do equipamento.'); return false; }
+        
         if ((status === 'Manutenção' || status === 'Inativo') && !observacoes) {
-            alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!');
+            alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!\n\nDescreva o problema ou motivo.');
             document.getElementById('equipObservacoes').focus();
-            return;
+            return false;
         }
-        if (equipamentos.some(eq => eq.serial === serial)) { alert('❌ Este número de série já está cadastrado!'); return; }
-
+        
+        if (equipamentos.some(eq => eq.serial === serial)) {
+            alert('❌ Já existe um equipamento com este número de série!');
+            return false;
+        }
+        
+        const agora = new Date();
+        const dataHora = agora.toLocaleString('pt-BR');
+        
         mostrarMensagem('Salvando...', 'syncing');
         try {
-            const params = new URLSearchParams({ acao: 'salvar', nome, marca, serial, localizacao, quantidade, status, observacoes, registro: new Date().toLocaleString('pt-BR') });
-            const resposta = await fetch(`${URL_WEB_APP}?${params.toString()}`);
+            const params = new URLSearchParams({ 
+                acao: 'salvar', 
+                nome: nome, 
+                marca: marca,
+                serial: serial, 
+                localizacao: localizacao, 
+                quantidade: quantidade, 
+                status: status, 
+                observacoes: observacoes,
+                registro: dataHora 
+            });
+            const urlCompleta = URL_WEB_APP + '?' + params.toString();
+            const resposta = await fetch(urlCompleta);
             const resultado = await resposta.json();
             if (resultado.status === 'sucesso') {
                 mostrarMensagem('✅ Salvo com sucesso!', 'success');
-                document.getElementById('equipName').value = '';
-                document.getElementById('equipMarca').value = '';
-                document.getElementById('equipSerial').value = '';
-                document.getElementById('equipLocation').value = '';
-                document.getElementById('equipQtd').value = '1';
-                document.getElementById('equipStatus').value = 'Operacional';
-                document.getElementById('equipObservacoes').value = '';
+                resetForm();
                 setTimeout(() => carregarDaPlanilha(), 1000);
-            } else { throw new Error(resultado.mensagem); }
-        } catch (erro) { mostrarMensagem('❌ Erro ao salvar', 'error'); }
+                return true;
+            } else {
+                throw new Error(resultado.mensagem || 'Erro desconhecido');
+            }
+        } catch (erro) {
+            console.error('Erro no salvamento:', erro);
+            mostrarMensagem('❌ Erro ao salvar', 'error');
+            return false;
+        }
     }
-
+    
     async function excluirEquipamento(id) {
         const equip = equipamentos.find(eq => eq.id === id);
         if (!equip) return;
-        if (confirm(`Excluir "${equip.nome}" - ${equip.marca}?\n\nNº Série: ${equip.serial}\n\nEsta ação não pode ser desfeita.`)) {
+        
+        let msg = 'Excluir "' + equip.nome + '" - ' + equip.marca + '?\n\nNº Série: ' + equip.serial;
+        if (equip.observacoes) msg += '\n\nObservações: ' + equip.observacoes;
+        msg += '\n\nEsta ação não pode ser desfeita.';
+        
+        if (confirm(msg)) {
             mostrarMensagem('Excluindo...', 'syncing');
             const ok = await excluirDaPlanilha(id);
             if (ok) {
                 mostrarMensagem('🗑️ Equipamento excluído!', 'success');
                 setTimeout(() => carregarDaPlanilha(), 500);
-            } else { mostrarMensagem('❌ Erro ao excluir', 'error'); }
+            } else {
+                mostrarMensagem('❌ Erro ao excluir', 'error');
+            }
         }
     }
-
+    
+    function resetForm() {
+        document.getElementById('equipName').value = '';
+        document.getElementById('equipMarca').value = '';
+        document.getElementById('equipSerial').value = '';
+        document.getElementById('equipLocation').value = '';
+        document.getElementById('equipQtd').value = '1';
+        document.getElementById('equipStatus').value = 'Operacional';
+        document.getElementById('equipObservacoes').value = '';
+        editingId = null;
+        document.getElementById('formTitle').innerText = 'Cadastrar Equipamento';
+        verificarDuplicidade();
+    }
+    
     function editEquipamento(id) {
         const equip = equipamentos.find(eq => eq.id === id);
         if (!equip) return;
+        editingId = equip.id;
         document.getElementById('equipName').value = equip.nome;
         document.getElementById('equipMarca').value = equip.marca || '';
         document.getElementById('equipSerial').value = equip.serial;
@@ -410,27 +1171,41 @@
         document.getElementById('equipQtd').value = equip.quantidade || 1;
         document.getElementById('equipStatus').value = equip.status;
         document.getElementById('equipObservacoes').value = equip.observacoes || '';
-        document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editando (salvar criará novo)';
+        document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editar Equipamento';
         document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+        verificarDuplicidade();
         configurarStatusListener();
     }
-
+    
     function exportarCSV() {
         if (!equipamentos.length) { alert('Nenhum dado para exportar'); return; }
         const headers = ['ID', 'Nome', 'Marca', 'Série', 'Localização', 'Quantidade', 'Status', 'Observações', 'Registro'];
-        const linhas = equipamentos.map(eq => [eq.id, eq.nome, eq.marca, eq.serial, eq.localizacao, eq.quantidade, eq.status, eq.observacoes || '', eq.registro]);
-        let csv = headers.join(',') + '\n' + linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+        const linhas = equipamentos.map(eq => [
+            eq.id, 
+            '"' + String(eq.nome || '').replace(/"/g, '""') + '"', 
+            '"' + String(eq.marca || '').replace(/"/g, '""') + '"',
+            '"' + String(eq.serial || '').replace(/"/g, '""') + '"', 
+            '"' + String(eq.localizacao || '').replace(/"/g, '""') + '"', 
+            eq.quantidade || '1', 
+            eq.status, 
+            '"' + String(eq.observacoes || '').replace(/"/g, '""') + '"',
+            eq.registro || '' 
+        ]);
+        let csv = headers.join(',') + '\n' + linhas.map(l => l.join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `inventario_${new Date().toISOString().slice(0,10)}.csv`;
+        link.download = 'inventario_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.csv';
         link.click();
         URL.revokeObjectURL(link.href);
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
-
+    
+    // ============================================================
+    // EVENTOS
+    // ============================================================
     document.getElementById('saveBtn').onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
-    document.getElementById('cancelBtn').onclick = (e) => { e.preventDefault(); location.reload(); };
+    document.getElementById('cancelBtn').onclick = (e) => { e.preventDefault(); resetForm(); };
     document.getElementById('searchInput').oninput = () => aplicarFiltros();
     document.getElementById('filterStatusSelect').onchange = () => aplicarFiltros();
     document.getElementById('filterLocation').onchange = () => aplicarFiltros();
@@ -438,7 +1213,16 @@
     document.getElementById('exportBtn').onclick = () => exportarCSV();
     document.getElementById('refreshBtn').onclick = () => carregarDaPlanilha();
     document.getElementById('equipSerial').oninput = () => verificarDuplicidade();
-
+    document.getElementById('equipSerial').onblur = () => verificarDuplicidade();
+    
+    const sortableHeaders = document.querySelectorAll('.sortable');
+    for (let i = 0; i < sortableHeaders.length; i++) {
+        sortableHeaders[i].addEventListener('click', function() {
+            const field = this.getAttribute('data-field');
+            if (field) mudarOrdenacao(field);
+        });
+    }
+    
     configurarStatusListener();
     carregarDaPlanilha();
 </script>
