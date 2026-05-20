@@ -655,7 +655,7 @@
                 </div>
             </div>
             <div class="input-group">
-                <label><i class="fas fa-map-marker-alt"></i> Localização</label>
+                <label><i class="fas fa-map-marker-alt"></i> Localização *</label>
                 <select id="equipLocation">
                     <option value="">Selecione...</option>
                     <option value="Sala 171">🏢 Sala 171</option>
@@ -778,7 +778,7 @@
 // ============================================================
 // CONFIGURAÇÃO - URL DO WEB APP (ATUALIZE COM SUA URL)
 // ============================================================
-const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbwqnuFhkdgaN2RQuFt3_cW9eVNc_tjK5aEYao0HLRsilUDnv_2kIaeILHrzuOpmk6ik6Q/exec";
+const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbynan2wQpK9dgw0qLvA13FBQ2T0OWua5HqBphmYwTyyYjNoxRk86vr4MtTaopQf8hiwNQ/exec";
         
 // ============================================================
 // VARIÁVEIS GLOBAIS
@@ -1043,15 +1043,20 @@ function renderizarPagina() {
             '<i class="fas fa-comment-dots"></i> ' + escapeHtml(eq.observacoes).substring(0, 80) + (escapeHtml(eq.observacoes).length > 80 ? '...' : '') : 
             '<span style="color:#cbd5e1;"><i class="far fa-comment"></i> Sem observações</span>';
         
+        // CORREÇÃO: Garantindo que localização e registro estão nos lugares certos
+        const localizacao = eq.localizacao || '-';
+        const registro = eq.registro || 'Não registrado';
+        const quantidade = eq.quantidade || '1';
+        
         html += '<tr>';
         html += '<td><strong>' + escapeHtml(eq.nome) + '</strong></td>';
         html += '<td><span class="marca-modelo">' + escapeHtml(eq.marca || '-') + '</span></td>';
         html += '<td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">' + escapeHtml(eq.serial) + '</code></td>';
-        html += '<td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ' + escapeHtml(eq.localizacao || '-') + '</td>';
-        html += '<td style="text-align:center;"><span class="quantidade-numero">' + escapeHtml(eq.quantidade || '1') + '</span></td>';
+        html += '<td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ' + escapeHtml(localizacao) + '</td>';
+        html += '<td style="text-align:center;"><span class="quantidade-numero">' + escapeHtml(quantidade) + '</span></td>';
         html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(status) + '</span></td>';
         html += '<td class="observacoes-cell">' + observacoesHtml + '</td>';
-        html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
+        html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(registro) + '</td>';
         html += '<td class="row-actions">';
         html += '<i class="fas fa-edit" onclick="editEquipamento(\'' + eq.id + '\')"></i>';
         html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(\'' + eq.id + '\')"></i>';
@@ -1127,19 +1132,27 @@ async function carregarDaPlanilha() {
         console.log('Dados recebidos da planilha:', dados);
         
         if (dados && dados.status === 'sucesso' && Array.isArray(dados.dados)) {
-            equipamentos = dados.dados.map(function(eq, index) {
+            equipamentos = dados.dados.map(function(eq) {
+                // Garantindo que cada campo seja mapeado corretamente
                 return {
-                    id: eq.id || eq.ID || (index + 1),
-                    nome: toSafeString(eq.nome || eq.Nome || eq.B || ''),
-                    marca: toSafeString(eq.marca || eq.Marca || eq.C || ''),
-                    serial: toSafeString(eq.serial || eq.Serial || eq.D || ''),
-                    localizacao: toSafeString(eq.localizacao || eq.Localizacao || eq.E || ''),
-                    status: toSafeString(eq.status || eq.Status || eq.F || 'Operacional'),
-                    quantidade: eq.quantidade || eq.Quantidade || eq.G || 1,
-                    registro: toSafeString(eq.registro || eq.Registro || eq.H || new Date().toISOString()),
-                    observacoes: toSafeString(eq.observacoes || eq.Observacoes || eq.I || '')
+                    id: toSafeString(eq.id),
+                    nome: toSafeString(eq.nome),
+                    marca: toSafeString(eq.marca),
+                    serial: toSafeString(eq.serial),
+                    localizacao: toSafeString(eq.localizacao),
+                    status: toSafeString(eq.status),
+                    quantidade: eq.quantidade || 1,
+                    registro: toSafeString(eq.registro),
+                    observacoes: toSafeString(eq.observacoes)
                 };
             });
+            
+            // Log para depuração - mostra os primeiros itens
+            if (equipamentos.length > 0) {
+                console.log('Primeiro equipamento:', equipamentos[0]);
+                console.log('Localização do primeiro:', equipamentos[0].localizacao);
+                console.log('Registro do primeiro:', equipamentos[0].registro);
+            }
             
             document.getElementById('totalCount').innerText = equipamentos.length;
             aplicarFiltros();
