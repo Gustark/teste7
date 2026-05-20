@@ -776,141 +776,152 @@
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO - URL DO WEB APP
+// CONFIGURAÇÃO
 // ============================================================
+
 const URL_WEB_APP = "https://script.google.com/macros/s/AKfycby29yBgFHQm04qSRCOWA9QeUZ7FRtCPTdAzg3rTUrKJ7C76Yfri00hMyDiEAygSUvbu1A/exec";
-        
+
 // ============================================================
-// VARIÁVEIS GLOBAIS
+// ESTADO GLOBAL
 // ============================================================
+
 let equipamentos = [];
 let equipamentosFiltrados = [];
 let editingId = null;
 let carregando = false;
+
 let paginaAtual = 1;
-let ITENS_POR_PAGINA = 10;
+const ITENS_POR_PAGINA = 10;
+
 let sortField = 'nome';
 let sortOrder = 'asc';
 
 // ============================================================
-// FUNÇÃO PARA CONVERTER QUALQUER VALOR PARA STRING SEGURA
+// HELPERS
 // ============================================================
+
 function toSafeString(value) {
     if (value === null || value === undefined) return '';
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number') return value.toString();
-    if (typeof value === 'boolean') return value.toString();
-    if (value instanceof Date) return value.toLocaleString('pt-BR');
     return String(value);
 }
 
-// ============================================================
-// FUNÇÕES AUXILIARES
-// ============================================================
+function escapeHtml(str) {
+    return toSafeString(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
 
 function formatarData(dataString) {
-    if (!dataString) return "Não registrado";
+    if (!dataString) return '-';
+
     try {
         const data = new Date(dataString);
-        if (isNaN(data.getTime())) return toSafeString(dataString);
-        return data.toLocaleString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    } catch(e) {
-        return toSafeString(dataString);
-    }
-}
 
-function mostrarMensagem(texto, tipo) {
-    const toast = document.getElementById('toast');
-    if (toast) {
-        toast.textContent = texto;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-    const statusText = document.getElementById('syncText');
-    const statusDiv = document.getElementById('syncStatus');
-    if (statusText && statusDiv) {
-        statusDiv.classList.remove('syncing', 'error', 'success');
-        if (tipo === 'error') {
-            statusDiv.classList.add('error');
-            statusText.innerText = 'Erro';
-        } else if (tipo === 'syncing') {
-            statusDiv.classList.add('syncing');
-            statusText.innerText = texto;
-        } else if (tipo === 'success') {
-            statusDiv.classList.add('success');
-            statusText.innerText = texto;
-        } else {
-            statusText.innerText = texto;
+        if (isNaN(data.getTime())) {
+            return dataString;
         }
+
+        return data.toLocaleString('pt-BR');
+    } catch {
+        return dataString;
     }
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return toSafeString(str).replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
+function mostrarMensagem(texto, tipo = 'success') {
+
+    const toast = document.getElementById('toast');
+
+    toast.textContent = texto;
+    toast.className = 'toast show';
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+
+    const status = document.getElementById('syncStatus');
+    const text = document.getElementById('syncText');
+
+    status.classList.remove('success', 'error', 'syncing');
+
+    if (tipo === 'success') {
+        status.classList.add('success');
+    }
+
+    if (tipo === 'error') {
+        status.classList.add('error');
+    }
+
+    if (tipo === 'syncing') {
+        status.classList.add('syncing');
+    }
+
+    text.innerText = texto;
 }
 
 // ============================================================
-// VERIFICAÇÃO DE DUPLICIDADE
+// DUPLICIDADE
 // ============================================================
 
 function verificarDuplicidade() {
+
     const serialInput = document.getElementById('equipSerial');
-    if (!serialInput) return;
-    const serial = serialInput.value.trim();
-    const msgDiv = document.getElementById('msgDuplicado');
+    const msg = document.getElementById('msgDuplicado');
     const saveBtn = document.getElementById('saveBtn');
-    
+
+    const serial = serialInput.value
+        .trim()
+        .toUpperCase();
+
     if (!serial) {
         serialInput.classList.remove('duplicado');
-        if(msgDiv) msgDiv.classList.remove('show');
-        if(saveBtn) saveBtn.disabled = false;
+        msg.classList.remove('show');
+        saveBtn.disabled = false;
         return;
     }
-    
-    const existe = equipamentos.some(eq => toSafeString(eq.serial) === serial && eq.id !== editingId);
+
+    const existe = equipamentos.some(eq =>
+        toSafeString(eq.serial).trim().toUpperCase() === serial &&
+        Number(eq.id) !== Number(editingId)
+    );
+
     if (existe) {
         serialInput.classList.add('duplicado');
-        if(msgDiv) msgDiv.classList.add('show');
-        if(saveBtn) saveBtn.disabled = true;
+        msg.classList.add('show');
+        saveBtn.disabled = true;
     } else {
         serialInput.classList.remove('duplicado');
-        if(msgDiv) msgDiv.classList.remove('show');
-        if(saveBtn) saveBtn.disabled = false;
+        msg.classList.remove('show');
+        saveBtn.disabled = false;
     }
 }
 
 // ============================================================
-// STATUS LISTENER
+// STATUS
 // ============================================================
 
 function configurarStatusListener() {
-    const statusSelect = document.getElementById('equipStatus');
-    const observacoesGroup = document.getElementById('observacoesGroup');
-    const obsObrigatorio = document.getElementById('obsObrigatorio');
-    if (!statusSelect) return;
-    
+
+    const status = document.getElementById('equipStatus');
+    const grupo = document.getElementById('observacoesGroup');
+    const obrigatorio = document.getElementById('obsObrigatorio');
+
     function atualizar() {
-        if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
-            observacoesGroup.classList.add('destaque');
-            if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
+
+        if (
+            status.value === 'Manutenção' ||
+            status.value === 'Inativo'
+        ) {
+            grupo.classList.add('destaque');
+            obrigatorio.style.display = 'inline';
         } else {
-            observacoesGroup.classList.remove('destaque');
-            if (obsObrigatorio) obsObrigatorio.style.display = 'none';
+            grupo.classList.remove('destaque');
+            obrigatorio.style.display = 'none';
         }
     }
-    statusSelect.addEventListener('change', atualizar);
+
+    status.addEventListener('change', atualizar);
+
     atualizar();
 }
 
@@ -918,19 +929,24 @@ function configurarStatusListener() {
 // ORDENAÇÃO
 // ============================================================
 
-function ordenarEquipamentos(array) {
-    return [...array].sort(function(a, b) {
+function ordenarEquipamentos(lista) {
+
+    return [...lista].sort((a, b) => {
+
         let valA = a[sortField] || '';
         let valB = b[sortField] || '';
-        
+
         if (sortField === 'registro') {
-            valA = valA ? new Date(valA).getTime() : 0;
-            valB = valB ? new Date(valB).getTime() : 0;
+
+            valA = new Date(valA).getTime() || 0;
+            valB = new Date(valB).getTime() || 0;
+
         } else {
+
             valA = toSafeString(valA).toLowerCase();
             valB = toSafeString(valB).toLowerCase();
         }
-        
+
         if (sortOrder === 'asc') {
             return valA > valB ? 1 : -1;
         } else {
@@ -940,22 +956,27 @@ function ordenarEquipamentos(array) {
 }
 
 function mudarOrdenacao(campo) {
+
     if (sortField === campo) {
         sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     } else {
         sortField = campo;
         sortOrder = 'asc';
     }
-    
-    document.querySelectorAll('.sortable i').forEach(function(icon) {
+
+    document.querySelectorAll('.sortable i').forEach(icon => {
         icon.className = 'fas fa-sort';
     });
-    
-    const th = document.querySelector('.sortable[data-field="' + campo + '"] i');
-    if (th) {
-        th.className = 'fas fa-sort-' + (sortOrder === 'asc' ? 'up' : 'down');
+
+    const icon = document.querySelector(`[data-field="${campo}"] i`);
+
+    if (icon) {
+        icon.className =
+            sortOrder === 'asc'
+                ? 'fas fa-sort-up'
+                : 'fas fa-sort-down';
     }
-    
+
     aplicarFiltros();
 }
 
@@ -964,282 +985,322 @@ function mudarOrdenacao(campo) {
 // ============================================================
 
 function aplicarFiltros() {
-    const busca = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-    const statusFiltro = document.getElementById('filterStatusSelect')?.value || 'todos';
-    const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
-    
-    let filtrados = equipamentos.filter(function(eq) {
+
+    const busca = document
+        .getElementById('searchInput')
+        .value
+        .toLowerCase()
+        .trim();
+
+    const statusFiltro =
+        document.getElementById('filterStatusSelect').value;
+
+    const localFiltro =
+        document.getElementById('filterLocation').value;
+
+    let lista = equipamentos.filter(eq => {
+
         const nome = toSafeString(eq.nome).toLowerCase();
         const marca = toSafeString(eq.marca).toLowerCase();
         const serial = toSafeString(eq.serial).toLowerCase();
-        const status = toSafeString(eq.status);
-        const localizacao = toSafeString(eq.localizacao);
-        
-        const matchBusca = busca === '' || 
-            nome.includes(busca) || 
+
+        const buscaOk =
+            nome.includes(busca) ||
             marca.includes(busca) ||
             serial.includes(busca);
-        
-        const matchStatus = statusFiltro === 'todos' || status === statusFiltro;
-        const matchLocal = localFiltro === 'todos' || localizacao === localFiltro;
-        
-        return matchBusca && matchStatus && matchLocal;
+
+        const statusOk =
+            statusFiltro === 'todos' ||
+            eq.status === statusFiltro;
+
+        const localOk =
+            localFiltro === 'todos' ||
+            eq.localizacao === localFiltro;
+
+        return buscaOk && statusOk && localOk;
     });
-    
-    equipamentosFiltrados = ordenarEquipamentos(filtrados);
-    
-    const statsDiv = document.getElementById('filterStats');
-    if (statsDiv) {
-        if (equipamentosFiltrados.length !== equipamentos.length) {
-            statsDiv.innerHTML = '🎯 Mostrando ' + equipamentosFiltrados.length + ' de ' + equipamentos.length + ' equipamentos';
-        } else {
-            statsDiv.innerHTML = '📊 Total: ' + equipamentos.length + ' equipamentos';
-        }
-    }
-    
+
+    equipamentosFiltrados = ordenarEquipamentos(lista);
+
     paginaAtual = 1;
+
     renderizarPagina();
     atualizarPaginacao();
+
+    document.getElementById('filterStats').innerHTML =
+        `📊 ${equipamentosFiltrados.length} equipamento(s)`;
 }
 
-function limparFiltros() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterStatusSelect').value = 'todos';
-    document.getElementById('filterLocation').value = 'todos';
-    aplicarFiltros();
-    mostrarMensagem('🧹 Filtros limpos!', 'success');
+// ============================================================
+// TABELA
+// ============================================================
+
+function renderizarPagina() {
+
+    const tbody = document.getElementById('tableBody');
+
+    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+    const fim = inicio + ITENS_POR_PAGINA;
+
+    const lista = equipamentosFiltrados.slice(inicio, fim);
+
+    if (!lista.length) {
+
+        tbody.innerHTML = `
+        <tr class="empty-row">
+            <td colspan="9">
+                Nenhum equipamento encontrado
+            </td>
+        </tr>
+        `;
+
+        return;
+    }
+
+    let html = '';
+
+    lista.forEach(eq => {
+
+        let statusClass = 'status-operacional';
+
+        if (eq.status === 'Manutenção') {
+            statusClass = 'status-manutencao';
+        }
+
+        if (eq.status === 'Inativo') {
+            statusClass = 'status-inativo';
+        }
+
+        html += `
+        <tr>
+
+            <td><strong>${escapeHtml(eq.nome)}</strong></td>
+
+            <td>
+                <span class="marca-modelo">
+                    ${escapeHtml(eq.marca)}
+                </span>
+            </td>
+
+            <td>
+                <code>
+                    ${escapeHtml(eq.serial)}
+                </code>
+            </td>
+
+            <td>${escapeHtml(eq.localizacao)}</td>
+
+            <td style="text-align:center;">
+                ${eq.quantidade}
+            </td>
+
+            <td>
+                <span class="status-badge ${statusClass}">
+                    ${escapeHtml(eq.status)}
+                </span>
+            </td>
+
+            <td class="observacoes-cell">
+                ${escapeHtml(eq.observacoes || '-')}
+            </td>
+
+            <td class="registro-data">
+                ${formatarData(eq.registro)}
+            </td>
+
+            <td class="row-actions">
+
+                <i class="fas fa-edit"
+                   onclick="editEquipamento(${eq.id})">
+                </i>
+
+                <i class="fas fa-trash-alt"
+                   onclick="excluirEquipamento(${eq.id})">
+                </i>
+
+            </td>
+
+        </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
 }
 
 // ============================================================
 // PAGINAÇÃO
 // ============================================================
 
-function renderizarPagina() {
-    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
-    const fim = inicio + ITENS_POR_PAGINA;
-    const itensPagina = equipamentosFiltrados.slice(inicio, fim);
-    const tbody = document.getElementById('tableBody');
-    if (!tbody) return;
-    
-    if (itensPagina.length === 0) {
-        if (equipamentos.length === 0) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
-        } else {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
-        }
-        return;
-    }
-    
-    let html = '';
-    for (let i = 0; i < itensPagina.length; i++) {
-        const eq = itensPagina[i];
-        let statusClass = '';
-        const status = toSafeString(eq.status);
-        if (status === 'Operacional') statusClass = 'status-operacional';
-        else if (status === 'Manutenção') statusClass = 'status-manutencao';
-        else statusClass = 'status-inativo';
-        
-        let observacoesHtml = eq.observacoes ? 
-            '<i class="fas fa-comment-dots"></i> ' + escapeHtml(eq.observacoes).substring(0, 80) + (escapeHtml(eq.observacoes).length > 80 ? '...' : '') : 
-            '<span style="color:#cbd5e1;"><i class="far fa-comment"></i> Sem observações</span>';
-        
-        html += '<tr>';
-        html += '<td><strong>' + escapeHtml(eq.nome) + '</strong></td>';
-        html += '<td><span class="marca-modelo">' + escapeHtml(eq.marca || '-') + '</span></td>';
-        html += '<td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">' + escapeHtml(eq.serial) + '</code></td>';
-        html += '<td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ' + escapeHtml(eq.localizacao || '-') + '</td>';
-        html += '<td style="text-align:center;"><span class="quantidade-numero">' + escapeHtml(eq.quantidade || '1') + '</span></td>';
-        html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(status) + '</span></td>';
-        html += '<td class="observacoes-cell">' + observacoesHtml + '</td>';
-        html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
-        html += '<td class="row-actions">';
-        html += '<i class="fas fa-edit" onclick="editEquipamento(' + eq.id + ')"></i>';
-        html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(' + eq.id + ')"></i>';
-        html += '</td></tr>';
-    }
-    tbody.innerHTML = html;
-    
-    const total = equipamentosFiltrados.length;
-    const inicioMostrar = total === 0 ? 0 : inicio + 1;
-    const fimMostrar = Math.min(fim, total);
-    const infoDiv = document.getElementById('paginationInfo');
-    if (infoDiv && total > 0) {
-        infoDiv.innerHTML = '📄 Mostrando ' + inicioMostrar + ' - ' + fimMostrar + ' de ' + total + ' equipamentos | Página ' + paginaAtual + ' de ' + Math.ceil(total / ITENS_POR_PAGINA);
-    } else if (infoDiv) {
-        infoDiv.innerHTML = '';
-    }
-}
-
 function atualizarPaginacao() {
-    const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
-    const paginationDiv = document.getElementById('pagination');
-    if (!paginationDiv) return;
-    
+
+    const totalPaginas =
+        Math.ceil(
+            equipamentosFiltrados.length / ITENS_POR_PAGINA
+        );
+
+    const pag = document.getElementById('pagination');
+
     if (totalPaginas <= 1) {
-        paginationDiv.innerHTML = '';
+        pag.innerHTML = '';
         return;
     }
-    
+
     let html = '';
-    html += '<button onclick="mudarPagina(1)" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-angle-double-left"></i></button>';
-    html += '<button onclick="mudarPagina(' + (paginaAtual - 1) + ')" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i> Anterior</button>';
-    
+
     for (let i = 1; i <= totalPaginas; i++) {
-        if (i === 1 || i === totalPaginas || (i >= paginaAtual - 2 && i <= paginaAtual + 2)) {
-            html += '<button onclick="mudarPagina(' + i + ')" class="' + (i === paginaAtual ? 'active' : '') + '">' + i + '</button>';
-        } else if (i === paginaAtual - 3 || i === paginaAtual + 3) {
-            html += '<button disabled>...</button>';
-        }
+
+        html += `
+        <button
+            class="${i === paginaAtual ? 'active' : ''}"
+            onclick="mudarPagina(${i})">
+            ${i}
+        </button>
+        `;
     }
-    
-    html += '<button onclick="mudarPagina(' + (paginaAtual + 1) + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '>Próximo <i class="fas fa-chevron-right"></i></button>';
-    html += '<button onclick="mudarPagina(' + totalPaginas + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '><i class="fas fa-angle-double-right"></i></button>';
-    
-    paginationDiv.innerHTML = html;
+
+    pag.innerHTML = html;
 }
 
 function mudarPagina(pagina) {
-    const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
-    if (pagina < 1 || pagina > totalPaginas) return;
+
     paginaAtual = pagina;
+
     renderizarPagina();
     atualizarPaginacao();
-    document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ============================================================
-// CRUD - COMUNICAÇÃO COM PLANILHA
+// CARREGAR PLANILHA
 // ============================================================
 
 async function carregarDaPlanilha() {
+
     if (carregando) return;
+
     carregando = true;
+
     mostrarMensagem('Carregando...', 'syncing');
+
     try {
-        const resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
-        
-        if (!resposta.ok) {
-            throw new Error(`HTTP ${resposta.status}: ${resposta.statusText}`);
+
+        const response = await fetch(
+            URL_WEB_APP + '?t=' + Date.now()
+        );
+
+        const texto = await response.text();
+
+        let dados;
+
+        try {
+            dados = JSON.parse(texto);
+        } catch {
+            console.error(texto);
+            throw new Error('Resposta inválida do servidor');
         }
-        
-        const dados = await resposta.json();
-        
-        console.log('Dados recebidos da planilha:', dados);
-        
-        if (dados && dados.status === 'sucesso' && Array.isArray(dados.dados)) {
-            equipamentos = dados.dados.map(function(eq, index) {
-                return {
-                    id: eq.id || eq.ID || (index + 1),
-                    nome: toSafeString(eq.nome || eq.Nome || eq.B || ''),
-                    marca: toSafeString(eq.marca || eq.Marca || eq.C || ''),
-                    serial: toSafeString(eq.serial || eq.Serial || eq.D || ''),
-                    localizacao: toSafeString(eq.localizacao || eq.Localizacao || eq.E || ''),
-                    status: toSafeString(eq.status || eq.Status || eq.F || 'Operacional'),
-                    quantidade: eq.quantidade || eq.Quantidade || eq.G || 1,
-                    registro: toSafeString(eq.registro || eq.Registro || eq.H || new Date().toISOString()),
-                    observacoes: toSafeString(eq.observacoes || eq.Observacoes || eq.I || '')
-                };
-            });
-            
-            document.getElementById('totalCount').innerText = equipamentos.length;
-            aplicarFiltros();
-            mostrarMensagem(equipamentos.length + ' equipamentos carregados', 'success');
-        } else {
-            throw new Error(dados?.mensagem || 'Formato de dados inválido');
+
+        if (!dados.dados || !Array.isArray(dados.dados)) {
+            throw new Error('Dados inválidos');
         }
-    } catch (erro) {
-        console.error('Erro detalhado:', erro);
-        mostrarMensagem('Erro ao carregar: ' + erro.message, 'error');
-        equipamentos = [];
+
+        equipamentos = dados.dados.map((eq, index) => ({
+
+            id: Number(eq.id || index + 1),
+
+            nome: toSafeString(eq.nome),
+
+            marca: toSafeString(eq.marca),
+
+            serial: toSafeString(eq.serial),
+
+            localizacao: toSafeString(eq.localizacao),
+
+            quantidade: Number(eq.quantidade || 1),
+
+            status: toSafeString(eq.status || 'Operacional'),
+
+            observacoes: toSafeString(eq.observacoes),
+
+            registro: toSafeString(eq.registro)
+        }));
+
+        document.getElementById('totalCount').innerText =
+            equipamentos.length;
+
         aplicarFiltros();
-        document.getElementById('totalCount').innerText = '0';
-    }
-    carregando = false;
-    verificarDuplicidade();
-}
 
-// ============================================================
-// FUNÇÃO DE EXCLUIR CORRIGIDA
-// ============================================================
+        mostrarMensagem(
+            `${equipamentos.length} equipamento(s) carregado(s)`,
+            'success'
+        );
 
-async function excluirDaPlanilha(id) {
-    try {
-        // Usando POST em vez de GET para exclusão (mais confiável)
-        const params = new URLSearchParams();
-        params.append('acao', 'excluir');
-        params.append('id', id);
-        
-        const resposta = await fetch(URL_WEB_APP, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params.toString()
-        });
-        
-        const resultado = await resposta.json();
-        console.log('Resposta da exclusão:', resultado);
-        return resultado.status === 'sucesso';
     } catch (erro) {
-        console.error('Erro na exclusão:', erro);
-        return false;
-    }
-}
 
-async function excluirEquipamento(id) {
-    const equip = equipamentos.find(eq => eq.id === id);
-    if (!equip) {
-        mostrarMensagem('Equipamento não encontrado!', 'error');
-        return;
+        console.error(erro);
+
+        mostrarMensagem(
+            'Erro ao carregar dados',
+            'error'
+        );
     }
-    
-    if (confirm(`⚠️ EXCLUIR EQUIPAMENTO ⚠️\n\n${equip.nome} - ${equip.marca}\nNº Série: ${equip.serial}\n\nEsta ação não pode ser desfeita!\n\nClique em OK para confirmar a exclusão.`)) {
-        mostrarMensagem('Excluindo equipamento...', 'syncing');
-        const ok = await excluirDaPlanilha(id);
-        if (ok) {
-            mostrarMensagem('✅ Equipamento excluído com sucesso!', 'success');
-            // Recarrega a lista após 1 segundo
-            setTimeout(() => carregarDaPlanilha(), 1000);
-        } else {
-            mostrarMensagem('❌ Erro ao excluir equipamento. Tente novamente.', 'error');
-        }
-    }
+
+    carregando = false;
 }
 
 // ============================================================
-// FUNÇÃO DE SALVAR (CORRIGIDA)
+// SALVAR
 // ============================================================
 
 async function salvarEquipamento() {
-    const nome = document.getElementById('equipName')?.value.trim();
-    const marca = document.getElementById('equipMarca')?.value.trim();
-    const serial = document.getElementById('equipSerial')?.value.trim();
-    const localizacao = document.getElementById('equipLocation')?.value;
-    const quantidade = parseInt(document.getElementById('equipQtd')?.value) || 1;
-    const status = document.getElementById('equipStatus')?.value;
-    const observacoes = document.getElementById('equipObservacoes')?.value.trim() || '';
 
-    if (!nome) { alert('⚠️ Informe o Nome/Tipo'); return; }
-    if (!marca) { alert('⚠️ Informe a Marca/Modelo'); return; }
-    if (!serial) { alert('⚠️ Informe o Número de Série'); return; }
-    if (!localizacao) { alert('⚠️ Selecione a Localização'); return; }
-    if (quantidade < 1) { alert('⚠️ Quantidade deve ser pelo menos 1'); return; }
-    if ((status === 'Manutenção' || status === 'Inativo') && !observacoes) {
-        alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!');
-        document.getElementById('equipObservacoes').focus();
+    const nome =
+        document.getElementById('equipName').value.trim();
+
+    const marca =
+        document.getElementById('equipMarca').value.trim();
+
+    const serial =
+        document.getElementById('equipSerial').value.trim();
+
+    const localizacao =
+        document.getElementById('equipLocation').value;
+
+    const quantidade =
+        Number(document.getElementById('equipQtd').value);
+
+    const status =
+        document.getElementById('equipStatus').value;
+
+    const observacoes =
+        document.getElementById('equipObservacoes')
+        .value
+        .trim();
+
+    if (!nome || !marca || !serial || !localizacao) {
+        alert('Preencha todos os campos obrigatórios');
         return;
     }
-    
-    if (equipamentos.some(eq => toSafeString(eq.serial) === serial && eq.id !== editingId)) {
-        alert('❌ Este número de série já está cadastrado!');
+
+    if (
+        (status === 'Manutenção' || status === 'Inativo') &&
+        !observacoes
+    ) {
+        alert('Observações obrigatórias');
         return;
     }
 
     mostrarMensagem('Salvando...', 'syncing');
+
     try {
-        const acao = editingId ? 'editar' : 'salvar';
+
         const params = new URLSearchParams();
-        params.append('acao', acao);
+
+        params.append(
+            'acao',
+            editingId ? 'editar' : 'salvar'
+        );
+
+        params.append('id', editingId || '');
+
         params.append('nome', nome);
         params.append('marca', marca);
         params.append('serial', serial);
@@ -1247,157 +1308,293 @@ async function salvarEquipamento() {
         params.append('quantidade', quantidade);
         params.append('status', status);
         params.append('observacoes', observacoes);
-        params.append('registro', new Date().toLocaleString('pt-BR'));
-        
-        if (editingId) {
-            params.append('id', editingId);
-        }
-        
-        const resposta = await fetch(URL_WEB_APP, {
+
+        const response = await fetch(URL_WEB_APP, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params.toString()
+            body: params
         });
-        
-        const resultado = await resposta.json();
-        console.log('Resposta do salvamento:', resultado);
-        
-        if (resultado.status === 'sucesso') {
-            mostrarMensagem(editingId ? '✅ Atualizado com sucesso!' : '✅ Salvo com sucesso!', 'success');
-            resetForm();
-            setTimeout(() => carregarDaPlanilha(), 1000);
-        } else {
-            throw new Error(resultado.mensagem || 'Erro ao salvar');
+
+        const texto = await response.text();
+
+        let resultado;
+
+        try {
+            resultado = JSON.parse(texto);
+        } catch {
+            console.error(texto);
+            throw new Error('Resposta inválida');
         }
+
+        if (resultado.status !== 'sucesso') {
+            throw new Error(resultado.mensagem || 'Erro');
+        }
+
+        mostrarMensagem('Salvo com sucesso!', 'success');
+
+        resetForm();
+
+        carregarDaPlanilha();
+
     } catch (erro) {
-        console.error('Erro:', erro);
-        mostrarMensagem('❌ Erro ao salvar: ' + erro.message, 'error');
+
+        console.error(erro);
+
+        mostrarMensagem(
+            'Erro ao salvar',
+            'error'
+        );
     }
 }
 
+// ============================================================
+// EXCLUIR
+// ============================================================
+
+async function excluirEquipamento(id) {
+
+    const equip = equipamentos.find(
+        e => Number(e.id) === Number(id)
+    );
+
+    if (!equip) return;
+
+    const confirmar = confirm(
+        `Excluir ${equip.nome}?`
+    );
+
+    if (!confirmar) return;
+
+    mostrarMensagem('Excluindo...', 'syncing');
+
+    try {
+
+        const params = new URLSearchParams();
+
+        params.append('acao', 'excluir');
+        params.append('id', id);
+
+        const response = await fetch(URL_WEB_APP, {
+            method: 'POST',
+            body: params
+        });
+
+        const texto = await response.text();
+
+        let resultado;
+
+        try {
+            resultado = JSON.parse(texto);
+        } catch {
+            console.error(texto);
+            throw new Error('Resposta inválida');
+        }
+
+        if (resultado.status !== 'sucesso') {
+            throw new Error('Erro ao excluir');
+        }
+
+        mostrarMensagem(
+            'Equipamento excluído',
+            'success'
+        );
+
+        carregarDaPlanilha();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        mostrarMensagem(
+            'Erro ao excluir',
+            'error'
+        );
+    }
+}
+
+// ============================================================
+// EDITAR
+// ============================================================
+
+function editEquipamento(id) {
+
+    const eq = equipamentos.find(
+        e => Number(e.id) === Number(id)
+    );
+
+    if (!eq) return;
+
+    editingId = eq.id;
+
+    document.getElementById('equipName').value =
+        eq.nome;
+
+    document.getElementById('equipMarca').value =
+        eq.marca;
+
+    document.getElementById('equipSerial').value =
+        eq.serial;
+
+    document.getElementById('equipLocation').value =
+        eq.localizacao;
+
+    document.getElementById('equipQtd').value =
+        eq.quantidade;
+
+    document.getElementById('equipStatus').value =
+        eq.status;
+
+    document.getElementById('equipObservacoes').value =
+        eq.observacoes || '';
+
+    document.getElementById('formTitle').innerHTML =
+        '<i class="fas fa-pen-alt"></i> Editar Equipamento';
+
+    verificarDuplicidade();
+
+    document.getElementById('formCard')
+        .scrollIntoView({
+            behavior: 'smooth'
+        });
+}
+
+// ============================================================
+// RESET
+// ============================================================
+
 function resetForm() {
+
+    editingId = null;
+
     document.getElementById('equipName').value = '';
     document.getElementById('equipMarca').value = '';
     document.getElementById('equipSerial').value = '';
     document.getElementById('equipLocation').value = '';
-    document.getElementById('equipQtd').value = '1';
+    document.getElementById('equipQtd').value = 1;
     document.getElementById('equipStatus').value = 'Operacional';
     document.getElementById('equipObservacoes').value = '';
-    editingId = null;
-    document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Cadastrar Equipamento';
+
+    document.getElementById('formTitle').innerHTML =
+        '<i class="fas fa-plus-circle"></i> Cadastrar Equipamento';
+
     verificarDuplicidade();
-    
-    const observacoesGroup = document.getElementById('observacoesGroup');
-    const obsObrigatorio = document.getElementById('obsObrigatorio');
-    if (observacoesGroup) observacoesGroup.classList.remove('destaque');
-    if (obsObrigatorio) obsObrigatorio.style.display = 'none';
 }
 
-function editEquipamento(id) {
-    const equip = equipamentos.find(eq => eq.id === id);
-    if (!equip) return;
-    
-    document.getElementById('equipName').value = equip.nome;
-    document.getElementById('equipMarca').value = equip.marca || '';
-    document.getElementById('equipSerial').value = equip.serial;
-    document.getElementById('equipLocation').value = equip.localizacao || '';
-    document.getElementById('equipQtd').value = equip.quantidade || 1;
-    document.getElementById('equipStatus').value = equip.status;
-    document.getElementById('equipObservacoes').value = equip.observacoes || '';
-    editingId = id;
-    document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editar Equipamento';
-    document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-    
-    const statusSelect = document.getElementById('equipStatus');
-    const observacoesGroup = document.getElementById('observacoesGroup');
-    const obsObrigatorio = document.getElementById('obsObrigatorio');
-    if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
-        observacoesGroup.classList.add('destaque');
-        if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
-    } else {
-        observacoesGroup.classList.remove('destaque');
-        if (obsObrigatorio) obsObrigatorio.style.display = 'none';
-    }
-    
-    verificarDuplicidade();
-}
+// ============================================================
+// EXPORTAR CSV
+// ============================================================
 
 function exportarCSV() {
-    if (!equipamentos.length) { alert('Nenhum dado para exportar'); return; }
-    const headers = ['ID', 'Nome', 'Marca', 'Série', 'Localização', 'Quantidade', 'Status', 'Observações', 'Registro'];
-    const linhas = equipamentos.map(function(eq) {
-        return [eq.id, eq.nome, eq.marca, eq.serial, eq.localizacao, eq.quantidade, eq.status, eq.observacoes || '', eq.registro];
-    });
-    let csv = headers.join(',') + '\n';
-    for (let i = 0; i < linhas.length; i++) {
-        csv += linhas[i].map(function(v) { return '"' + toSafeString(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+
+    if (!equipamentos.length) {
+        alert('Nenhum dado');
+        return;
     }
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+
+    const headers = [
+        'ID',
+        'Nome',
+        'Marca',
+        'Serial',
+        'Localização',
+        'Quantidade',
+        'Status',
+        'Observações',
+        'Registro'
+    ];
+
+    let csv = headers.join(',') + '\n';
+
+    equipamentos.forEach(eq => {
+
+        csv += [
+            eq.id,
+            eq.nome,
+            eq.marca,
+            eq.serial,
+            eq.localizacao,
+            eq.quantidade,
+            eq.status,
+            eq.observacoes,
+            eq.registro
+        ]
+        .map(v => `"${toSafeString(v).replace(/"/g, '""')}"`)
+        .join(',');
+
+        csv += '\n';
+    });
+
+    const blob = new Blob(
+        ['\uFEFF' + csv],
+        { type: 'text/csv;charset=utf-8;' }
+    );
+
     const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.setAttribute('download', 'inventario_' + new Date().toISOString().slice(0,10) + '.csv');
-    document.body.appendChild(link);
+
+    link.href = URL.createObjectURL(blob);
+
+    link.download = 'inventario.csv';
+
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    mostrarMensagem('📄 CSV exportado!', 'success');
+
+    mostrarMensagem('CSV exportado!');
 }
 
 // ============================================================
-// EVENTOS E INICIALIZAÇÃO
+// EVENTOS
 // ============================================================
 
-document.getElementById('saveBtn').onclick = function(e) { 
-    e.preventDefault(); 
-    salvarEquipamento(); 
-};
+document.getElementById('saveBtn')
+    .addEventListener('click', salvarEquipamento);
 
-document.getElementById('cancelBtn').onclick = function(e) { 
-    e.preventDefault(); 
-    resetForm(); 
-    mostrarMensagem('Formulário limpo', 'success');
-};
+document.getElementById('cancelBtn')
+    .addEventListener('click', resetForm);
 
-document.getElementById('searchInput').oninput = function() { 
-    aplicarFiltros(); 
-};
+document.getElementById('searchInput')
+    .addEventListener('input', aplicarFiltros);
 
-document.getElementById('filterStatusSelect').onchange = function() { 
-    aplicarFiltros(); 
-};
+document.getElementById('filterStatusSelect')
+    .addEventListener('change', aplicarFiltros);
 
-document.getElementById('filterLocation').onchange = function() { 
-    aplicarFiltros(); 
-};
+document.getElementById('filterLocation')
+    .addEventListener('change', aplicarFiltros);
 
-document.getElementById('clearFiltersBtn').onclick = function() { 
-    limparFiltros(); 
-};
+document.getElementById('clearFiltersBtn')
+    .addEventListener('click', () => {
 
-document.getElementById('exportBtn').onclick = function() { 
-    exportarCSV(); 
-};
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterStatusSelect').value = 'todos';
+        document.getElementById('filterLocation').value = 'todos';
 
-document.getElementById('refreshBtn').onclick = function() { 
-    carregarDaPlanilha(); 
-};
-
-document.getElementById('equipSerial').oninput = function() { 
-    verificarDuplicidade(); 
-};
-
-document.querySelectorAll('.sortable').forEach(function(th) {
-    th.addEventListener('click', function() {
-        const field = this.getAttribute('data-field');
-        if (field) mudarOrdenacao(field);
+        aplicarFiltros();
     });
-});
+
+document.getElementById('refreshBtn')
+    .addEventListener('click', carregarDaPlanilha);
+
+document.getElementById('exportBtn')
+    .addEventListener('click', exportarCSV);
+
+document.getElementById('equipSerial')
+    .addEventListener('input', verificarDuplicidade);
+
+document.querySelectorAll('.sortable')
+    .forEach(th => {
+
+        th.addEventListener('click', () => {
+
+            mudarOrdenacao(
+                th.dataset.field
+            );
+        });
+    });
+
+// ============================================================
+// START
+// ============================================================
 
 configurarStatusListener();
 carregarDaPlanilha();
+
 </script>
 </body>
 </html>
