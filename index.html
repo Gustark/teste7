@@ -1,733 +1,1403 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Inventário EGESP</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:Arial, sans-serif;
-    background:#f1f5f9;
-    padding:30px;
-    color:#1e293b;
-}
-
-.container{
-    max-width:1400px;
-    margin:auto;
-}
-
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
-    flex-wrap:wrap;
-    gap:15px;
-}
-
-.header h1{
-    color:#2563eb;
-}
-
-.card{
-    background:white;
-    border-radius:16px;
-    padding:25px;
-    margin-bottom:25px;
-    box-shadow:0 2px 10px rgba(0,0,0,.05);
-}
-
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-}
-
-.input-group{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-.input-group label{
-    font-size:14px;
-    font-weight:bold;
-}
-
-.input-group input,
-.input-group select,
-.input-group textarea{
-    padding:12px;
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    font-size:14px;
-}
-
-.input-group textarea{
-    min-height:90px;
-    resize:vertical;
-}
-
-.actions{
-    margin-top:25px;
-    display:flex;
-    gap:10px;
-}
-
-button{
-    border:none;
-    padding:12px 22px;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.btn-primary{
-    background:#2563eb;
-    color:white;
-}
-
-.btn-danger{
-    background:#dc2626;
-    color:white;
-}
-
-.btn-secondary{
-    background:#e2e8f0;
-}
-
-.table-container{
-    overflow:auto;
-    background:white;
-    border-radius:16px;
-    box-shadow:0 2px 10px rgba(0,0,0,.05);
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:1100px;
-}
-
-th{
-    background:#f8fafc;
-    padding:15px;
-    text-align:left;
-    border-bottom:1px solid #e2e8f0;
-}
-
-td{
-    padding:15px;
-    border-bottom:1px solid #e2e8f0;
-}
-
-tr:hover{
-    background:#f8fafc;
-}
-
-.status{
-    padding:5px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:bold;
-}
-
-.operacional{
-    background:#dcfce7;
-    color:#166534;
-}
-
-.manutencao{
-    background:#fef3c7;
-    color:#92400e;
-}
-
-.inativo{
-    background:#fee2e2;
-    color:#991b1b;
-}
-
-.search{
-    margin-bottom:20px;
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-}
-
-.search input,
-.search select{
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #cbd5e1;
-}
-
-.toast{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#0f172a;
-    color:white;
-    padding:14px 20px;
-    border-radius:10px;
-    opacity:0;
-    transition:.3s;
-}
-
-.toast.show{
-    opacity:1;
-}
-
-@media(max-width:700px){
-
-    body{
-        padding:15px;
-    }
-
-    .actions{
-        flex-direction:column;
-    }
-
-    button{
-        width:100%;
-    }
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Inventário EGESP - Gestão de Equipamentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #1e293b;
+            padding: 32px 24px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            gap: 16px;
+        }
+        
+        .title-section h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .title-section p {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .stats-badge {
+            background: white;
+            border-radius: 60px;
+            padding: 10px 24px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .stats-badge i {
+            color: #3b82f6;
+            font-size: 1.2rem;
+        }
+        
+        .sync-status {
+            background: white;
+            border-radius: 60px;
+            padding: 10px 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .sync-status.syncing {
+            background: #fef3c7;
+            color: #d97706;
+            border-color: #fcd34d;
+        }
+        
+        .sync-status.error {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+        
+        .sync-status.success {
+            background: #d1fae5;
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        
+        .form-card h3 {
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .form-card h3 i {
+            color: #3b82f6;
+            margin-right: 8px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .observacoes-group {
+            grid-column: 1 / -1;
+            margin-top: 5px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-group label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+        }
+        
+        .input-group label i {
+            margin-right: 5px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            font-family: 'Inter', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .input-group textarea {
+            min-height: 80px;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        
+        .input-group input.duplicado {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .observacoes-group.destaque label {
+            color: #dc2626;
+        }
+        
+        .observacoes-group.destaque textarea {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        
+        .mensagem-duplicado {
+            font-size: 0.7rem;
+            color: #ef4444;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .mensagem-duplicado.show {
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        
+        .btn-primary:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .filters-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 48px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #e2e8f0;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-box i {
+            color: #64748b;
+        }
+        
+        .search-box input {
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 0.9rem;
+            background: transparent;
+            color: #1e293b;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+        }
+        
+        .filter-select {
+            border-radius: 40px;
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #1e293b;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 160px;
+        }
+        
+        .btn-clear {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-clear:hover {
+            background: #f8fafc;
+            color: #1e293b;
+            border-color: #3b82f6;
+        }
+        
+        .filter-stats {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .table-wrapper {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 1100px;
+        }
+        
+        .inventory-table th {
+            text-align: left;
+            padding: 18px 20px;
+            background: #f8fafc;
+            font-weight: 700;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .inventory-table th:hover {
+            color: #3b82f6;
+        }
+        
+        .inventory-table th i {
+            margin-left: 8px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+        
+        .inventory-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        
+        .inventory-table tr:hover {
+            background: rgba(59,130,246,0.04);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .status-operacional {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .status-manutencao {
+            background: #fed7aa;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+        
+        .status-inativo {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .observacoes-cell {
+            max-width: 250px;
+            font-size: 0.75rem;
+            color: #64748b;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        
+        .observacoes-cell i {
+            color: #f59e0b;
+            margin-right: 5px;
+        }
+        
+        .row-actions i {
+            font-size: 1.1rem;
+            margin: 0 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+        
+        .row-actions i:hover {
+            color: #3b82f6;
+            transform: scale(1.1);
+        }
+        
+        .row-actions i:last-child:hover {
+            color: #ef4444;
+        }
+        
+        .empty-row td {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .pagination-container {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .pagination button {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #1e293b;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .pagination button.active {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #64748b;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 30px 20px 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            margin: 0 auto 20px;
+            border-radius: 3px;
+        }
+        
+        .footer-text {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+        
+        .footer-text i {
+            color: #3b82f6;
+            margin: 0 4px;
+        }
+        
+        .footer-name {
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .footer-heart {
+            color: #ef4444;
+            animation: pulse 1.5s ease infinite;
+            display: inline-block;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .social-links {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+        
+        .social-links a {
+            color: #64748b;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: #3b82f6;
+            transform: translateY(-3px);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .registro-data {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        
+        .marca-modelo {
+            font-weight: 500;
+            color: #06b6d4;
+        }
+        
+        .quantidade-numero {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 680px) {
+            body {
+                padding: 20px 16px;
+            }
+            .form-card {
+                padding: 20px;
+            }
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+            .filters-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .filter-select {
+                width: 100%;
+            }
+            .pagination button {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
 <div class="container">
-
-<div class="header">
-    <h1>
-        <i class="fas fa-microchip"></i>
-        Inventário EGESP
-    </h1>
-
-    <div>
-        Total:
-        <strong id="totalEquipamentos">0</strong>
+    <div class="header">
+        <div class="title-section">
+            <h1><i class="fas fa-microchip"></i> Inventário EGESP</h1>
+            <p>Gestão de equipamentos sincronizada com Google Planilhas</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <div class="sync-status" id="syncStatus">
+                <i class="fas fa-cloud"></i> <span id="syncText">Carregando...</span>
+            </div>
+            <div class="stats-badge" id="statsBadge">
+                <i class="fas fa-laptop-code"></i>
+                <span id="totalCount">0</span> equipamentos
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="card">
-
-    <h2 id="tituloFormulario">
-        Cadastrar Equipamento
-    </h2>
-
-    <br>
-
-    <div class="form-grid">
-
-        <div class="input-group">
-            <label>Nome *</label>
-            <input type="text" id="nome">
+    <div class="form-card" id="formCard">
+        <h3><i class="fas fa-plus-circle"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
+        <div class="form-grid">
+            <div class="input-group">
+                <label><i class="fas fa-tag"></i> Nome / Tipo *</label>
+                <input type="text" id="equipName" placeholder="Ex: Notebook" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-industry"></i> Marca / Modelo *</label>
+                <input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-barcode"></i> Nº de Série *</label>
+                <input type="text" id="equipSerial" placeholder="SF0000" autocomplete="off">
+                <div class="mensagem-duplicado" id="msgDuplicado">
+                    <i class="fas fa-exclamation-triangle"></i> Este número de série já está cadastrado!
+                </div>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-map-marker-alt"></i> Localização</label>
+                <select id="equipLocation">
+                    <option value="">Selecione...</option>
+                    <option value="Sala 171">🏢 Sala 171</option>
+                    <option value="Sala 178">🏢 Sala 178</option>
+                    <option value="Estúdio">🎙️ Estúdio</option>
+                    <option value="Grande Auditório">🎪 Grande Auditório</option>
+                    <option value="Plenário">📢 Plenário</option>
+                    <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
+                    <option value="SSC - ADM">📋 SSC - ADM</option>
+                    <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
+                    <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
+                    <option value="17/5">📅 17/5</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-boxes"></i> Quantidade</label>
+                <input type="number" id="equipQtd" value="1" min="1" step="1">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-chart-line"></i> Status</label>
+                <select id="equipStatus">
+                    <option value="Operacional">🟢 Operacional</option>
+                    <option value="Manutenção">🟡 Manutenção</option>
+                    <option value="Inativo">🔴 Inativo</option>
+                </select>
+            </div>
+            <div class="observacoes-group" id="observacoesGroup">
+                <div class="input-group">
+                    <label><i class="fas fa-pen-alt"></i> Observações <span id="obsObrigatorio" style="display:none; color:#dc2626;">(obrigatório para Manutenção/Inativo)</span></label>
+                    <textarea id="equipObservacoes" rows="2" placeholder="Descreva o problema, motivo da manutenção, etc..."></textarea>
+                </div>
+            </div>
         </div>
-
-        <div class="input-group">
-            <label>Marca / Modelo *</label>
-            <input type="text" id="marca">
+        <div class="action-buttons">
+            <button class="btn-secondary" id="cancelBtn">Cancelar</button>
+            <button class="btn-primary" id="saveBtn">Salvar Equipamento</button>
         </div>
+    </div>
 
-        <div class="input-group">
-            <label>Número de Série *</label>
-            <input type="text" id="serial">
-        </div>
-
-        <div class="input-group">
-            <label>Localização *</label>
-
-            <select id="localizacao">
-
-                <option value="">Selecione</option>
-
-                <option>Sala 171</option>
-                <option>Sala 178</option>
-                <option>Estúdio</option>
-                <option>Grande Auditório</option>
-                <option>Plenário</option>
-                <option>Sala dos técnicos</option>
-                <option>SSC - ADM</option>
-                <option>Pequeno Auditório</option>
-                <option>Gráfica - Copa</option>
-
+    <div class="filter-bar">
+        <div class="filters-group">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nome, marca, série...">
+            </div>
+            <select id="filterLocation" class="filter-select">
+                <option value="todos">📍 Todas localizações</option>
+                <option value="Sala 171">🏢 Sala 171</option>
+                <option value="Sala 178">🏢 Sala 178</option>
+                <option value="Estúdio">🎙️ Estúdio</option>
+                <option value="Grande Auditório">🎪 Grande Auditório</option>
+                <option value="Plenário">📢 Plenário</option>
+                <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
+                <option value="SSC - ADM">📋 SSC - ADM</option>
+                <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
+                <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
+                <option value="17/5">📅 17/5</option>
             </select>
-        </div>
-
-        <div class="input-group">
-            <label>Quantidade</label>
-            <input type="number" id="quantidade" value="1">
-        </div>
-
-        <div class="input-group">
-            <label>Status</label>
-
-            <select id="status">
-
-                <option>Operacional</option>
-                <option>Manutenção</option>
-                <option>Inativo</option>
-
+            <select id="filterStatusSelect" class="filter-select">
+                <option value="todos">📋 Todos os status</option>
+                <option value="Operacional">✅ Operacional</option>
+                <option value="Manutenção">⚠️ Manutenção</option>
+                <option value="Inativo">❌ Inativo</option>
             </select>
+            <button id="clearFiltersBtn" class="btn-clear">Limpar Filtros</button>
+            <button id="exportBtn" class="btn-clear"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            <button id="refreshBtn" class="btn-clear"><i class="fas fa-sync-alt"></i> Atualizar</button>
         </div>
-
-        <div class="input-group" style="grid-column:1/-1;">
-            <label>Observações</label>
-            <textarea id="observacoes"></textarea>
-        </div>
-
+        <div class="filter-stats" id="filterStats"></div>
     </div>
 
-    <div class="actions">
-
-        <button class="btn-primary" onclick="salvarEquipamento()">
-            <i class="fas fa-save"></i>
-            Salvar
-        </button>
-
-        <button class="btn-secondary" onclick="resetarFormulario()">
-            Cancelar
-        </button>
-
+    <div class="table-wrapper">
+        <table class="inventory-table">
+            <thead>
+                <tr>
+                    <th class="sortable" data-field="nome">Nome / Tipo <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="marca">Marca / Modelo <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="serial">Nº Série <i class="fas fa-sort"></i></th>
+                    <th class="sortable" data-field="localizacao">Localização <i class="fas fa-sort"></i></th>
+                    <th style="text-align: center;">Qtd</th>
+                    <th class="sortable" data-field="status">Status <i class="fas fa-sort"></i></th>
+                    <th>Observações</th>
+                    <th class="sortable" data-field="registro">Data Registro <i class="fas fa-sort"></i></th>
+                    <th style="width: 100px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr class="empty-row">
+                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
+    <div class="pagination-container">
+        <div class="pagination" id="pagination"></div>
+        <div class="pagination-info" id="paginationInfo"></div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-divider"></div>
+        <div class="footer-text">
+            <i class="fas fa-code"></i> Desenvolvido por 
+            <span class="footer-name">Gustavo Hugo</span>
+            <i class="fas fa-heart footer-heart"></i>
+        </div>
+        <div class="footer-text" style="margin-top: 8px;">
+            <i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas
+        </div>
+        <div class="social-links">
+            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
 </div>
-
-<div class="search">
-
-    <input
-        type="text"
-        id="busca"
-        placeholder="Buscar..."
-        oninput="renderizarTabela()"
-    >
-
-    <select id="filtroStatus" onchange="renderizarTabela()">
-
-        <option value="">Todos status</option>
-        <option>Operacional</option>
-        <option>Manutenção</option>
-        <option>Inativo</option>
-
-    </select>
-
-</div>
-
-<div class="table-container">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Nome</th>
-<th>Marca</th>
-<th>Série</th>
-<th>Localização</th>
-<th>Qtd</th>
-<th>Status</th>
-<th>Registro</th>
-<th>Ações</th>
-
-</tr>
-
-</thead>
-
-<tbody id="tabelaEquipamentos"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
 <div id="toast" class="toast"></div>
 
 <script>
-
-const URL_WEB_APP =
-"https://script.google.com/macros/s/AKfycbz5YQfgLZdyIbvry8uiTS40kF1-ykp26qmMwGql6LnuibCBqrdyGCoEV1B4xE9DcIy7CA/exec";
-
+// ============================================================
+// CONFIGURAÇÃO - URL DO WEB APP
+// ============================================================
+const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbz5YQfgLZdyIbvry8uiTS40kF1-ykp26qmMwGql6LnuibCBqrdyGCoEV1B4xE9DcIy7CA/exec";
+        
+// ============================================================
+// VARIÁVEIS GLOBAIS
+// ============================================================
 let equipamentos = [];
+let equipamentosFiltrados = [];
+let editingId = null;
+let carregando = false;
+let paginaAtual = 1;
+let ITENS_POR_PAGINA = 10;
+let sortField = 'nome';
+let sortOrder = 'asc';
 
-let editandoId = null;
-
-// ======================================================
-// TOAST
-// ======================================================
-
-function mostrarToast(texto){
-
-    const toast = document.getElementById("toast");
-
-    toast.innerText = texto;
-
-    toast.classList.add("show");
-
-    setTimeout(()=>{
-
-        toast.classList.remove("show");
-
-    },3000);
+// ============================================================
+// FUNÇÃO PARA CONVERTER QUALQUER VALOR PARA STRING SEGURA
+// ============================================================
+function toSafeString(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return value.toString();
+    if (typeof value === 'boolean') return value.toString();
+    if (value instanceof Date) return value.toLocaleString('pt-BR');
+    return String(value);
 }
 
-// ======================================================
-// CARREGAR
-// ======================================================
+// ============================================================
+// FUNÇÕES AUXILIARES
+// ============================================================
 
-async function carregarEquipamentos(){
-
-    try{
-
-        const response = await fetch(
-            URL_WEB_APP
-        );
-
-        const dados = await response.json();
-
-        equipamentos = dados.dados || [];
-
-        renderizarTabela();
-
-    }catch(erro){
-
-        console.error(erro);
-
-        mostrarToast("Erro ao carregar");
+function formatarData(dataString) {
+    if (!dataString) return "Não registrado";
+    try {
+        const data = new Date(dataString);
+        if (isNaN(data.getTime())) return toSafeString(dataString);
+        return data.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch(e) {
+        return toSafeString(dataString);
     }
 }
 
-// ======================================================
-// RENDER
-// ======================================================
+function mostrarMensagem(texto, tipo) {
+    const toast = document.getElementById('toast');
+    if (toast) {
+        toast.textContent = texto;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    const statusText = document.getElementById('syncText');
+    const statusDiv = document.getElementById('syncStatus');
+    if (statusText && statusDiv) {
+        statusDiv.classList.remove('syncing', 'error', 'success');
+        if (tipo === 'error') {
+            statusDiv.classList.add('error');
+            statusText.innerText = 'Erro';
+        } else if (tipo === 'syncing') {
+            statusDiv.classList.add('syncing');
+            statusText.innerText = texto;
+        } else if (tipo === 'success') {
+            statusDiv.classList.add('success');
+            statusText.innerText = texto;
+        } else {
+            statusText.innerText = texto;
+        }
+    }
+}
 
-function renderizarTabela(){
-
-    const tbody =
-    document.getElementById("tabelaEquipamentos");
-
-    const busca =
-    document.getElementById("busca")
-    .value
-    .toLowerCase();
-
-    const filtroStatus =
-    document.getElementById("filtroStatus")
-    .value;
-
-    let lista = equipamentos.filter(eq=>{
-
-        const matchBusca =
-
-            eq.nome.toLowerCase().includes(busca) ||
-            eq.marca.toLowerCase().includes(busca) ||
-            eq.serial.toLowerCase().includes(busca);
-
-        const matchStatus =
-
-            !filtroStatus ||
-            eq.status === filtroStatus;
-
-        return matchBusca && matchStatus;
+function escapeHtml(str) {
+    if (!str) return '';
+    return toSafeString(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
     });
+}
 
-    document.getElementById(
-        "totalEquipamentos"
-    ).innerText = lista.length;
+// ============================================================
+// VERIFICAÇÃO DE DUPLICIDADE
+// ============================================================
 
-    if(!lista.length){
-
-        tbody.innerHTML = `
-        <tr>
-            <td colspan="8">
-                Nenhum equipamento
-            </td>
-        </tr>
-        `;
-
+function verificarDuplicidade() {
+    const serialInput = document.getElementById('equipSerial');
+    if (!serialInput) return;
+    const serial = serialInput.value.trim();
+    const msgDiv = document.getElementById('msgDuplicado');
+    const saveBtn = document.getElementById('saveBtn');
+    
+    if (!serial) {
+        serialInput.classList.remove('duplicado');
+        if(msgDiv) msgDiv.classList.remove('show');
+        if(saveBtn) saveBtn.disabled = false;
         return;
     }
+    
+    const existe = equipamentos.some(eq => toSafeString(eq.serial) === serial && eq.id !== editingId);
+    if (existe) {
+        serialInput.classList.add('duplicado');
+        if(msgDiv) msgDiv.classList.add('show');
+        if(saveBtn) saveBtn.disabled = true;
+    } else {
+        serialInput.classList.remove('duplicado');
+        if(msgDiv) msgDiv.classList.remove('show');
+        if(saveBtn) saveBtn.disabled = false;
+    }
+}
 
-    let html = "";
+// ============================================================
+// STATUS LISTENER
+// ============================================================
 
-    lista.forEach(eq=>{
-
-        let statusClass = "operacional";
-
-        if(eq.status === "Manutenção"){
-            statusClass = "manutencao";
+function configurarStatusListener() {
+    const statusSelect = document.getElementById('equipStatus');
+    const observacoesGroup = document.getElementById('observacoesGroup');
+    const obsObrigatorio = document.getElementById('obsObrigatorio');
+    if (!statusSelect) return;
+    
+    function atualizar() {
+        if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
+            observacoesGroup.classList.add('destaque');
+            if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
+        } else {
+            observacoesGroup.classList.remove('destaque');
+            if (obsObrigatorio) obsObrigatorio.style.display = 'none';
         }
+    }
+    statusSelect.addEventListener('change', atualizar);
+    atualizar();
+}
 
-        if(eq.status === "Inativo"){
-            statusClass = "inativo";
+// ============================================================
+// ORDENAÇÃO
+// ============================================================
+
+function ordenarEquipamentos(array) {
+    return [...array].sort(function(a, b) {
+        let valA = a[sortField] || '';
+        let valB = b[sortField] || '';
+        
+        if (sortField === 'registro') {
+            valA = valA ? new Date(valA).getTime() : 0;
+            valB = valB ? new Date(valB).getTime() : 0;
+        } else {
+            valA = toSafeString(valA).toLowerCase();
+            valB = toSafeString(valB).toLowerCase();
         }
-
-        html += `
-
-        <tr>
-
-            <td>${eq.nome}</td>
-
-            <td>${eq.marca}</td>
-
-            <td>${eq.serial}</td>
-
-            <td>${eq.localizacao}</td>
-
-            <td>${eq.quantidade}</td>
-
-            <td>
-                <span class="status ${statusClass}">
-                    ${eq.status}
-                </span>
-            </td>
-
-            <td>${eq.registro}</td>
-
-            <td>
-
-                <button
-                    class="btn-primary"
-                    onclick="editarEquipamento('${eq.id}')"
-                >
-                    <i class="fas fa-edit"></i>
-                </button>
-
-                <button
-                    class="btn-danger"
-                    onclick="excluirEquipamento('${eq.id}')"
-                >
-                    <i class="fas fa-trash"></i>
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
+        
+        if (sortOrder === 'asc') {
+            return valA > valB ? 1 : -1;
+        } else {
+            return valA < valB ? 1 : -1;
+        }
     });
+}
 
+function mudarOrdenacao(campo) {
+    if (sortField === campo) {
+        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortField = campo;
+        sortOrder = 'asc';
+    }
+    
+    document.querySelectorAll('.sortable i').forEach(function(icon) {
+        icon.className = 'fas fa-sort';
+    });
+    
+    const th = document.querySelector('.sortable[data-field="' + campo + '"] i');
+    if (th) {
+        th.className = 'fas fa-sort-' + (sortOrder === 'asc' ? 'up' : 'down');
+    }
+    
+    aplicarFiltros();
+}
+
+// ============================================================
+// FILTROS
+// ============================================================
+
+function aplicarFiltros() {
+    const busca = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+    const statusFiltro = document.getElementById('filterStatusSelect')?.value || 'todos';
+    const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
+    
+    let filtrados = equipamentos.filter(function(eq) {
+        const nome = toSafeString(eq.nome).toLowerCase();
+        const marca = toSafeString(eq.marca).toLowerCase();
+        const serial = toSafeString(eq.serial).toLowerCase();
+        const status = toSafeString(eq.status);
+        const localizacao = toSafeString(eq.localizacao);
+        
+        const matchBusca = busca === '' || 
+            nome.includes(busca) || 
+            marca.includes(busca) ||
+            serial.includes(busca);
+        
+        const matchStatus = statusFiltro === 'todos' || status === statusFiltro;
+        const matchLocal = localFiltro === 'todos' || localizacao === localFiltro;
+        
+        return matchBusca && matchStatus && matchLocal;
+    });
+    
+    equipamentosFiltrados = ordenarEquipamentos(filtrados);
+    
+    const statsDiv = document.getElementById('filterStats');
+    if (statsDiv) {
+        if (equipamentosFiltrados.length !== equipamentos.length) {
+            statsDiv.innerHTML = '🎯 Mostrando ' + equipamentosFiltrados.length + ' de ' + equipamentos.length + ' equipamentos';
+        } else {
+            statsDiv.innerHTML = '📊 Total: ' + equipamentos.length + ' equipamentos';
+        }
+    }
+    
+    paginaAtual = 1;
+    renderizarPagina();
+    atualizarPaginacao();
+}
+
+function limparFiltros() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterStatusSelect').value = 'todos';
+    document.getElementById('filterLocation').value = 'todos';
+    aplicarFiltros();
+    mostrarMensagem('🧹 Filtros limpos!', 'success');
+}
+
+// ============================================================
+// PAGINAÇÃO
+// ============================================================
+
+function renderizarPagina() {
+    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+    const fim = inicio + ITENS_POR_PAGINA;
+    const itensPagina = equipamentosFiltrados.slice(inicio, fim);
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    
+    if (itensPagina.length === 0) {
+        if (equipamentos.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
+        } else {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
+        }
+        return;
+    }
+    
+    let html = '';
+    for (let i = 0; i < itensPagina.length; i++) {
+        const eq = itensPagina[i];
+        let statusClass = '';
+        const status = toSafeString(eq.status);
+        if (status === 'Operacional') statusClass = 'status-operacional';
+        else if (status === 'Manutenção') statusClass = 'status-manutencao';
+        else statusClass = 'status-inativo';
+        
+        let observacoesHtml = eq.observacoes ? 
+            '<i class="fas fa-comment-dots"></i> ' + escapeHtml(eq.observacoes).substring(0, 80) + (escapeHtml(eq.observacoes).length > 80 ? '...' : '') : 
+            '<span style="color:#cbd5e1;"><i class="far fa-comment"></i> Sem observações</span>';
+        
+        html += '<tr>';
+        html += '<td><strong>' + escapeHtml(eq.nome) + '</strong></td>';
+        html += '<td><span class="marca-modelo">' + escapeHtml(eq.marca || '-') + '</span></td>';
+        html += '<td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">' + escapeHtml(eq.serial) + '</code></td>';
+        html += '<td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ' + escapeHtml(eq.localizacao || '-') + '</td>';
+        html += '<td style="text-align:center;"><span class="quantidade-numero">' + escapeHtml(eq.quantidade || '1') + '</span></td>';
+        html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(status) + '</span></td>';
+        html += '<td class="observacoes-cell">' + observacoesHtml + '</td>';
+        html += '<td class="registro-data"><i class="far fa-calendar-alt"></i> ' + formatarData(eq.registro) + '</td>';
+        html += '<td class="row-actions">';
+        html += '<i class="fas fa-edit" onclick="editEquipamento(' + eq.id + ')"></i>';
+        html += '<i class="fas fa-trash-alt" onclick="excluirEquipamento(' + eq.id + ')"></i>';
+        html += '</td></tr>';
+    }
     tbody.innerHTML = html;
+    
+    const total = equipamentosFiltrados.length;
+    const inicioMostrar = total === 0 ? 0 : inicio + 1;
+    const fimMostrar = Math.min(fim, total);
+    const infoDiv = document.getElementById('paginationInfo');
+    if (infoDiv && total > 0) {
+        infoDiv.innerHTML = '📄 Mostrando ' + inicioMostrar + ' - ' + fimMostrar + ' de ' + total + ' equipamentos | Página ' + paginaAtual + ' de ' + Math.ceil(total / ITENS_POR_PAGINA);
+    } else if (infoDiv) {
+        infoDiv.innerHTML = '';
+    }
 }
 
-// ======================================================
-// SALVAR
-// ======================================================
+function atualizarPaginacao() {
+    const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+    const paginationDiv = document.getElementById('pagination');
+    if (!paginationDiv) return;
+    
+    if (totalPaginas <= 1) {
+        paginationDiv.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    html += '<button onclick="mudarPagina(1)" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-angle-double-left"></i></button>';
+    html += '<button onclick="mudarPagina(' + (paginaAtual - 1) + ')" ' + (paginaAtual === 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i> Anterior</button>';
+    
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (i === 1 || i === totalPaginas || (i >= paginaAtual - 2 && i <= paginaAtual + 2)) {
+            html += '<button onclick="mudarPagina(' + i + ')" class="' + (i === paginaAtual ? 'active' : '') + '">' + i + '</button>';
+        } else if (i === paginaAtual - 3 || i === paginaAtual + 3) {
+            html += '<button disabled>...</button>';
+        }
+    }
+    
+    html += '<button onclick="mudarPagina(' + (paginaAtual + 1) + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '>Próximo <i class="fas fa-chevron-right"></i></button>';
+    html += '<button onclick="mudarPagina(' + totalPaginas + ')" ' + (paginaAtual === totalPaginas ? 'disabled' : '') + '><i class="fas fa-angle-double-right"></i></button>';
+    
+    paginationDiv.innerHTML = html;
+}
 
-async function salvarEquipamento(){
+function mudarPagina(pagina) {
+    const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
+    if (pagina < 1 || pagina > totalPaginas) return;
+    paginaAtual = pagina;
+    renderizarPagina();
+    atualizarPaginacao();
+    document.querySelector('.table-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-    const nome =
-    document.getElementById("nome").value.trim();
+// ============================================================
+// CRUD - COMUNICAÇÃO COM PLANILHA
+// ============================================================
 
-    const marca =
-    document.getElementById("marca").value.trim();
+async function carregarDaPlanilha() {
+    if (carregando) return;
+    carregando = true;
+    mostrarMensagem('Carregando...', 'syncing');
+    try {
+        const resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
+        
+        if (!resposta.ok) {
+            throw new Error(`HTTP ${resposta.status}: ${resposta.statusText}`);
+        }
+        
+        const dados = await resposta.json();
+        
+        console.log('Dados recebidos da planilha:', dados);
+        
+        if (dados && dados.status === 'sucesso' && Array.isArray(dados.dados)) {
+            equipamentos = dados.dados.map(function(eq, index) {
+                return {
+                    id: eq.id || eq.ID || (index + 1),
+                    nome: toSafeString(eq.nome || eq.Nome || eq.B || ''),
+                    marca: toSafeString(eq.marca || eq.Marca || eq.C || ''),
+                    serial: toSafeString(eq.serial || eq.Serial || eq.D || ''),
+                    localizacao: toSafeString(eq.localizacao || eq.Localizacao || eq.E || ''),
+                    status: toSafeString(eq.status || eq.Status || eq.F || 'Operacional'),
+                    quantidade: eq.quantidade || eq.Quantidade || eq.G || 1,
+                    registro: toSafeString(eq.registro || eq.Registro || eq.H || new Date().toISOString()),
+                    observacoes: toSafeString(eq.observacoes || eq.Observacoes || eq.I || '')
+                };
+            });
+            
+            document.getElementById('totalCount').innerText = equipamentos.length;
+            aplicarFiltros();
+            mostrarMensagem(equipamentos.length + ' equipamentos carregados', 'success');
+        } else {
+            throw new Error(dados?.mensagem || 'Formato de dados inválido');
+        }
+    } catch (erro) {
+        console.error('Erro detalhado:', erro);
+        mostrarMensagem('Erro ao carregar: ' + erro.message, 'error');
+        equipamentos = [];
+        aplicarFiltros();
+        document.getElementById('totalCount').innerText = '0';
+    }
+    carregando = false;
+    verificarDuplicidade();
+}
 
-    const serial =
-    document.getElementById("serial").value.trim();
+// ============================================================
+// FUNÇÃO DE EXCLUIR CORRIGIDA
+// ============================================================
 
-    const localizacao =
-    document.getElementById("localizacao").value;
+async function excluirDaPlanilha(id) {
+    try {
+        // Usando POST em vez de GET para exclusão (mais confiável)
+        const params = new URLSearchParams();
+        params.append('acao', 'excluir');
+        params.append('id', id);
+        
+        const resposta = await fetch(URL_WEB_APP, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        });
+        
+        const resultado = await resposta.json();
+        console.log('Resposta da exclusão:', resultado);
+        return resultado.status === 'sucesso';
+    } catch (erro) {
+        console.error('Erro na exclusão:', erro);
+        return false;
+    }
+}
 
-    const quantidade =
-    document.getElementById("quantidade").value;
+async function excluirEquipamento(id) {
+    const equip = equipamentos.find(eq => eq.id === id);
+    if (!equip) {
+        mostrarMensagem('Equipamento não encontrado!', 'error');
+        return;
+    }
+    
+    if (confirm(`⚠️ EXCLUIR EQUIPAMENTO ⚠️\n\n${equip.nome} - ${equip.marca}\nNº Série: ${equip.serial}\n\nEsta ação não pode ser desfeita!\n\nClique em OK para confirmar a exclusão.`)) {
+        mostrarMensagem('Excluindo equipamento...', 'syncing');
+        const ok = await excluirDaPlanilha(id);
+        if (ok) {
+            mostrarMensagem('✅ Equipamento excluído com sucesso!', 'success');
+            // Recarrega a lista após 1 segundo
+            setTimeout(() => carregarDaPlanilha(), 1000);
+        } else {
+            mostrarMensagem('❌ Erro ao excluir equipamento. Tente novamente.', 'error');
+        }
+    }
+}
 
-    const status =
-    document.getElementById("status").value;
+// ============================================================
+// FUNÇÃO DE SALVAR (CORRIGIDA)
+// ============================================================
 
-    const observacoes =
-    document.getElementById("observacoes").value;
+async function salvarEquipamento() {
+    const nome = document.getElementById('equipName')?.value.trim();
+    const marca = document.getElementById('equipMarca')?.value.trim();
+    const serial = document.getElementById('equipSerial')?.value.trim();
+    const localizacao = document.getElementById('equipLocation')?.value;
+    const quantidade = parseInt(document.getElementById('equipQtd')?.value) || 1;
+    const status = document.getElementById('equipStatus')?.value;
+    const observacoes = document.getElementById('equipObservacoes')?.value.trim() || '';
 
-    if(
-        !nome ||
-        !marca ||
-        !serial ||
-        !localizacao
-    ){
-        alert("Preencha os campos obrigatórios");
+    if (!nome) { alert('⚠️ Informe o Nome/Tipo'); return; }
+    if (!marca) { alert('⚠️ Informe a Marca/Modelo'); return; }
+    if (!serial) { alert('⚠️ Informe o Número de Série'); return; }
+    if (!localizacao) { alert('⚠️ Selecione a Localização'); return; }
+    if (quantidade < 1) { alert('⚠️ Quantidade deve ser pelo menos 1'); return; }
+    if ((status === 'Manutenção' || status === 'Inativo') && !observacoes) {
+        alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!');
+        document.getElementById('equipObservacoes').focus();
+        return;
+    }
+    
+    if (equipamentos.some(eq => toSafeString(eq.serial) === serial && eq.id !== editingId)) {
+        alert('❌ Este número de série já está cadastrado!');
         return;
     }
 
-    const params = new URLSearchParams();
-
-    params.append(
-        "acao",
-        editandoId ? "editar" : "salvar"
-    );
-
-    if(editandoId){
-
-        params.append("id", editandoId);
-    }
-
-    params.append("nome", nome);
-    params.append("marca", marca);
-    params.append("serial", serial);
-    params.append("localizacao", localizacao);
-    params.append("quantidade", quantidade);
-    params.append("status", status);
-    params.append("observacoes", observacoes);
-
-    try{
-
-        const response = await fetch(
-
-            URL_WEB_APP +
-            "?" +
-            params.toString()
-
-        );
-
-        const resultado =
-        await response.json();
-
-        if(resultado.status !== "sucesso"){
-
-            throw new Error(resultado.mensagem);
+    mostrarMensagem('Salvando...', 'syncing');
+    try {
+        const acao = editingId ? 'editar' : 'salvar';
+        const params = new URLSearchParams();
+        params.append('acao', acao);
+        params.append('nome', nome);
+        params.append('marca', marca);
+        params.append('serial', serial);
+        params.append('localizacao', localizacao);
+        params.append('quantidade', quantidade);
+        params.append('status', status);
+        params.append('observacoes', observacoes);
+        params.append('registro', new Date().toLocaleString('pt-BR'));
+        
+        if (editingId) {
+            params.append('id', editingId);
         }
-
-        mostrarToast("Salvo com sucesso");
-
-        resetarFormulario();
-
-        carregarEquipamentos();
-
-    }catch(erro){
-
-        console.error(erro);
-
-        mostrarToast("Erro ao salvar");
+        
+        const resposta = await fetch(URL_WEB_APP, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        });
+        
+        const resultado = await resposta.json();
+        console.log('Resposta do salvamento:', resultado);
+        
+        if (resultado.status === 'sucesso') {
+            mostrarMensagem(editingId ? '✅ Atualizado com sucesso!' : '✅ Salvo com sucesso!', 'success');
+            resetForm();
+            setTimeout(() => carregarDaPlanilha(), 1000);
+        } else {
+            throw new Error(resultado.mensagem || 'Erro ao salvar');
+        }
+    } catch (erro) {
+        console.error('Erro:', erro);
+        mostrarMensagem('❌ Erro ao salvar: ' + erro.message, 'error');
     }
 }
 
-// ======================================================
-// EDITAR
-// ======================================================
+function resetForm() {
+    document.getElementById('equipName').value = '';
+    document.getElementById('equipMarca').value = '';
+    document.getElementById('equipSerial').value = '';
+    document.getElementById('equipLocation').value = '';
+    document.getElementById('equipQtd').value = '1';
+    document.getElementById('equipStatus').value = 'Operacional';
+    document.getElementById('equipObservacoes').value = '';
+    editingId = null;
+    document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Cadastrar Equipamento';
+    verificarDuplicidade();
+    
+    const observacoesGroup = document.getElementById('observacoesGroup');
+    const obsObrigatorio = document.getElementById('obsObrigatorio');
+    if (observacoesGroup) observacoesGroup.classList.remove('destaque');
+    if (obsObrigatorio) obsObrigatorio.style.display = 'none';
+}
 
-function editarEquipamento(id){
+function editEquipamento(id) {
+    const equip = equipamentos.find(eq => eq.id === id);
+    if (!equip) return;
+    
+    document.getElementById('equipName').value = equip.nome;
+    document.getElementById('equipMarca').value = equip.marca || '';
+    document.getElementById('equipSerial').value = equip.serial;
+    document.getElementById('equipLocation').value = equip.localizacao || '';
+    document.getElementById('equipQtd').value = equip.quantidade || 1;
+    document.getElementById('equipStatus').value = equip.status;
+    document.getElementById('equipObservacoes').value = equip.observacoes || '';
+    editingId = id;
+    document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editar Equipamento';
+    document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+    
+    const statusSelect = document.getElementById('equipStatus');
+    const observacoesGroup = document.getElementById('observacoesGroup');
+    const obsObrigatorio = document.getElementById('obsObrigatorio');
+    if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
+        observacoesGroup.classList.add('destaque');
+        if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
+    } else {
+        observacoesGroup.classList.remove('destaque');
+        if (obsObrigatorio) obsObrigatorio.style.display = 'none';
+    }
+    
+    verificarDuplicidade();
+}
 
-    const eq = equipamentos.find(
-        item => item.id === id
-    );
-
-    if(!eq) return;
-
-    editandoId = id;
-
-    document.getElementById("nome").value =
-    eq.nome;
-
-    document.getElementById("marca").value =
-    eq.marca;
-
-    document.getElementById("serial").value =
-    eq.serial;
-
-    document.getElementById("localizacao").value =
-    eq.localizacao;
-
-    document.getElementById("quantidade").value =
-    eq.quantidade;
-
-    document.getElementById("status").value =
-    eq.status;
-
-    document.getElementById("observacoes").value =
-    eq.observacoes;
-
-    document.getElementById(
-        "tituloFormulario"
-    ).innerText = "Editar Equipamento";
-
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
+function exportarCSV() {
+    if (!equipamentos.length) { alert('Nenhum dado para exportar'); return; }
+    const headers = ['ID', 'Nome', 'Marca', 'Série', 'Localização', 'Quantidade', 'Status', 'Observações', 'Registro'];
+    const linhas = equipamentos.map(function(eq) {
+        return [eq.id, eq.nome, eq.marca, eq.serial, eq.localizacao, eq.quantidade, eq.status, eq.observacoes || '', eq.registro];
     });
-}
-
-// ======================================================
-// EXCLUIR
-// ======================================================
-
-async function excluirEquipamento(id){
-
-    const confirmar =
-    confirm("Deseja excluir?");
-
-    if(!confirmar) return;
-
-    try{
-
-        const response = await fetch(
-
-            URL_WEB_APP +
-            "?acao=excluir&id=" +
-            id
-
-        );
-
-        const resultado =
-        await response.json();
-
-        if(resultado.status !== "sucesso"){
-
-            throw new Error(resultado.mensagem);
-        }
-
-        mostrarToast("Excluído");
-
-        carregarEquipamentos();
-
-    }catch(erro){
-
-        console.error(erro);
-
-        mostrarToast("Erro ao excluir");
+    let csv = headers.join(',') + '\n';
+    for (let i = 0; i < linhas.length; i++) {
+        csv += linhas[i].map(function(v) { return '"' + toSafeString(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
     }
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'inventario_' + new Date().toISOString().slice(0,10) + '.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    mostrarMensagem('📄 CSV exportado!', 'success');
 }
 
-// ======================================================
-// RESET
-// ======================================================
+// ============================================================
+// EVENTOS E INICIALIZAÇÃO
+// ============================================================
 
-function resetarFormulario(){
+document.getElementById('saveBtn').onclick = function(e) { 
+    e.preventDefault(); 
+    salvarEquipamento(); 
+};
 
-    editandoId = null;
+document.getElementById('cancelBtn').onclick = function(e) { 
+    e.preventDefault(); 
+    resetForm(); 
+    mostrarMensagem('Formulário limpo', 'success');
+};
 
-    document.getElementById("nome").value = "";
-    document.getElementById("marca").value = "";
-    document.getElementById("serial").value = "";
-    document.getElementById("localizacao").value = "";
-    document.getElementById("quantidade").value = 1;
-    document.getElementById("status").value = "Operacional";
-    document.getElementById("observacoes").value = "";
+document.getElementById('searchInput').oninput = function() { 
+    aplicarFiltros(); 
+};
 
-    document.getElementById(
-        "tituloFormulario"
-    ).innerText = "Cadastrar Equipamento";
-}
+document.getElementById('filterStatusSelect').onchange = function() { 
+    aplicarFiltros(); 
+};
 
-// ======================================================
-// START
-// ======================================================
+document.getElementById('filterLocation').onchange = function() { 
+    aplicarFiltros(); 
+};
 
-carregarEquipamentos();
+document.getElementById('clearFiltersBtn').onclick = function() { 
+    limparFiltros(); 
+};
 
+document.getElementById('exportBtn').onclick = function() { 
+    exportarCSV(); 
+};
+
+document.getElementById('refreshBtn').onclick = function() { 
+    carregarDaPlanilha(); 
+};
+
+document.getElementById('equipSerial').oninput = function() { 
+    verificarDuplicidade(); 
+};
+
+document.querySelectorAll('.sortable').forEach(function(th) {
+    th.addEventListener('click', function() {
+        const field = this.getAttribute('data-field');
+        if (field) mudarOrdenacao(field);
+    });
+});
+
+configurarStatusListener();
+carregarDaPlanilha();
 </script>
-
 </body>
 </html>
