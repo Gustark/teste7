@@ -378,12 +378,6 @@
             background: rgba(59,130,246,0.04);
         }
         
-        .inventory-table th:nth-child(5),
-        .inventory-table td:nth-child(5) {
-            text-align: center;
-            width: 80px;
-        }
-        
         .status-badge {
             display: inline-block;
             padding: 5px 14px;
@@ -764,11 +758,11 @@
             </thead>
             <tbody id="tableBody">
                 <tr class="empty-row">
-                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...<\/td>
-                <\/tr>
-            <\/tbody>
-         <\/table>
-    <\/div>
+                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- PAGINAÇÃO -->
     <div class="pagination-container">
@@ -793,8 +787,8 @@
             <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
         </div>
     </div>
-<\/div>
-<div id="toast" class="toast"><\/div>
+</div>
+<div id="toast" class="toast"></div>
 
 <script>
 // ============================================================
@@ -888,7 +882,9 @@ function verificarDuplicidade() {
         if(saveBtn) saveBtn.disabled = false;
         return;
     }
-    const existe = equipamentos.some(eq => eq.serial === serial);
+    
+    // Verifica duplicidade ignorando o próprio item em edição
+    const existe = equipamentos.some(eq => eq.serial === serial && eq.id !== editingId);
     if (existe) {
         serialInput.classList.add('duplicado');
         if(msgDiv) msgDiv.classList.add('show');
@@ -933,8 +929,8 @@ function ordenarEquipamentos(array) {
         let valB = b[sortField] || '';
         
         if (sortField === 'registro') {
-            valA = new Date(valA) || 0;
-            valB = new Date(valB) || 0;
+            valA = valA ? new Date(valA).getTime() : 0;
+            valB = valB ? new Date(valB).getTime() : 0;
         }
         
         if (typeof valA === 'string') {
@@ -971,21 +967,28 @@ function mudarOrdenacao(campo) {
 }
 
 // ============================================================
-// FILTROS
+// FILTROS - CORRIGIDO
 // ============================================================
 
 function aplicarFiltros() {
-    const busca = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const busca = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
     const statusFiltro = document.getElementById('filterStatusSelect')?.value || 'todos';
     const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
     
     let filtrados = equipamentos.filter(function(eq) {
+        // Garantindo que os campos existem e são strings
+        const nome = (eq.nome || '').toLowerCase();
+        const marca = (eq.marca || '').toLowerCase();
+        const serial = (eq.serial || '').toLowerCase();
+        
         const matchBusca = busca === '' || 
-            (eq.nome || '').toLowerCase().includes(busca) || 
-            (eq.marca || '').toLowerCase().includes(busca) ||
-            (eq.serial || '').toLowerCase().includes(busca);
+            nome.includes(busca) || 
+            marca.includes(busca) ||
+            serial.includes(busca);
+        
         const matchStatus = statusFiltro === 'todos' || eq.status === statusFiltro;
         const matchLocal = localFiltro === 'todos' || eq.localizacao === localFiltro;
+        
         return matchBusca && matchStatus && matchLocal;
     });
     
@@ -1026,9 +1029,9 @@ function renderizarPagina() {
     
     if (itensPagina.length === 0) {
         if (equipamentos.length === 0) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭</td></tr>';
         } else {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros</td></tr>';
         }
         return;
     }
@@ -1110,7 +1113,7 @@ function mudarPagina(pagina) {
 }
 
 // ============================================================
-// CRUD - COMUNICAÇÃO COM PLANILHA
+// CRUD - COMUNICAÇÃO COM PLANILHA (AJUSTADO PARA AS COLUNAS)
 // ============================================================
 
 async function carregarDaPlanilha() {
@@ -1119,23 +1122,43 @@ async function carregarDaPlanilha() {
     mostrarMensagem('Carregando...', 'syncing');
     try {
         const resposta = await fetch(URL_WEB_APP + '?t=' + Date.now());
+        
+        if (!resposta.ok) {
+            throw new Error(`HTTP ${resposta.status}: ${resposta.statusText}`);
+        }
+        
         const dados = await resposta.json();
-        if (dados.status === 'sucesso' && dados.dados) {
-            equipamentos = dados.dados;
-            aplicarFiltros();
+        
+        if (dados && dados.status === 'sucesso' && Array.isArray(dados.dados)) {
+            // Mapeamento correto baseado nas colunas da planilha:
+            // B: Nome/Tipo, C: Marca/Modelo, D: Nº Série, E: Localização, 
+            // F: Status, G: Quantidade, H: Data registro, I: Observações
+            equipamentos = dados.dados.map(function(eq, index) {
+                return {
+                    id: eq.id || eq.ID || (index + 1),
+                    nome: eq.nome || eq.Nome || eq.B || '',
+                    marca: eq.marca || eq.Marca || eq.C || '',
+                    serial: eq.serial || eq.Serial || eq.D || '',
+                    localizacao: eq.localizacao || eq.Localizacao || eq.E || '',
+                    status: eq.status || eq.Status || eq.F || 'Operacional',
+                    quantidade: eq.quantidade || eq.Quantidade || eq.G || 1,
+                    registro: eq.registro || eq.Registro || eq.H || new Date().toISOString(),
+                    observacoes: eq.observacoes || eq.Observacoes || eq.I || ''
+                };
+            });
+            
             document.getElementById('totalCount').innerText = equipamentos.length;
+            aplicarFiltros();
             mostrarMensagem(equipamentos.length + ' equipamentos carregados', 'success');
         } else {
-            equipamentos = [];
-            aplicarFiltros();
-            document.getElementById('totalCount').innerText = '0';
-            mostrarMensagem('Planilha vazia', 'error');
+            throw new Error(dados?.mensagem || 'Formato de dados inválido');
         }
     } catch (erro) {
-        console.error('Erro:', erro);
-        mostrarMensagem('Erro ao carregar', 'error');
+        console.error('Erro detalhado:', erro);
+        mostrarMensagem('Erro ao carregar: ' + erro.message, 'error');
         equipamentos = [];
         aplicarFiltros();
+        document.getElementById('totalCount').innerText = '0';
     }
     carregando = false;
     verificarDuplicidade();
@@ -1143,7 +1166,7 @@ async function carregarDaPlanilha() {
 
 async function excluirDaPlanilha(id) {
     try {
-        const resposta = await fetch(URL_WEB_APP + '?acao=excluir&id=' + id);
+        const resposta = await fetch(URL_WEB_APP + '?acao=excluir&id=' + id + '&t=' + Date.now());
         const resultado = await resposta.json();
         return resultado.status === 'sucesso';
     } catch (erro) {
@@ -1157,28 +1180,33 @@ async function salvarEquipamento() {
     const marca = document.getElementById('equipMarca')?.value.trim();
     const serial = document.getElementById('equipSerial')?.value.trim();
     const localizacao = document.getElementById('equipLocation')?.value;
-    const quantidade = document.getElementById('equipQtd')?.value || '1';
+    const quantidade = parseInt(document.getElementById('equipQtd')?.value) || 1;
     const status = document.getElementById('equipStatus')?.value;
     const observacoes = document.getElementById('equipObservacoes')?.value.trim() || '';
 
-    if (!nome) { alert('Informe o Nome/Tipo'); return; }
-    if (!marca) { alert('Informe a Marca/Modelo'); return; }
-    if (!serial) { alert('Informe o Número de Série'); return; }
-    if (!localizacao) { alert('Selecione a Localização'); return; }
+    // Validações
+    if (!nome) { alert('⚠️ Informe o Nome/Tipo'); return; }
+    if (!marca) { alert('⚠️ Informe a Marca/Modelo'); return; }
+    if (!serial) { alert('⚠️ Informe o Número de Série'); return; }
+    if (!localizacao) { alert('⚠️ Selecione a Localização'); return; }
+    if (quantidade < 1) { alert('⚠️ Quantidade deve ser pelo menos 1'); return; }
     if ((status === 'Manutenção' || status === 'Inativo') && !observacoes) {
         alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!');
         document.getElementById('equipObservacoes').focus();
         return;
     }
-    if (equipamentos.some(eq => eq.serial === serial)) {
+    
+    // Verifica duplicidade (ignorando o próprio item em edição)
+    if (equipamentos.some(eq => eq.serial === serial && eq.id !== editingId)) {
         alert('❌ Este número de série já está cadastrado!');
         return;
     }
 
     mostrarMensagem('Salvando...', 'syncing');
     try {
+        const acao = editingId ? 'editar' : 'salvar';
         const params = new URLSearchParams({ 
-            acao: 'salvar', 
+            acao: acao,
             nome: nome,
             marca: marca,
             serial: serial,
@@ -1188,24 +1216,24 @@ async function salvarEquipamento() {
             observacoes: observacoes,
             registro: new Date().toLocaleString('pt-BR')
         });
+        
+        if (editingId) {
+            params.append('id', editingId);
+        }
+        
         const resposta = await fetch(URL_WEB_APP + '?' + params.toString());
         const resultado = await resposta.json();
+        
         if (resultado.status === 'sucesso') {
-            mostrarMensagem('✅ Salvo com sucesso!', 'success');
-            document.getElementById('equipName').value = '';
-            document.getElementById('equipMarca').value = '';
-            document.getElementById('equipSerial').value = '';
-            document.getElementById('equipLocation').value = '';
-            document.getElementById('equipQtd').value = '1';
-            document.getElementById('equipStatus').value = 'Operacional';
-            document.getElementById('equipObservacoes').value = '';
+            mostrarMensagem(editingId ? '✅ Atualizado com sucesso!' : '✅ Salvo com sucesso!', 'success');
+            resetForm();
             setTimeout(() => carregarDaPlanilha(), 1000);
         } else {
-            throw new Error(resultado.mensagem);
+            throw new Error(resultado.mensagem || 'Erro ao salvar');
         }
     } catch (erro) {
         console.error('Erro:', erro);
-        mostrarMensagem('❌ Erro ao salvar', 'error');
+        mostrarMensagem('❌ Erro ao salvar: ' + erro.message, 'error');
     }
 }
 
@@ -1233,13 +1261,20 @@ function resetForm() {
     document.getElementById('equipStatus').value = 'Operacional';
     document.getElementById('equipObservacoes').value = '';
     editingId = null;
-    document.getElementById('formTitle').innerText = 'Cadastrar Equipamento';
+    document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Cadastrar Equipamento';
     verificarDuplicidade();
+    
+    // Remove destaque das observações
+    const observacoesGroup = document.getElementById('observacoesGroup');
+    const obsObrigatorio = document.getElementById('obsObrigatorio');
+    if (observacoesGroup) observacoesGroup.classList.remove('destaque');
+    if (obsObrigatorio) obsObrigatorio.style.display = 'none';
 }
 
 function editEquipamento(id) {
     const equip = equipamentos.find(eq => eq.id === id);
     if (!equip) return;
+    
     document.getElementById('equipName').value = equip.nome;
     document.getElementById('equipMarca').value = equip.marca || '';
     document.getElementById('equipSerial').value = equip.serial;
@@ -1247,8 +1282,22 @@ function editEquipamento(id) {
     document.getElementById('equipQtd').value = equip.quantidade || 1;
     document.getElementById('equipStatus').value = equip.status;
     document.getElementById('equipObservacoes').value = equip.observacoes || '';
+    editingId = id;
     document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editar Equipamento';
     document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+    
+    // Atualiza o destaque das observações se necessário
+    const statusSelect = document.getElementById('equipStatus');
+    const observacoesGroup = document.getElementById('observacoesGroup');
+    const obsObrigatorio = document.getElementById('obsObrigatorio');
+    if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
+        observacoesGroup.classList.add('destaque');
+        if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
+    } else {
+        observacoesGroup.classList.remove('destaque');
+        if (obsObrigatorio) obsObrigatorio.style.display = 'none';
+    }
+    
     verificarDuplicidade();
 }
 
@@ -1262,29 +1311,62 @@ function exportarCSV() {
     for (let i = 0; i < linhas.length; i++) {
         csv += linhas[i].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',') + '\n';
     }
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'inventario_' + new Date().toISOString().slice(0,10) + '.csv';
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'inventario_' + new Date().toISOString().slice(0,10) + '.csv');
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(link.href);
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     mostrarMensagem('📄 CSV exportado!', 'success');
 }
 
 // ============================================================
-// EVENTOS
+// EVENTOS E INICIALIZAÇÃO
 // ============================================================
 
-document.getElementById('saveBtn').onclick = function(e) { e.preventDefault(); salvarEquipamento(); };
-document.getElementById('cancelBtn').onclick = function(e) { e.preventDefault(); location.reload(); };
-document.getElementById('searchInput').oninput = function() { aplicarFiltros(); };
-document.getElementById('filterStatusSelect').onchange = function() { aplicarFiltros(); };
-document.getElementById('filterLocation').onchange = function() { aplicarFiltros(); };
-document.getElementById('clearFiltersBtn').onclick = function() { limparFiltros(); };
-document.getElementById('exportBtn').onclick = function() { exportarCSV(); };
-document.getElementById('refreshBtn').onclick = function() { carregarDaPlanilha(); };
-document.getElementById('equipSerial').oninput = function() { verificarDuplicidade(); };
+document.getElementById('saveBtn').onclick = function(e) { 
+    e.preventDefault(); 
+    salvarEquipamento(); 
+};
 
+document.getElementById('cancelBtn').onclick = function(e) { 
+    e.preventDefault(); 
+    resetForm(); 
+    mostrarMensagem('Formulário limpo', 'success');
+};
+
+document.getElementById('searchInput').oninput = function() { 
+    aplicarFiltros(); 
+};
+
+document.getElementById('filterStatusSelect').onchange = function() { 
+    aplicarFiltros(); 
+};
+
+document.getElementById('filterLocation').onchange = function() { 
+    aplicarFiltros(); 
+};
+
+document.getElementById('clearFiltersBtn').onclick = function() { 
+    limparFiltros(); 
+};
+
+document.getElementById('exportBtn').onclick = function() { 
+    exportarCSV(); 
+};
+
+document.getElementById('refreshBtn').onclick = function() { 
+    carregarDaPlanilha(); 
+};
+
+document.getElementById('equipSerial').oninput = function() { 
+    verificarDuplicidade(); 
+};
+
+// Configurar ordenação
 document.querySelectorAll('.sortable').forEach(function(th) {
     th.addEventListener('click', function() {
         const field = this.getAttribute('data-field');
@@ -1292,6 +1374,7 @@ document.querySelectorAll('.sortable').forEach(function(th) {
     });
 });
 
+// Inicialização
 configurarStatusListener();
 carregarDaPlanilha();
 </script>
