@@ -8,472 +8,93 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f5f7fa;
-            color: #1e293b;
-            padding: 32px 24px;
-        }
-        
+        body { font-family: 'Inter', sans-serif; background: #f5f7fa; color: #1e293b; padding: 32px 24px; }
         .container { max-width: 1400px; margin: 0 auto; }
         
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 32px;
-            gap: 16px;
-        }
-        
-        .title-section h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        
-        .title-section p {
-            color: #64748b;
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-        
-        .stats-badge {
-            background: white;
-            border-radius: 60px;
-            padding: 10px 20px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 32px; gap: 16px; }
+        .title-section h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #06b6d4); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .title-section p { color: #64748b; font-size: 0.85rem; margin-top: 5px; }
+        .stats-badge { background: white; border-radius: 60px; padding: 10px 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; font-weight: 600; }
         .stats-badge i { color: #3b82f6; }
-        
-        .sync-status {
-            background: white;
-            border-radius: 60px;
-            padding: 10px 20px;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid #e2e8f0;
-        }
-        
+        .sync-status { background: white; border-radius: 60px; padding: 10px 20px; font-size: 0.75rem; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0; }
         .sync-status.syncing { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
         .sync-status.error { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .sync-status.success { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
         
-        .form-card {
-            background: white;
-            border-radius: 20px;
-            padding: 24px 28px;
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .observacoes-group {
-            grid-column: 1 / -1;
-            margin-top: 5px;
-        }
-        
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
-        .input-group label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b;
-        }
-        
-        .input-group label i { margin-right: 4px; }
-        
-        .input-group input, .input-group select, .input-group textarea {
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1.5px solid #e2e8f0;
-            background: white;
-            font-family: 'Inter', monospace;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            resize: vertical;
-        }
-        
-        .input-group textarea {
-            min-height: 80px;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-        }
-        
-        .input-group input.duplicado {
-            border-color: #ef4444;
-            background: #fef2f2;
-        }
-        
-        .observacoes-group.destaque label {
-            color: #dc2626;
-        }
-        
-        .observacoes-group.destaque textarea {
-            border-color: #dc2626;
-            background: #fef2f2;
-        }
-        
-        .mensagem-duplicado {
-            font-size: 0.7rem;
-            color: #ef4444;
-            margin-top: 4px;
-            display: none;
-        }
-        
+        .form-card { background: white; border-radius: 20px; padding: 24px 28px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .observacoes-group { grid-column: 1 / -1; margin-top: 5px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
+        .input-group input, .input-group select, .input-group textarea { padding: 12px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: white; font-size: 0.9rem; transition: all 0.2s; resize: vertical; }
+        .input-group textarea { min-height: 80px; font-family: 'Inter', sans-serif; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .input-group input.duplicado { border-color: #ef4444; background: #fef2f2; }
+        .observacoes-group.destaque label { color: #dc2626; }
+        .observacoes-group.destaque textarea { border-color: #dc2626; background: #fef2f2; }
+        .mensagem-duplicado { font-size: 0.7rem; color: #ef4444; margin-top: 4px; display: none; }
         .mensagem-duplicado.show { display: block; }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            border: none;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-        
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #06b6d4); border: none; padding: 12px 28px; border-radius: 40px; font-weight: 700; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.2s; }
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
         .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
-        
-        .btn-secondary {
-            background: white;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
+        .btn-secondary { background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 40px; font-weight: 500; cursor: pointer; }
         .btn-secondary:hover { background: #f8fafc; border-color: #3b82f6; }
+        .action-buttons { display: flex; gap: 12px; justify-content: flex-end; }
         
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-        
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .filters-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            flex: 1;
-        }
-        
-        .search-box {
-            background: white;
-            border-radius: 48px;
-            padding: 8px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid #e2e8f0;
-            flex: 1;
-            min-width: 200px;
-        }
-        
+        .filter-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .filters-group { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; flex: 1; }
+        .search-box { background: white; border-radius: 48px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; border: 1px solid #e2e8f0; flex: 1; min-width: 200px; }
         .search-box i { color: #64748b; }
-        .search-box input {
-            border: none;
-            padding: 10px 0;
-            width: 100%;
-            font-size: 0.9rem;
-            background: transparent;
-        }
+        .search-box input { border: none; padding: 10px 0; width: 100%; background: transparent; }
         .search-box input:focus { outline: none; }
-        
-        .filter-select {
-            border-radius: 40px;
-            padding: 10px 20px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            font-weight: 500;
-            cursor: pointer;
-            min-width: 150px;
-        }
-        
-        .btn-clear {
-            background: white;
-            border: 1px solid #e2e8f0;
-            color: #64748b;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
+        .filter-select { border-radius: 40px; padding: 10px 20px; border: 1px solid #e2e8f0; background: white; font-weight: 500; cursor: pointer; min-width: 150px; }
+        .btn-clear { background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 8px 20px; border-radius: 40px; cursor: pointer; }
         .btn-clear:hover { background: #f8fafc; color: #1e293b; }
+        .filter-stats { font-size: 0.75rem; color: #64748b; background: white; padding: 6px 14px; border-radius: 40px; border: 1px solid #e2e8f0; }
         
-        .filter-stats {
-            font-size: 0.75rem;
-            color: #64748b;
-            background: white;
-            padding: 6px 14px;
-            border-radius: 40px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .table-wrapper {
-            background: white;
-            border-radius: 20px;
-            overflow-x: auto;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 30px;
-        }
-        
-        .inventory-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 1100px;
-        }
-        
-        .inventory-table th {
-            text-align: left;
-            padding: 16px 16px;
-            background: #f8fafc;
-            font-weight: 700;
-            color: #64748b;
-            border-bottom: 1px solid #e2e8f0;
-            cursor: pointer;
-        }
-        
+        .table-wrapper { background: white; border-radius: 20px; overflow-x: auto; border: 1px solid #e2e8f0; margin-bottom: 30px; }
+        .inventory-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
+        .inventory-table th { text-align: left; padding: 16px; background: #f8fafc; font-weight: 700; color: #64748b; border-bottom: 1px solid #e2e8f0; cursor: pointer; }
         .inventory-table th:hover { color: #3b82f6; }
-        .inventory-table th i { margin-left: 6px; font-size: 0.7rem; opacity: 0.6; }
-        
-        .inventory-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            vertical-align: top;
-        }
-        
+        .inventory-table td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
         .inventory-table tr:hover { background: #f8fafc; }
+        .inventory-table th:nth-child(5), .inventory-table td:nth-child(5) { text-align: center; width: 70px; }
         
-        .inventory-table th:nth-child(5),
-        .inventory-table td:nth-child(5) {
-            text-align: center;
-            width: 70px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
         .status-operacional { background: #d1fae5; color: #059669; }
         .status-manutencao { background: #fed7aa; color: #c2410c; }
         .status-inativo { background: #fee2e2; color: #dc2626; }
         
-        .observacoes-cell {
-            max-width: 250px;
-            font-size: 0.75rem;
-            color: #64748b;
-            white-space: normal;
-            word-break: break-word;
-            line-height: 1.4;
-        }
-        
-        .observacoes-cell i {
-            color: #f59e0b;
-            margin-right: 5px;
-        }
-        
-        .row-actions i {
-            font-size: 1rem;
-            margin: 0 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #64748b;
-        }
-        
+        .observacoes-cell { max-width: 250px; font-size: 0.75rem; color: #64748b; word-break: break-word; line-height: 1.4; }
+        .observacoes-cell i { color: #f59e0b; margin-right: 5px; }
+        .row-actions i { font-size: 1rem; margin: 0 6px; cursor: pointer; color: #64748b; }
         .row-actions i:hover { color: #3b82f6; transform: scale(1.1); }
         .row-actions i:last-child:hover { color: #ef4444; }
-        
         .empty-row td { text-align: center; padding: 60px; color: #64748b; font-style: italic; }
         
-        .pagination-container {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
+        .pagination-container { text-align: center; margin-top: 20px; margin-bottom: 30px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .pagination button { background: white; border: 1px solid #e2e8f0; padding: 8px 14px; border-radius: 40px; cursor: pointer; font-weight: 500; color: #1e293b; }
+        .pagination button:hover:not(:disabled) { background: #3b82f6; border-color: #3b82f6; color: white; }
+        .pagination button.active { background: linear-gradient(135deg, #3b82f6, #06b6d4); border-color: transparent; color: white; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination-info { display: inline-block; margin-top: 16px; font-size: 0.8rem; color: #64748b; background: white; padding: 8px 20px; border-radius: 40px; border: 1px solid #e2e8f0; }
         
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .pagination button {
-            background: white;
-            border: 1px solid #e2e8f0;
-            padding: 8px 14px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            color: #1e293b;
-        }
-        
-        .pagination button:hover:not(:disabled) {
-            background: #3b82f6;
-            border-color: #3b82f6;
-            color: white;
-        }
-        
-        .pagination button.active {
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            border-color: transparent;
-            color: white;
-        }
-        
-        .pagination button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .pagination-info {
-            display: inline-block;
-            margin-top: 16px;
-            font-size: 0.8rem;
-            color: #64748b;
-            background: white;
-            padding: 8px 20px;
-            border-radius: 40px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            padding: 30px 20px 20px;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .footer-divider {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            margin: 0 auto 20px;
-            border-radius: 3px;
-        }
-        
-        .footer-text {
-            color: #64748b;
-            font-size: 0.75rem;
-        }
-        
+        .footer { margin-top: 30px; text-align: center; padding: 30px 20px 20px; border-top: 1px solid #e2e8f0; }
+        .footer-divider { width: 60px; height: 3px; background: linear-gradient(135deg, #3b82f6, #06b6d4); margin: 0 auto 20px; border-radius: 3px; }
+        .footer-text { color: #64748b; font-size: 0.75rem; }
         .footer-text i { color: #3b82f6; margin: 0 4px; }
-        .footer-name {
-            font-weight: 700;
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        
-        .footer-heart {
-            color: #ef4444;
-            animation: pulse 1.5s ease infinite;
-            display: inline-block;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .social-links {
-            margin-top: 12px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .social-links a {
-            color: #64748b;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
+        .footer-name { font-weight: 700; background: linear-gradient(135deg, #3b82f6, #06b6d4); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .footer-heart { color: #ef4444; animation: pulse 1.5s ease infinite; display: inline-block; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .social-links { margin-top: 12px; display: flex; justify-content: center; gap: 20px; }
+        .social-links a { color: #64748b; font-size: 1rem; transition: all 0.3s ease; }
         .social-links a:hover { color: #3b82f6; transform: translateY(-3px); }
         
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-        
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #1e293b; color: white; padding: 12px 24px; border-radius: 40px; font-size: 0.85rem; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
         .toast.show { opacity: 1; }
-        
-        .registro-data {
-            font-family: monospace;
-            font-size: 0.7rem;
-            color: #64748b;
-            white-space: nowrap;
-        }
-        
+        .registro-data { font-family: monospace; font-size: 0.7rem; color: #64748b; white-space: nowrap; }
         .marca-modelo { font-weight: 500; color: #06b6d4; }
         .quantidade-numero { font-weight: 700; font-size: 1rem; }
         
@@ -482,8 +103,7 @@
             .form-card { padding: 16px; }
             .btn-primary { width: 100%; justify-content: center; }
             .filters-group { flex-direction: column; align-items: stretch; }
-            .search-box { width: 100%; }
-            .filter-select { width: 100%; }
+            .search-box, .filter-select { width: 100%; }
             .pagination button { padding: 6px 10px; font-size: 0.7rem; }
         }
     </style>
@@ -496,98 +116,30 @@
             <p>Gestão de equipamentos sincronizada com Google Planilhas</p>
         </div>
         <div style="display: flex; gap: 12px;">
-            <div class="sync-status" id="syncStatus">
-                <i class="fas fa-cloud"></i> <span id="syncText">Carregando...</span>
-            </div>
-            <div class="stats-badge" id="statsBadge">
-                <i class="fas fa-laptop-code"></i>
-                <span id="totalCount">0</span> equipamentos
-            </div>
+            <div class="sync-status" id="syncStatus"><i class="fas fa-cloud"></i> <span id="syncText">Carregando...</span></div>
+            <div class="stats-badge" id="statsBadge"><i class="fas fa-laptop-code"></i> <span id="totalCount">0</span> equipamentos</div>
         </div>
     </div>
 
     <div class="form-card" id="formCard">
         <h3 style="margin-bottom: 20px;"><i class="fas fa-plus-circle" style="color: #3b82f6;"></i> <span id="formTitle">Cadastrar Equipamento</span></h3>
         <div class="form-grid">
-            <div class="input-group">
-                <label><i class="fas fa-tag"></i> Nome / Tipo *</label>
-                <input type="text" id="equipName" placeholder="Ex: Notebook">
-            </div>
-            <div class="input-group">
-                <label><i class="fas fa-industry"></i> Marca / Modelo *</label>
-                <input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron">
-            </div>
-            <div class="input-group">
-                <label><i class="fas fa-barcode"></i> Nº de Série *</label>
-                <input type="text" id="equipSerial" placeholder="SF0000">
-                <div class="mensagem-duplicado" id="msgDuplicado">⚠️ Este número de série já está cadastrado!</div>
-            </div>
-            <div class="input-group">
-                <label><i class="fas fa-map-marker-alt"></i> Localização</label>
-                <select id="equipLocation">
-                    <option value="">Selecione...</option>
-                    <option value="Sala 171">🏢 Sala 171</option>
-                    <option value="Sala 178">🏢 Sala 178</option>
-                    <option value="Estúdio">🎙️ Estúdio</option>
-                    <option value="Grande Auditório">🎪 Grande Auditório</option>
-                    <option value="Plenário">📢 Plenário</option>
-                    <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
-                    <option value="SSC - ADM">📋 SSC - ADM</option>
-                    <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
-                    <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
-                    <option value="17/5">📅 17/5</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label><i class="fas fa-boxes"></i> Quantidade</label>
-                <input type="number" id="equipQtd" value="1" min="1">
-            </div>
-            <div class="input-group">
-                <label><i class="fas fa-chart-line"></i> Status</label>
-                <select id="equipStatus">
-                    <option value="Operacional">🟢 Operacional</option>
-                    <option value="Manutenção">🟡 Manutenção</option>
-                    <option value="Inativo">🔴 Inativo</option>
-                </select>
-            </div>
-            <div class="observacoes-group" id="observacoesGroup">
-                <div class="input-group">
-                    <label><i class="fas fa-pen-alt"></i> Observações <span id="obsObrigatorio" style="display:none; color:#dc2626;">(obrigatório para Manutenção/Inativo)</span></label>
-                    <textarea id="equipObservacoes" rows="2" placeholder="Descreva o problema, motivo da manutenção, etc..."></textarea>
-                </div>
-            </div>
+            <div class="input-group"><label><i class="fas fa-tag"></i> Nome / Tipo *</label><input type="text" id="equipName" placeholder="Ex: Notebook"></div>
+            <div class="input-group"><label><i class="fas fa-industry"></i> Marca / Modelo *</label><input type="text" id="equipMarca" placeholder="Ex: Dell Inspiron"></div>
+            <div class="input-group"><label><i class="fas fa-barcode"></i> Nº de Série *</label><input type="text" id="equipSerial" placeholder="SF0000"><div class="mensagem-duplicado" id="msgDuplicado">⚠️ Este número de série já está cadastrado!</div></div>
+            <div class="input-group"><label><i class="fas fa-map-marker-alt"></i> Localização</label><select id="equipLocation"><option value="">Selecione...</option><option value="Sala 171">🏢 Sala 171</option><option value="Sala 178">🏢 Sala 178</option><option value="Estúdio">🎙️ Estúdio</option><option value="Grande Auditório">🎪 Grande Auditório</option><option value="Plenário">📢 Plenário</option><option value="Sala dos técnicos">🔧 Sala dos técnicos</option><option value="SSC - ADM">📋 SSC - ADM</option><option value="Pequeno Auditório">🎤 Pequeno Auditório</option><option value="Gráfica - Copa">🖨️ Gráfica - Copa</option><option value="17/5">📅 17/5</option></select></div>
+            <div class="input-group"><label><i class="fas fa-boxes"></i> Quantidade</label><input type="number" id="equipQtd" value="1" min="1"></div>
+            <div class="input-group"><label><i class="fas fa-chart-line"></i> Status</label><select id="equipStatus"><option value="Operacional">🟢 Operacional</option><option value="Manutenção">🟡 Manutenção</option><option value="Inativo">🔴 Inativo</option></select></div>
+            <div class="observacoes-group" id="observacoesGroup"><div class="input-group"><label><i class="fas fa-pen-alt"></i> Observações <span id="obsObrigatorio" style="display:none; color:#dc2626;">(obrigatório para Manutenção/Inativo)</span></label><textarea id="equipObservacoes" rows="2" placeholder="Descreva o problema, motivo da manutenção, etc..."></textarea></div></div>
         </div>
-        <div class="action-buttons">
-            <button class="btn-secondary" id="cancelBtn">Cancelar</button>
-            <button class="btn-primary" id="saveBtn">Salvar Equipamento</button>
-        </div>
+        <div class="action-buttons"><button class="btn-secondary" id="cancelBtn">Cancelar</button><button class="btn-primary" id="saveBtn">Salvar Equipamento</button></div>
     </div>
 
     <div class="filter-bar">
         <div class="filters-group">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Buscar por nome, marca, série...">
-            </div>
-            <select id="filterLocation" class="filter-select">
-                <option value="todos">📍 Todas localizações</option>
-                <option value="Sala 171">🏢 Sala 171</option>
-                <option value="Sala 178">🏢 Sala 178</option>
-                <option value="Estúdio">🎙️ Estúdio</option>
-                <option value="Grande Auditório">🎪 Grande Auditório</option>
-                <option value="Plenário">📢 Plenário</option>
-                <option value="Sala dos técnicos">🔧 Sala dos técnicos</option>
-                <option value="SSC - ADM">📋 SSC - ADM</option>
-                <option value="Pequeno Auditório">🎤 Pequeno Auditório</option>
-                <option value="Gráfica - Copa">🖨️ Gráfica - Copa</option>
-                <option value="17/5">📅 17/5</option>
-            </select>
-            <select id="filterStatusSelect" class="filter-select">
-                <option value="todos">📋 Todos os status</option>
-                <option value="Operacional">✅ Operacional</option>
-                <option value="Manutenção">⚠️ Manutenção</option>
-                <option value="Inativo">❌ Inativo</option>
-            </select>
+            <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Buscar por nome, marca, série..."></div>
+            <select id="filterLocation" class="filter-select"><option value="todos">📍 Todas localizações</option><option value="Sala 171">🏢 Sala 171</option><option value="Sala 178">🏢 Sala 178</option><option value="Estúdio">🎙️ Estúdio</option><option value="Grande Auditório">🎪 Grande Auditório</option><option value="Plenário">📢 Plenário</option><option value="Sala dos técnicos">🔧 Sala dos técnicos</option><option value="SSC - ADM">📋 SSC - ADM</option><option value="Pequeno Auditório">🎤 Pequeno Auditório</option><option value="Gráfica - Copa">🖨️ Gráfica - Copa</option><option value="17/5">📅 17/5</option></select>
+            <select id="filterStatusSelect" class="filter-select"><option value="todos">📋 Todos os status</option><option value="Operacional">✅ Operacional</option><option value="Manutenção">⚠️ Manutenção</option><option value="Inativo">❌ Inativo</option></select>
             <button id="clearFiltersBtn" class="btn-clear">Limpar Filtros</button>
             <button id="exportBtn" class="btn-clear"><i class="fas fa-file-csv"></i> Exportar CSV</button>
             <button id="refreshBtn" class="btn-clear"><i class="fas fa-sync-alt"></i> Atualizar</button>
@@ -597,25 +149,9 @@
 
     <div class="table-wrapper">
         <table class="inventory-table">
-            <thead>
-                <tr>
-                    <th>Nome / Tipo</th>
-                    <th>Marca / Modelo</th>
-                    <th>Nº Série</th>
-                    <th>Localização</th>
-                    <th>Qtd</th>
-                    <th>Status</th>
-                    <th>Observações</th>
-                    <th>Data Registro</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr class="empty-row">
-                    <td colspan="9" style="text-align:center; padding:60px;">Carregando equipamentos...<\/td>
-                <\/tr>
-            <\/tbody>
-         <\/table>
+            <thead><tr><th>Nome / Tipo</th><th>Marca / Modelo</th><th>Nº Série</th><th>Localização</th><th>Qtd</th><th>Status</th><th>Observações</th><th>Data Registro</th><th>Ações</th></tr></thead>
+            <tbody id="tableBody"><tr class="empty-row"><td colspan="9">Carregando equipamentos...<\/td><\/tr><\/tbody>
+        <\/table>
     <\/div>
 
     <div class="pagination-container">
@@ -625,19 +161,8 @@
 
     <div class="footer">
         <div class="footer-divider"></div>
-        <div class="footer-text">
-            <i class="fas fa-code"></i> Desenvolvido por 
-            <span class="footer-name">Gustavo Hugo</span>
-            <i class="fas fa-heart footer-heart"></i>
-        </div>
-        <div class="footer-text" style="margin-top: 8px;">
-            <i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas
-        </div>
-        <div class="social-links">
-            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-        </div>
+        <div class="footer-text"><i class="fas fa-code"></i> Desenvolvido por <span class="footer-name">Gustavo Hugo</span> <i class="fas fa-heart footer-heart"></i></div>
+        <div class="footer-text" style="margin-top: 8px;"><i class="fas fa-cloud-upload-alt"></i> Sincronizado com Google Planilhas</div>
     </div>
 <\/div>
 <div id="toast" class="toast"><\/div>
@@ -645,23 +170,15 @@
 <script>
     const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbznu4Ei-U1yIMU-ylc8WOCDiOHaB75COdIQQrBFBQgYfkbTZTFISWk-IkPHNJyPryUfDg/exec";
     
-    let equipamentos = [];
-    let equipamentosFiltrados = [];
-    let editingId = null;
-    let carregando = false;
-    let paginaAtual = 1;
-    let ITENS_POR_PAGINA = 10;
+    let equipamentos = [], equipamentosFiltrados = [], editingId = null, carregando = false, paginaAtual = 1, ITENS_POR_PAGINA = 10;
 
     function configurarStatusListener() {
         const statusSelect = document.getElementById('equipStatus');
         const observacoesGroup = document.getElementById('observacoesGroup');
         const obsObrigatorio = document.getElementById('obsObrigatorio');
-        
         if (!statusSelect) return;
-        
-        function atualizarDestaqueObservacoes() {
-            const status = statusSelect.value;
-            if (status === 'Manutenção' || status === 'Inativo') {
+        function atualizar() {
+            if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
                 observacoesGroup.classList.add('destaque');
                 if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
             } else {
@@ -669,18 +186,13 @@
                 if (obsObrigatorio) obsObrigatorio.style.display = 'none';
             }
         }
-        
-        statusSelect.addEventListener('change', atualizarDestaqueObservacoes);
-        atualizarDestaqueObservacoes();
+        statusSelect.addEventListener('change', atualizar);
+        atualizar();
     }
 
     function mostrarMensagem(texto, tipo) {
         const toast = document.getElementById('toast');
-        if (toast) {
-            toast.textContent = texto;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
-        }
+        if (toast) { toast.textContent = texto; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2500); }
         const statusText = document.getElementById('syncText');
         const statusDiv = document.getElementById('syncStatus');
         if (statusText && statusDiv) {
@@ -694,17 +206,10 @@
 
     function formatarData(dataString) {
         if (!dataString) return 'Não registrado';
-        try {
-            const data = new Date(dataString);
-            if (isNaN(data.getTime())) return dataString;
-            return data.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        } catch(e) { return dataString; }
+        try { const data = new Date(dataString); if (isNaN(data.getTime())) return dataString; return data.toLocaleString('pt-BR'); } catch(e) { return dataString; }
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
-    }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m)); }
 
     function verificarDuplicidade() {
         const serialInput = document.getElementById('equipSerial');
@@ -734,26 +239,14 @@
         const busca = (document.getElementById('searchInput')?.value || '').toLowerCase();
         const statusFiltro = document.getElementById('filterStatusSelect')?.value || 'todos';
         const localFiltro = document.getElementById('filterLocation')?.value || 'todos';
-        
         equipamentosFiltrados = equipamentos.filter(eq => {
-            const matchBusca = busca === '' || 
-                (eq.nome || '').toLowerCase().includes(busca) ||
-                (eq.marca || '').toLowerCase().includes(busca) ||
-                (eq.serial || '').toLowerCase().includes(busca);
+            const matchBusca = busca === '' || (eq.nome || '').toLowerCase().includes(busca) || (eq.marca || '').toLowerCase().includes(busca) || (eq.serial || '').toLowerCase().includes(busca);
             const matchStatus = statusFiltro === 'todos' || eq.status === statusFiltro;
             const matchLocal = localFiltro === 'todos' || eq.localizacao === localFiltro;
             return matchBusca && matchStatus && matchLocal;
         });
-        
         const statsDiv = document.getElementById('filterStats');
-        if (statsDiv) {
-            if (equipamentosFiltrados.length !== equipamentos.length) {
-                statsDiv.innerHTML = `🎯 Mostrando ${equipamentosFiltrados.length} de ${equipamentos.length} equipamentos`;
-            } else {
-                statsDiv.innerHTML = `📊 Total: ${equipamentos.length} equipamentos`;
-            }
-        }
-        
+        if (statsDiv) statsDiv.innerHTML = equipamentosFiltrados.length !== equipamentos.length ? `🎯 Mostrando ${equipamentosFiltrados.length} de ${equipamentos.length} equipamentos` : `📊 Total: ${equipamentos.length} equipamentos`;
         paginaAtual = 1;
         renderizarPagina();
         atualizarPaginacao();
@@ -763,66 +256,33 @@
         const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
         const fim = inicio + ITENS_POR_PAGINA;
         const itensPagina = equipamentosFiltrados.slice(inicio, fim);
-        
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
-        
         if (itensPagina.length === 0) {
-            if (equipamentos.length === 0) {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>';
-            } else {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>';
-            }
+            tbody.innerHTML = equipamentos.length === 0 ? '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento cadastrado. Cadastre o primeiro! 📭<\/td><\/tr>' : '<tr class="empty-row"><td colspan="9">📭 Nenhum equipamento corresponde aos filtros<\/td><\/tr>';
             return;
         }
-        
         let html = '';
         for (let eq of itensPagina) {
             let statusClass = eq.status === 'Operacional' ? 'status-operacional' : (eq.status === 'Manutenção' ? 'status-manutencao' : 'status-inativo');
             let observacoesHtml = eq.observacoes ? `<i class="fas fa-comment-dots"></i> ${escapeHtml(eq.observacoes).substring(0, 80)}${escapeHtml(eq.observacoes).length > 80 ? '...' : ''}` : '<span style="color:#cbd5e1;"><i class="far fa-comment"></i> Sem observações</span>';
-            
-            html += `<tr>
-                <td><strong>${escapeHtml(eq.nome)}</strong></td>
-                <td><span class="marca-modelo">${escapeHtml(eq.marca || '-')}</span></td>
-                <td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}</code></td>
-                <td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ${escapeHtml(eq.localizacao || '-')}</td>
-                <td style="text-align:center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || '1')}</span></td>
-                <td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}</span></td>
-                <td class="observacoes-cell">${observacoesHtml}</td>
-                <td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}</td>
-                <td class="row-actions">
-                    <i class="fas fa-edit" onclick="editEquipamento(${eq.id})"></i>
-                    <i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})"></i>
-                </td>
-            </tr>`;
+            html += `<tr><td><strong>${escapeHtml(eq.nome)}</strong></td><td><span class="marca-modelo">${escapeHtml(eq.marca || '-')}</span></td><td><code style="background:#eff6ff; padding:4px 8px; border-radius:8px;">${escapeHtml(eq.serial)}</code></td><td><i class="fas fa-location-dot" style="color:#06b6d4;"></i> ${escapeHtml(eq.localizacao || '-')}</td><td style="text-align:center;"><span class="quantidade-numero">${escapeHtml(eq.quantidade || '1')}</span></td><td><span class="status-badge ${statusClass}">${escapeHtml(eq.status)}</span></td><td class="observacoes-cell">${observacoesHtml}</td><td class="registro-data"><i class="far fa-calendar-alt"></i> ${formatarData(eq.registro)}</td><td class="row-actions"><i class="fas fa-edit" onclick="editEquipamento(${eq.id})"></i><i class="fas fa-trash-alt" onclick="excluirEquipamento(${eq.id})"></i></td></tr>`;
         }
         tbody.innerHTML = html;
-        
         const total = equipamentosFiltrados.length;
-        const inicioMostrar = inicio + 1;
-        const fimMostrar = Math.min(fim, total);
         const infoDiv = document.getElementById('paginationInfo');
-        if (infoDiv && total > 0) {
-            infoDiv.innerHTML = `📄 Mostrando ${inicioMostrar} - ${fimMostrar} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
-        } else if (infoDiv) {
-            infoDiv.innerHTML = '';
-        }
+        if (infoDiv && total > 0) infoDiv.innerHTML = `📄 Mostrando ${inicio + 1} - ${Math.min(fim, total)} de ${total} equipamentos | Página ${paginaAtual} de ${Math.ceil(total / ITENS_POR_PAGINA)}`;
+        else if (infoDiv) infoDiv.innerHTML = '';
     }
 
     function atualizarPaginacao() {
         const totalPaginas = Math.ceil(equipamentosFiltrados.length / ITENS_POR_PAGINA);
         const paginationDiv = document.getElementById('pagination');
         if (!paginationDiv) return;
-        
-        if (totalPaginas <= 1) {
-            paginationDiv.innerHTML = '';
-            return;
-        }
-        
+        if (totalPaginas <= 1) { paginationDiv.innerHTML = ''; return; }
         let html = '';
         html += `<button onclick="mudarPagina(1)" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
         html += `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Anterior</button>`;
-        
         for (let i = 1; i <= totalPaginas; i++) {
             if (i === 1 || i === totalPaginas || (i >= paginaAtual - 2 && i <= paginaAtual + 2)) {
                 html += `<button onclick="mudarPagina(${i})" class="${i === paginaAtual ? 'active' : ''}">${i}</button>`;
@@ -830,10 +290,8 @@
                 html += `<button disabled>...</button>`;
             }
         }
-        
         html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próximo <i class="fas fa-chevron-right"></i></button>`;
         html += `<button onclick="mudarPagina(${totalPaginas})" ${paginaAtual === totalPaginas ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
-        
         paginationDiv.innerHTML = html;
     }
 
@@ -886,12 +344,8 @@
         try {
             const resposta = await fetch(`${URL_WEB_APP}?acao=excluir&id=${id}`);
             const resultado = await resposta.json();
-            console.log('Resposta exclusão:', resultado);
             return resultado.status === 'sucesso';
-        } catch (erro) { 
-            console.error('Erro na exclusão:', erro);
-            return false; 
-        }
+        } catch (erro) { return false; }
     }
 
     async function salvarEquipamento() {
@@ -907,31 +361,16 @@
         if (!marca) { alert('Informe a Marca/Modelo'); return; }
         if (!serial) { alert('Informe o Número de Série'); return; }
         if (!localizacao) { alert('Selecione a Localização'); return; }
-        
         if ((status === 'Manutenção' || status === 'Inativo') && !observacoes) {
-            alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!\n\nDescreva o problema ou motivo.');
+            alert('⚠️ Para equipamentos em Manutenção ou Inativos, é obrigatório preencher as Observações!');
             document.getElementById('equipObservacoes').focus();
             return;
         }
-        
-        if (equipamentos.some(eq => eq.serial === serial)) {
-            alert('❌ Este número de série já está cadastrado!');
-            return;
-        }
+        if (equipamentos.some(eq => eq.serial === serial)) { alert('❌ Este número de série já está cadastrado!'); return; }
 
         mostrarMensagem('Salvando...', 'syncing');
         try {
-            const params = new URLSearchParams({ 
-                acao: 'salvar', 
-                nome: nome,
-                marca: marca,
-                serial: serial,
-                localizacao: localizacao,
-                quantidade: quantidade,
-                status: status,
-                observacoes: observacoes,
-                registro: new Date().toLocaleString('pt-BR')
-            });
+            const params = new URLSearchParams({ acao: 'salvar', nome, marca, serial, localizacao, quantidade, status, observacoes, registro: new Date().toLocaleString('pt-BR') });
             const resposta = await fetch(`${URL_WEB_APP}?${params.toString()}`);
             const resultado = await resposta.json();
             if (resultado.status === 'sucesso') {
@@ -944,31 +383,20 @@
                 document.getElementById('equipStatus').value = 'Operacional';
                 document.getElementById('equipObservacoes').value = '';
                 setTimeout(() => carregarDaPlanilha(), 1000);
-            } else {
-                throw new Error(resultado.mensagem);
-            }
-        } catch (erro) {
-            console.error('Erro:', erro);
-            mostrarMensagem('❌ Erro ao salvar', 'error');
-        }
+            } else { throw new Error(resultado.mensagem); }
+        } catch (erro) { mostrarMensagem('❌ Erro ao salvar', 'error'); }
     }
 
     async function excluirEquipamento(id) {
         const equip = equipamentos.find(eq => eq.id === id);
         if (!equip) return;
-        let msg = `Excluir "${equip.nome}" - ${equip.marca}?\n\nNº Série: ${equip.serial}`;
-        if (equip.observacoes) msg += `\n\nObservações: ${equip.observacoes}`;
-        msg += `\n\nEsta ação não pode ser desfeita.`;
-        
-        if (confirm(msg)) {
+        if (confirm(`Excluir "${equip.nome}" - ${equip.marca}?\n\nNº Série: ${equip.serial}\n\nEsta ação não pode ser desfeita.`)) {
             mostrarMensagem('Excluindo...', 'syncing');
             const ok = await excluirDaPlanilha(id);
             if (ok) {
                 mostrarMensagem('🗑️ Equipamento excluído!', 'success');
                 setTimeout(() => carregarDaPlanilha(), 500);
-            } else {
-                mostrarMensagem('❌ Erro ao excluir', 'error');
-            }
+            } else { mostrarMensagem('❌ Erro ao excluir', 'error'); }
         }
     }
 
@@ -984,17 +412,7 @@
         document.getElementById('equipObservacoes').value = equip.observacoes || '';
         document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen-alt"></i> Editando (salvar criará novo)';
         document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-        
-        const statusSelect = document.getElementById('equipStatus');
-        const observacoesGroup = document.getElementById('observacoesGroup');
-        const obsObrigatorio = document.getElementById('obsObrigatorio');
-        if (statusSelect.value === 'Manutenção' || statusSelect.value === 'Inativo') {
-            observacoesGroup.classList.add('destaque');
-            if (obsObrigatorio) obsObrigatorio.style.display = 'inline';
-        } else {
-            observacoesGroup.classList.remove('destaque');
-            if (obsObrigatorio) obsObrigatorio.style.display = 'none';
-        }
+        configurarStatusListener();
     }
 
     function exportarCSV() {
@@ -1011,7 +429,6 @@
         mostrarMensagem('📄 CSV exportado!', 'success');
     }
 
-    // Eventos
     document.getElementById('saveBtn').onclick = (e) => { e.preventDefault(); salvarEquipamento(); };
     document.getElementById('cancelBtn').onclick = (e) => { e.preventDefault(); location.reload(); };
     document.getElementById('searchInput').oninput = () => aplicarFiltros();
@@ -1021,7 +438,7 @@
     document.getElementById('exportBtn').onclick = () => exportarCSV();
     document.getElementById('refreshBtn').onclick = () => carregarDaPlanilha();
     document.getElementById('equipSerial').oninput = () => verificarDuplicidade();
-    
+
     configurarStatusListener();
     carregarDaPlanilha();
 </script>
